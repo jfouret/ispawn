@@ -1,0 +1,38 @@
+#!/bin/bash
+
+echo "Log ENTRYPOINT" > /log.out 2> log.err
+
+# Create user with specified UID and GID
+if ! id -u $USERNAME > /dev/null 2>&1; then
+    groupadd -g $GID $USERNAME
+    useradd -m -s /bin/bash -u $UID -g $USERNAME $USERNAME >> /log.out 2>> log.err
+    echo "$USERNAME:$PASSWORD" | chpasswd >> /log.out 2>> log.err
+    echo "$USERNAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USERNAME
+fi
+
+# Start services
+{% if 'rstudio' == service %}
+if [ -n "$(which rstudio-server)" ]; then
+    echo "auth-required-user-group=$USERNAME" >> /etc/rstudio/rserver.conf
+    service rstudio-server start >> /log.out 2>> log.err
+fi
+{% endif %}
+
+{% if 'jupyter' == service %}
+if [ -n "$(which jupyter)" ]; then
+    nohup jupyter notebook --no-browser --ip=0.0.0.0 --port=8888 --NotebookApp.token="$PASSWORD"  >> /log.out 2>> log.err &
+fi
+{% endif %}
+
+echo "Server running with the following credentials:" >> /log.out 2>> log.err
+echo "Username: $USERNAME" >> /log.out 2>> log.err
+echo "Password: $PASSWORD" >> /log.out 2>> log.err
+{% if 'rstudio' == service %}
+echo "RStudio Server: http://127.0.0.1:8787" >> /log.out 2>> log.err
+{% endif %}
+{% if 'jupyter' == service %}
+echo "Jupyter Notebook: http://127.0.0.1:8888" >> /log.out 2>> log.err
+{% endif %}
+
+# Keep the container running
+exec "$@"
