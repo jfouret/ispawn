@@ -20,7 +20,7 @@ fi
 
 {% if 'jupyter' == service %}
 if [ -n "$(which jupyter)" ]; then
-    nohup jupyter notebook --no-browser --ip=0.0.0.0 --port=8888 --NotebookApp.token="$PASSWORD"  >> /log.out 2>> log.err &
+    nohup su - $USERNAME -c "jupyter notebook --no-browser --ip=0.0.0.0 --port=8888 --NotebookApp.token='$PASSWORD' --notebook-dir=/home/$USERNAME" &
 fi
 {% endif %}
 
