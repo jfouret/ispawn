@@ -35,6 +35,7 @@ def main():
   run_parser.add_argument('--password', required=True, help='Password for the user in the Docker container')
   run_parser.add_argument('--uid', type=int, default=None, help='User ID for the Docker container (default: UID of current user)')
   run_parser.add_argument('--gid', type=int, default=None, help='Group ID for the Docker container (default: GID of current user)')
+  run_parser.add_argument('--dns', default="8.8.8.8,8.8.4.4", help='Comma-separated list of dns servers to use (default: 8.8.8.8,8.8.4.4)')
   run_parser.add_argument('--volumes', default=None, help='Comma-separated list of volumes to mount (default: user home)')
   run_parser.add_argument('--mount-prefix', default='/host', help='Prefix for volume mounts inside the container (default: /host)')
   run_parser.add_argument('--force', action='store_true', help='Force stopping and removal of an existing container if it exists')

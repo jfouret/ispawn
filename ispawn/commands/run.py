@@ -75,9 +75,11 @@ def run_container(args):
       '-e', f'GID={gid}',
   ])
 
+  for dns in args.dns.split(","):
+     docker_command.extend(['--dns', dns])
+
   docker_command.append(target)
   docker_command.append("sleep infinity")
-
 
   # Run the Docker container
   exit_code, output = command_runner(" ".join(docker_command), live_output=True)

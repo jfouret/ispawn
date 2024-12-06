@@ -1,7 +1,11 @@
 FROM {{image}}
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
-    apt install -y wget sudo {{ 'python3-pip' if 'jupyter' in services else '' }}
+    apt install -y wget locales sudo {{ 'python3-pip' if 'jupyter' in services else '' }} \
+    && rm -rf /var/lib/apt/lists/* \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+ENV LANG en_US.utf8
 
 # Install RStudio Server if requested
 {% if 'rstudio' == service %}
