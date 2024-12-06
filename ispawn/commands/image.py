@@ -59,10 +59,10 @@ def list_images(args):
 
 def remove_images(args):
   if args.all:
-    images = get_docker_images()
+    images = get_docker_images(args)
   else:
     images = args.image_names
 
   for image in images:
-    subprocess.run(['docker', 'rmi', image], check=True)
-    print(f"Removed image '{image}'.")
+    subprocess.run(['docker', 'rmi', '-f', image["ID"]], check=True)
+    print(f"Removed image '{image["Repository"]}:{image["Tag"]}'.")
