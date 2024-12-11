@@ -36,9 +36,8 @@ Access services at:
    - Username: jfouret
    - Password: ZHZjILbD
 ---
- - jupyter: http://jupyter-test.ispawn.localhost
-   - Token: ZHZjILbD
+ - jupyter: https://jupyter-test.ispawn.localhost?token=ZHZjILbD
 ---
- - vscode: http://vscode-test.ispawn.localhost?tkn=ZHZjILbD
+ - vscode: https://vscode-test.ispawn.localhost?tkn=ZHZjILbD
 ---
 ```

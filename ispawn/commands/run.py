@@ -128,9 +128,8 @@ def run_container(args):
       print(f"   - Username: {username}")
       print(f"   - Password: {password}")
     elif service == "vscode":
-      print(f" - {service}: http://{service}-{args.name}.{domain}?tkn={password}")
+      print(f" - {service}: https://{service}-{args.name}.{domain}?tkn={password}")
     elif service == "jupyter":
-      print(f" - {service}: http://{service}-{args.name}.{domain}")
-      print(f"   - Token: {password}")
+      print(f" - {service}: https://{service}-{args.name}.{domain}?token={password}")
     print("---")
   
