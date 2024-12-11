@@ -5,10 +5,34 @@ import getpass
 from ispawn.utils import *
 from command_runner import command_runner
 from pathlib import Path
+import yaml
+import random
+import string
+
+def generate_labels(service, name, domain, container_name):
+  if service == 'rstudio':
+    port = 8787
+  elif service == 'jupyter':
+    port = 8888
+  elif service == 'vscode':
+    port = 8842
+  else:
+    raise ValueError(f'Unknown service: {service}')
+  return [
+    "--label", f"traefik.http.services.{container_name}-{service}.loadbalancer.server.port={port}",
+    "--label", f"traefik.http.routers.{container_name}-{service}-https.rule=Host(`{service}-{name}.{domain}`)",
+    "--label", f"traefik.http.routers.{container_name}-{service}-https.service={container_name}-{service}",
+    "--label", f"traefik.http.routers.{container_name}-{service}-https.tls=true",
+    "--label", f"traefik.http.routers.{container_name}-{service}-http.rule=Host(`{service}-{name}.{domain}`)",
+    "--label", f"traefik.http.routers.{container_name}-{service}-http.entrypoints=web",
+    "--label", f"traefik.http.routers.{container_name}-{service}-http.middlewares=redirect-to-https@docker"
+  ]
 
 def run_container(args):
   # Setup
   username = args.username if args.username else getpass.getuser()
+  ## get password or generate 8 chars password
+  password = args.password if args.password else ''.join(random.choices(string.ascii_letters + string.digits, k=8))
   uid = args.uid if args.uid else os.getuid()
   gid = args.gid if args.gid else os.getgid()
   container_name = f"{args.name_prefix}-{args.name}"
@@ -17,13 +41,8 @@ def run_container(args):
   services = args.services.split(',')
   services = [service.strip() for service in services]
 
-  if len(services) != 1:
-    print("One and Only One service required for running", file=sys.stderr)
-    sys.exit(1)
-
-  service = services[0]
   images = get_docker_images(args)
-  target = get_image_target(args, service)
+  target = get_image_target(args, services)
 
   if target not in [ im["Repository"] + ":" + im["Tag"] for im in images]:
     print(f"Image '{target}' not found. Please build the image first using 'ispawn image build'.")
@@ -41,16 +60,28 @@ def run_container(args):
           print(f"Use --force to stop and remove the existing container.")
           return
 
+  config = yaml.safe_load(open("/etc/ispawn/config.yml"))
+
   # Prepare docker run command
   docker_command = [
       'docker', 'run', '-d',
       '--name', container_name,
+      '--network', config["name"]
   ]
 
-  if 'rstudio' in services:
-      docker_command.extend(['-p', f"{args.rstudio_port}:8787"])
-  if 'jupyter' in services:
-      docker_command.extend(['-p', f"{args.jupyter_port}:8888"])
+  docker_command.extend([  
+    '--label',
+    'traefik.enable=true',  
+    '--label',
+    'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'  
+  ])
+
+  domain = config["web"]["domain"]
+
+  for service in services:
+    docker_command.extend(
+      generate_labels(service, args.name, domain, container_name)
+    )
 
   # Handle volume mounts
   if not args.volumes:
@@ -70,7 +101,7 @@ def run_container(args):
   # Pass environment variables for user setup
   docker_command.extend([
       '-e', f'USERNAME={username}',
-      '-e', f'PASSWORD={args.password}',
+      '-e', f'PASSWORD={password}',
       '-e', f'UID={uid}',
       '-e', f'GID={gid}',
   ])
@@ -82,6 +113,7 @@ def run_container(args):
   docker_command.append("sleep infinity")
 
   # Run the Docker container
+  print("Running Docker container...")
   exit_code, output = command_runner(" ".join(docker_command), live_output=True)
   if exit_code != 0:
     print("An error occurred while running the Docker image.")
@@ -89,7 +121,15 @@ def run_container(args):
 
   print(f"Docker container '{container_name}' is running.")
   print(f"Access services at:")
-  if 'rstudio' in services:
-      print(f" - RStudio Server: http://127.0.0.1:{args.rstudio_port}")
-  if 'jupyter' in services:
-      print(f" - Jupyter Notebook: http://127.0.0.1:{args.jupyter_port}")
+  for service in services:
+    if service == "rstudio":
+      print(f" - {service}: https://{service}-{args.name}.{domain}")
+      print(f"   - Username: {username}")
+      print(f"   - Password: {password}")
+      print("---")
+    elif service == "vscode":
+      print(f" - {service}: http://{service}-{args.name}.{domain}?tkn={password}")
+    elif service == "jupyter":
+      print(f" - {service}: http://{service}-{args.name}.{domain}")
+      print(f"   - Token: {password}")
+  

@@ -1,1 +1,2 @@
 include ispawn/templates/*.j2
+include ispawn/files/*

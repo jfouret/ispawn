@@ -1,0 +1,27 @@
+services:
+  traefik:
+    image: traefik:v3.2.2
+    container_name: {{name}}-traefik
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "/etc/ispawn/shared_providers_dynamic.yml:/etc/traefik/shared_providers_dynamic.yml:ro"
+      - "/etc/ispawn/traefik.yml:/traefik.yml:ro"
+      - {{web.cert_path}}:/certs/cert.pem:ro
+      - {{web.key_path}}:/certs/key.pem:ro
+    networks:
+      - {{name}}
+    environment:
+      - "NO_PROXY={{subnet}}"
+      - "no_proxy={{subnet}}"
+networks:
+  {{name}}:
+    name: {{name}}
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: {{subnet}}

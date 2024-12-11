@@ -38,9 +38,10 @@ def get_running_containers(args):
           })
   return containers
 
-def get_image_target(args, service):
+def get_image_target(args, services):
+  service_tag = "-".join(services)
   target = args.image.split(":")
   if len(target) > 1: 
-    return(f"{args.name_prefix}-{target[0]}:{target[1]}-{service}")
+    return(f"{args.name_prefix}-{target[0]}:{target[1]}-{service_tag}")
   else:
-    return(f"{args.name_prefix}-{target[0]}:{service}")
+    return(f"{args.name_prefix}-{target[0]}:latest-{service_tag}")

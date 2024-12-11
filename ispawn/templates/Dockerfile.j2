@@ -5,10 +5,20 @@ RUN apt update && \
     && rm -rf /var/lib/apt/lists/* \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
-ENV LANG en_US.utf8
+ENV LANG=en_US.utf8
+
+{% if 'env_file' in config %}
+COPY {{ config['env_file'] }} /tmp/env_file
+RUN cat /tmp/env_file >> /etc/environment && rm /tmp/env_file
+{% endif %}
+
+{% if 'setup_file' in config %}
+COPY {{ config['setup_file'] }} /tmp/setup
+RUN chmod +x /tmp/setup.sh && /tmp/setup && rm /tmp/setup
+{% endif %}
 
 # Install RStudio Server if requested
-{% if 'rstudio' == service %}
+{% if 'rstudio' in services %}
 RUN if [ -z "$(which rstudio-server)" ]; then \
         apt update && apt install -y gdebi-core libssl-dev libcurl4-gnutls-dev libxml2-dev; \
         . /etc/os-release; \
@@ -21,23 +31,30 @@ RUN if [ -z "$(which rstudio-server)" ]; then \
 # Configure RStudio Server
 RUN echo "" >> $(Rscript -e 'cat(R.home())')/etc/Renviron.site \
   && cat /etc/environment >> $(Rscript -e 'cat(R.home())')/etc/Renviron.site
+
+EXPOSE 8787
 {% endif %}
 
 # Install Jupyter Notebook if requested
-{% if 'jupyter' == service %}
+{% if 'jupyter' in services %}
 RUN pip3 install notebook
+EXPOSE 8888
+{% endif %}
+
+# Install Open VS Code is requested
+{% if 'vscode' in services %}
+RUN apt-get update && apt-get install -y wget tar gzip \
+    && wget https://github.com/gitpod-io/openvscode-server/releases/download/openvscode-server-v1.95.2/openvscode-server-v1.95.2-linux-x64.tar.gz \ 
+    && tar -xzf openvscode-server-v1.95.2-linux-x64.tar.gz \
+    && rm openvscode-server-v1.95.2-linux-x64.tar.gz \
+    && mv openvscode-server-v1.95.2-linux-x64 /opt/openvscode-server \
+    && rm -rf /var/lib/apt/lists/*
+EXPOSE 8842
 {% endif %}
 
 # Create the entrypoint script
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
-{% if 'rstudio' == service %}
-EXPOSE 8787
-{% endif %}
-{% if 'jupyter' == service %}
-EXPOSE 8888
-{% endif %}
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD []
