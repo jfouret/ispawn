@@ -121,15 +121,16 @@ def run_container(args):
 
   print(f"Docker container '{container_name}' is running.")
   print(f"Access services at:")
+  print("---")
   for service in services:
     if service == "rstudio":
       print(f" - {service}: https://{service}-{args.name}.{domain}")
       print(f"   - Username: {username}")
       print(f"   - Password: {password}")
-      print("---")
     elif service == "vscode":
       print(f" - {service}: http://{service}-{args.name}.{domain}?tkn={password}")
     elif service == "jupyter":
       print(f" - {service}: http://{service}-{args.name}.{domain}")
       print(f"   - Token: {password}")
+    print("---")
   
