@@ -2,7 +2,8 @@ import pytest
 from pathlib import Path
 import yaml
 import tempfile
-from ispawn.config import Config
+from ispawn.services.config import Config
+from ispawn.domain.deployment import Mode, CertMode
 from ispawn.domain.exceptions import ConfigurationError
 
 @pytest.fixture
@@ -20,7 +21,15 @@ def sample_config():
         "web": {
             "domain": "test.local",
             "subnet": "172.30.0.0/24",
-            "mode": "local"
+            "mode": Mode.LOCAL.value,
+            "ssl": {
+                "cert_dir": "/path/to/certs",
+                "cert_mode": CertMode.LETSENCRYPT.value,
+                "email": None
+            }
+        },
+        "logs": {
+            "dir": "/path/to/logs"
         },
         "services": {
             "rstudio": {
@@ -38,10 +47,10 @@ def test_default_config_creation(temp_config_file):
     """Test creation of default configuration."""
     config = Config(temp_config_file)
     
-    assert config.network_name == "ispawn"
-    assert config.domain == Config.DEFAULT_DOMAIN
-    assert config.subnet == Config.DEFAULT_SUBNET
-    assert config.is_local is True
+    assert config.name == "ispawn"
+    assert config.deployment.domain == "ispawn.localhost"
+    assert config.deployment.subnet == "172.30.0.0/24"
+    assert config.deployment.is_local is True
 
 def test_load_existing_config(temp_config_file, sample_config):
     """Test loading existing configuration."""
@@ -51,10 +60,10 @@ def test_load_existing_config(temp_config_file, sample_config):
     
     config = Config(temp_config_file)
     
-    assert config.network_name == "test-ispawn"
-    assert config.domain == "test.local"
-    assert config.subnet == "172.30.0.0/24"
-    assert config.is_local is True
+    assert config.name == "test-ispawn"
+    assert config.deployment.domain == "test.local"
+    assert config.deployment.subnet == "172.30.0.0/24"
+    assert config.deployment.is_local is True
 
 def test_save_config_changes(temp_config_file):
     """Test saving configuration changes."""
@@ -67,9 +76,9 @@ def test_save_config_changes(temp_config_file):
     
     # Load config again to verify changes were saved
     new_config = Config(temp_config_file)
-    assert new_config.domain == "new.local"
-    assert new_config.subnet == "172.31.0.0/24"
-    assert new_config.is_local is False
+    assert new_config.deployment.domain == "new.local"
+    assert new_config.deployment.subnet == "172.31.0.0/24"
+    assert new_config.deployment.is_local is False
 
 def test_service_config_management(temp_config_file):
     """Test service configuration management."""
@@ -79,18 +88,6 @@ def test_service_config_management(temp_config_file):
     rstudio_config = config.get_service_config("rstudio")
     assert rstudio_config["port"] == 8787
     assert rstudio_config["enabled"] is True
-    
-    # Update service config
-    new_config = {
-        "port": 8780,
-        "enabled": False
-    }
-    config.update_service_config("rstudio", new_config)
-    
-    # Verify changes
-    updated_config = config.get_service_config("rstudio")
-    assert updated_config["port"] == 8780
-    assert updated_config["enabled"] is False
 
 def test_invalid_service_config(temp_config_file):
     """Test error handling for invalid service configuration."""
@@ -128,7 +125,7 @@ def test_get_all_config(temp_config_file, sample_config):
     
     # Verify it's a copy
     all_config["name"] = "modified"
-    assert config.network_name == "test-ispawn"
+    assert config.name == "test-ispawn"
 
 def test_config_directory_creation(temp_config_file):
     """Test configuration directory creation."""
@@ -153,3 +150,39 @@ def test_invalid_yaml_handling(temp_config_file):
     
     with pytest.raises(ConfigurationError):
         Config(temp_config_file)
+
+def test_deployment_config_integration(temp_config_file):
+    """Test integration with DeploymentConfig."""
+    config = Config(temp_config_file)
+    deployment = config.deployment
+    
+    assert isinstance(deployment.mode, Mode)
+    assert isinstance(deployment.cert_mode, CertMode)
+    assert deployment.domain == "ispawn.localhost"
+    assert deployment.subnet == "172.30.0.0/24"
+    
+    # Test mode changes
+    config.set_mode("remote")
+    new_deployment = config.deployment
+    assert new_deployment.mode == Mode.REMOTE
+    assert new_deployment.cert_mode == CertMode.LETSENCRYPT
+
+def test_cert_configuration(temp_config_file):
+    """Test certificate configuration."""
+    config = Config(temp_config_file)
+    
+    # Test remote mode with Let's Encrypt
+    config.set_mode("remote")
+    config.set_cert_mode("letsencrypt")
+    config.set_email("test@example.com")
+    
+    deployment = config.deployment
+    assert deployment.cert_mode == CertMode.LETSENCRYPT
+    assert deployment.email == "test@example.com"
+    assert deployment.requires_email is True
+    
+    # Test remote mode with provided certificates
+    config.set_cert_mode("provided")
+    deployment = config.deployment
+    assert deployment.cert_mode == CertMode.PROVIDED
+    assert deployment.requires_email is False

@@ -2,34 +2,9 @@ import os
 import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional
-from enum import Enum
+
+from ispawn.domain.deployment import Mode, CertMode, DeploymentConfig
 from ispawn.domain.exceptions import ConfigurationError
-
-class Mode(str, Enum):
-    """Available deployment modes."""
-    LOCAL = "local"   # Local development with mkcert wildcard SSL
-    REMOTE = "remote" # Remote deployment with wildcard SSL (Let's Encrypt or provided)
-
-    @classmethod
-    def from_str(cls, value: str) -> "Mode":
-        """Create Mode from string."""
-        try:
-            return cls(value.lower())
-        except ValueError:
-            raise ValueError(f"Invalid mode: {value}. Must be one of: {' '.join(m.value for m in Mode)}")
-
-class CertMode(str, Enum):
-    """Available certificate modes for remote deployment."""
-    LETSENCRYPT = "letsencrypt"  # Use Let's Encrypt for certificates
-    PROVIDED = "provided"        # Use provided wildcard certificates
-
-    @classmethod
-    def from_str(cls, value: str) -> "CertMode":
-        """Create CertMode from string."""
-        try:
-            return cls(value.lower())
-        except ValueError:
-            raise ValueError(f"Invalid certificate mode: {value}. Must be one of: {' '.join(m.value for m in CertMode)}")
 
 class Config:
     """Configuration manager for ispawn."""
@@ -151,46 +126,29 @@ class Config:
         return self.config.get("name", "ispawn")
 
     @property
-    def domain(self) -> str:
-        """Get domain name."""
-        return self.config.get("web", {}).get("domain", "ispawn.localhost")
-
-    @property
-    def subnet(self) -> str:
-        """Get subnet configuration."""
-        return self.config.get("web", {}).get("subnet", "172.30.0.0/24")
-
-    @property
-    def mode(self) -> Mode:
-        """Get deployment mode."""
-        mode_str = self.config.get("web", {}).get("mode", Mode.LOCAL.value)
-        return Mode.from_str(mode_str)
-
-    @property
-    def cert_mode(self) -> CertMode:
-        """Get certificate mode."""
-        mode_str = self.config.get("web", {}).get("ssl", {}).get("cert_mode", CertMode.LETSENCRYPT.value)
-        return CertMode.from_str(mode_str)
+    def deployment(self) -> DeploymentConfig:
+        """Get deployment configuration."""
+        web_config = self.config.get("web", {})
+        ssl_config = web_config.get("ssl", {})
+        
+        return DeploymentConfig(
+            mode=web_config.get("mode", Mode.LOCAL.value),
+            domain=web_config.get("domain", "ispawn.localhost"),
+            subnet=web_config.get("subnet", "172.30.0.0/24"),
+            cert_mode=ssl_config.get("cert_mode"),
+            cert_dir=ssl_config.get("cert_dir"),
+            email=ssl_config.get("email")
+        )
 
     @property
     def network_name(self) -> str:
         """Get Docker network name."""
-        return self.name  # Use project name directly for network
+        return self.name
 
     @property
     def log_dir(self) -> Path:
         """Get log directory path."""
         return Path(self.config.get("logs", {}).get("dir", str(self.config_dir / "logs")))
-
-    @property
-    def cert_dir(self) -> Path:
-        """Get SSL certificate directory."""
-        return Path(self.config.get("web", {}).get("ssl", {}).get("cert_dir", str(self.config_dir / "certs")))
-
-    @property
-    def email(self) -> Optional[str]:
-        """Get email for Let's Encrypt."""
-        return self.config.get("web", {}).get("ssl", {}).get("email")
 
     def get_all(self) -> Dict[str, Any]:
         """Get complete configuration."""
@@ -274,8 +232,3 @@ class Config:
             self.config["web"]["ssl"] = {}
         self.config["web"]["ssl"]["email"] = email
         self.save()
-
-    @property
-    def is_local(self) -> bool:
-        """Check if running in local mode."""
-        return self.mode == Mode.LOCAL
