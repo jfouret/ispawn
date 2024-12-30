@@ -1,245 +1,147 @@
-from command_runner import command_runner
-import platform
 import os
-import sys
-import yaml
-from jinja2 import Template
-from tempfile import TemporaryDirectory, NamedTemporaryFile
+from pathlib import Path
+from typing import Optional
+import shutil
+import jinja2
+from ispawn.config import Config, Mode, CertMode
+from ispawn.services.docker import DockerService
+from ispawn.services.certificate import CertificateService
+from ispawn.domain.exceptions import ConfigurationError, CertificateError
 
-def input_yn(prompt):
-  while True:
-    response = input(prompt).lower()[0]
-    if response in ["y","n"]:
-      break
-    else:
-      print("Please answer with 'y' or 'n'.")
-  return response == "y"
+def render_template(template_path: Path, output_path: Path, context: dict) -> None:
+    """Render a Jinja2 template to a file."""
+    try:
+        template_dir = template_path.parent
+        template_name = template_path.name
+        env = jinja2.Environment(loader=jinja2.FileSystemLoader(str(template_dir)))
+        template = env.get_template(template_name)
+        content = template.render(**context)
+        
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(content)
+        
+    except (jinja2.TemplateError, OSError) as e:
+        raise RuntimeError(f"Failed to render template {template_path}: {str(e)}")
 
-# Get OS information for package management
-OS_ID = platform.freedesktop_os_release()["ID_LIKE"].lower()
-COMPOSE_TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), '..',
-  'templates', 'traefik_compose.yml.j2')
-SHARED_PROVIDERS_DYNAMIC_PATH = os.path.join(os.path.dirname(__file__), '..',
-  'files', 'shared_providers_dynamic.yml')
-TRAEFIK_PATH = os.path.join(os.path.dirname(__file__), '..',
-  'files', 'traefik.yml')
-CARGS= {"shell":True, "live_output":True}
-
-def run_commands(commands, as_sudo = False, work_dir = None):
-  if not (type(commands) is list or type(commands) is tuple):
-    commands = [commands]
-  for command in commands:
-    if work_dir:
-      command = f"cd {work_dir} && {command}"
-    if as_sudo:
-      command = command.replace("'", "'\\''")
-      command = f"sudo bash -c '{command}'"
-    print("### Running command ###")
-    print(command)
-    print("### --- ###")
-    rc,_ = command_runner(command, **CARGS)
-    if rc != 0:
-      print("### Error running command", file=sys.stderr)
-      sys.exit(1)
-
-class ISpawnSetup:
-  def __init__(self, args):
-    if args.mode == "remote":
-      if not args.cert or not args.key:
-        print("--cert and --key are required when --mode is 'remote'",
-          file=sys.stderr)
-        sys.exit(1)
-    elif args.mode == "local":
-      if not args.domain.endswith(".localhost"):
-        print("--domain must not end with '.localhost' when --mode is 'local'",
-          file=sys.stderr)
-        sys.exit(1)
-    self.args = args
-    self.sys_config_dir = f"/etc/ispawn"
-    commands = []
-    if not os.path.exists(self.sys_config_dir):
-      commands.append(f"mkdir -p {self.sys_config_dir}")
-      commands.append(f"chmod 755 {self.sys_config_dir}")
-    self.sys_config_file = f"{self.sys_config_dir}/config.yml"
-    self.sys_cert_dir = f"{self.sys_config_dir}/certs"
-    if not os.path.exists(self.sys_cert_dir):
-      commands.append(f"mkdir -p {self.sys_cert_dir}")
-      commands.append(f"chmod 700 {self.sys_cert_dir}")
-    # compose file for traefik
-    run_commands(commands, as_sudo=True)
-    self.sys_compose_file = f"{self.sys_config_dir}/compose.yml"
-    self.check_root()
-    self.config_web()
-
-  def check_root(self):
-    """Ensure script is not run as root"""
-    if os.geteuid() == 0:
-      print(
-        "This script shall not be ran as root, please run it as a normal user.",
-        file=sys.stderr)
-      sys.exit(1)
-    run_commands(["sudo true"], as_sudo=True)
-
-  def install_mkcert(self):
-    """Install mkcert if not present"""
-    if os.path.isfile("/usr/local/bin/mkcert"):
-      print("mkcert is already installed.")
-      return
-
-    if not input_yn(
-        "mkcert is not installed, do you want to install it? [y/n]"
-      ):
-      print("mkcert is required for ispawn to work in local mode.",
-        file=sys.stderr)
-      sys.exit(1)
-
-    if "debian" in OS_ID:
-      run_commands(["apt-get install libnss3-tools"], as_sudo = True)
-    elif "fedora" in OS_ID or "rhel" in OS_ID:
-      run_commands(["yum install nss-tools"], as_sudo = True)
-    else:
-      print("Unsupported OS", file=sys.stderr)
-      sys.exit(1)
-
-    with TemporaryDirectory() as tmp_dir:
-      commands = [
-        "curl -JLO \"https://dl.filippo.io/mkcert/v1.4.4?for=linux/amd64\"",
-        "chmod 777 mkcert-v1.4.4-linux-amd64",
-        "cp mkcert-v1.4.4-linux-amd64 /usr/local/bin/mkcert"
-      ]
-      run_commands(commands, as_sudo=True, work_dir=tmp_dir)
-  
-  def config_web(self):
-    """Configure web access settings"""
-
-    config_dict = {}
-    if os.path.exists(self.sys_config_file):
-      with open(self.sys_config_file, "r") as f:
-        config_dict = yaml.safe_load(f) or {}
-
-    web_config = {
-      "domain": self.args.domain,
-      "mode": self.args.mode
-    }
-
-    if web_config["mode"] == "remote":
-      print("Important: Make sure you DNS setting is correct.")
-      cert_path = self.args.cert
-      key_path = self.args.key
-      if not os.path.exists(cert_path) or not os.path.exists(key_path):
-        print("Invalid certificate or key path.", file=sys.stderr)
-        sys.exit(1)
-    else:
-      cert_path = os.path.join(self.sys_cert_dir, "cert.pem")
-      key_path = os.path.join(self.sys_cert_dir, "key.pem")
-
-    web_config.update({"cert_path": cert_path, "key_path": key_path})
-    config_dict["web"] = web_config
-
-    if web_config["mode"] == "local":
-      self.setup_certificates(config_dict)
-
-    config_dict["name"] = self.args.name_prefix
-    config_dict["subnet"] =  self.args.subnet
-
-    with NamedTemporaryFile(mode='w+') as tmp_file:
-      yaml.dump(config_dict, tmp_file)
-      tmp_file.flush()
-      run_commands(
-        [f"cp {tmp_file.name} {self.sys_config_file}",
-        f"chmod 644 {self.sys_config_file}"],
-        as_sudo=True)
+def setup_traefik(config: Config) -> None:
+    """Setup Traefik reverse proxy configuration."""
+    # Get package directory
+    package_dir = Path(__file__).parent.parent
     
-    run_commands(
-      [
-        " ".join([
-          f"cp {SHARED_PROVIDERS_DYNAMIC_PATH}",
-          f"{self.sys_config_dir}/shared_providers_dynamic.yml"
-        ]),
-        f"chmod 644 {self.sys_config_dir}/shared_providers_dynamic.yml",
-        " ".join([
-          f"cp {TRAEFIK_PATH}",
-          f"{self.sys_config_dir}/traefik.yml"
-        ]),
-        f"chmod 644 {self.sys_config_dir}/traefik.yml"
-      ],
-      as_sudo=True
-    )
+    # Render compose file
+    template_path = package_dir / "templates/traefik_compose.yml.j2"
+    output_path = config.config_dir / "traefik-compose.yml"
+    
+    # Create template context
+    context = {
+        "network_name": config.network_name,
+        "domain": config.domain,
+        "mode": config.mode.value,
+        "cert_mode": config.cert_mode.value,
+        "cert_dir": config.cert_dir,
+        "email": config.email
+    }
+    
+    render_template(template_path, output_path, context)
 
-    if self.args.env_file is not None:
-      env_abspath = os.path.abspath(self.args.env_file)
-      run_commands(
-        [
-          " ".join([
-            f"cp {env_abspath}",
-            f"{self.sys_config_dir}/environment"
-          ]),
-          f"chmod 644 {self.sys_config_dir}/environment"
-        ],
-        as_sudo=True
-      )
-    if self.args.setup_file is not None:
-      setup_abspath = os.path.abspath(self.args.setup_file)
-      run_commands(
-        [
-          " ".join([
-            f"cp {setup_abspath}",
-            f"{self.sys_config_dir}/setup"
-          ]),
-          f"chmod 600 {self.sys_config_dir}/setup"
-        ],
-        as_sudo=True
-      )
-    self.start_traefik(config_dict)
+def setup_environment(config: Config, env_file: Optional[Path] = None) -> None:
+    """Setup environment configuration."""
+    if env_file:
+        dst = config.config_dir / ".env"
+        shutil.copy2(env_file, dst)
 
-  def setup_certificates(self, config):
-    """Setup SSL certificates using mkcert"""
-    if config["web"]["mode"] != "local":
-      return
+def setup_logs(config: Config) -> None:
+    """Setup log directory structure."""
+    log_dir = config.log_dir
+    log_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Set permissions: readable only by owner
+    os.chmod(log_dir, 0o700)
+    
+    # Create README file
+    readme = log_dir / "README.md"
+    readme.write_text("""# ispawn Logs Directory
 
-    self.install_mkcert()
+This directory contains logs from ispawn containers. Each container gets its own
+numbered subdirectory (e.g., container-name.1, container-name.2, etc.).
 
-    domain = config["web"]["domain"]
-    with TemporaryDirectory() as tmp_dir:
-      commands = [
-        f"mkcert -install",
-        " ".join([
-          f"mkcert",
-          f"-cert-file {tmp_dir}/cert.pem",
-          f"-key-file {tmp_dir}/key.pem",
-          f"\"*.{domain}\" \"{domain}\""
-        ])
-      ]
-      run_commands(commands, work_dir=tmp_dir)
-      commands = [
-        f"mkdir -p {self.sys_cert_dir}",
-        f"cp {tmp_dir}/cert.pem {self.sys_cert_dir}/cert.pem",
-        f"cp {tmp_dir}/key.pem {self.sys_cert_dir}/key.pem",
-        f"chown -R root:root {self.sys_cert_dir}",
-        f"chmod 644 {self.sys_cert_dir}/cert.pem",
-        f"chmod 600 {self.sys_cert_dir}/key.pem"
-      ]
-      run_commands(commands, as_sudo=True)
+## Directory Structure
 
-    return True
+```
+container-name.1/
+  ├── entrypoint.log  # Container startup and service initialization logs
+  ├── jupyter/        # Jupyter service logs (if enabled)
+  ├── rstudio/        # RStudio service logs (if enabled)
+  └── vscode/         # VS Code service logs (if enabled)
+```
 
-  def start_traefik(self, config):
-    """Start Traefik reverse proxy"""
-    with open(COMPOSE_TEMPLATE_PATH, 'r') as file:
-      dockerfile_template = Template(file.read())
-    rendered_compose = dockerfile_template.render(**config)
+The numbered directories help maintain history when containers are recreated.
+""")
 
-    with NamedTemporaryFile(mode='w+') as tmp_file:
-      tmp_file.write(rendered_compose)
-      tmp_file.flush()
-      run_commands(
-        [f"cp {tmp_file.name} {self.sys_compose_file}",
-        f"chmod 644 {self.sys_compose_file}"],
-        as_sudo=True
-      )
+def setup_certificates(config: Config, cert_service: CertificateService) -> None:
+    """Setup SSL certificates based on mode and certificate type."""
+    if config.mode == Mode.LOCAL:
+        cert_service.setup_local_certificates(config.domain, config.cert_dir)
+    elif config.mode == Mode.REMOTE:
+        if config.cert_mode == CertMode.PROVIDED:
+            cert_service.validate_certificates(config.cert_dir)
+        else:  # CertMode.LETSENCRYPT
+            if not config.email:
+                raise CertificateError("Email is required for Let's Encrypt certificates")
+            cert_service.setup_remote_certificates(config.cert_dir, config.email)
 
-    run_commands(
-      ["docker compose -f {} up -d".format(self.sys_compose_file)],
-      as_sudo=True,
-      work_dir=self.sys_config_dir
-    )
+def setup_command(config: Config, mode: Optional[str] = None, domain: Optional[str] = None,
+                 subnet: Optional[str] = None, cert_mode: Optional[str] = None,
+                 email: Optional[str] = None, env_file: Optional[Path] = None) -> None:
+    """Setup ispawn environment.
+    
+    Args:
+        config: Configuration instance
+        mode: Deployment mode (local or remote)
+        domain: Domain name
+        subnet: Subnet configuration
+        cert_mode: Certificate mode (letsencrypt or provided)
+        email: Email for Let's Encrypt
+        env_file: Path to environment file
+        
+    Raises:
+        ConfigurationError: If configuration is invalid
+        RuntimeError: If setup fails
+    """
+    try:
+        # Update configuration if provided
+        if mode:
+            config.set_mode(mode)
+        if domain:
+            config.set_domain(domain)
+        if subnet:
+            config.set_subnet(subnet)
+        if cert_mode:
+            config.set_cert_mode(cert_mode)
+        if email:
+            config.set_email(email)
+        
+        # Initialize services
+        docker_service = DockerService()
+        cert_service = CertificateService()
+        
+        # Setup network
+        docker_service.ensure_network(config.network_name, config.subnet)
+        
+        # Setup logs directory
+        setup_logs(config)
+        
+        # Setup SSL certificates
+        setup_certificates(config, cert_service)
+        
+        # Setup Traefik
+        setup_traefik(config)
+        
+        # Setup environment if provided
+        if env_file:
+            setup_environment(config, env_file)
+            
+    except (ConfigurationError, CertificateError) as e:
+        raise ConfigurationError(str(e))
+    except Exception as e:
+        raise RuntimeError(f"Setup failed: {str(e)}")

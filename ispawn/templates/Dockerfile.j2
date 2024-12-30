@@ -1,60 +1,43 @@
-FROM {{image}}
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && \
-    apt install -y wget locales sudo {{ 'python3-pip' if 'jupyter' in services else '' }} \
-    && rm -rf /var/lib/apt/lists/* \
-    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+FROM {{ BASE_IMAGE }}
 
-ENV LANG=en_US.utf8
-
-{% if 'env_file' in config %}
-COPY {{ config['env_file'] }} /tmp/env_file
-RUN cat /tmp/env_file >> /etc/environment && rm /tmp/env_file
-{% endif %}
-
-{% if 'setup_file' in config %}
-COPY {{ config['setup_file'] }} /tmp/setup
-RUN chmod +x /tmp/setup.sh && /tmp/setup && rm /tmp/setup
-{% endif %}
-
-# Install RStudio Server if requested
-{% if 'rstudio' in services %}
-RUN if [ -z "$(which rstudio-server)" ]; then \
-        apt update && apt install -y gdebi-core libssl-dev libcurl4-gnutls-dev libxml2-dev; \
-        . /etc/os-release; \
-        wget https://download2.rstudio.org/server/${VERSION_CODENAME}/amd64/rstudio-server-2023.12.1-402-amd64.deb; \
-        gdebi -n rstudio-server-2023.12.1-402-amd64.deb; \
-    else \
-        echo "RStudio Server is already installed."; \
-    fi
-
-# Configure RStudio Server
-RUN echo "" >> $(Rscript -e 'cat(R.home())')/etc/Renviron.site \
-  && cat /etc/environment >> $(Rscript -e 'cat(R.home())')/etc/Renviron.site
-
-EXPOSE 8787
-{% endif %}
-
-# Install Jupyter Notebook if requested
-{% if 'jupyter' in services %}
-RUN pip3 install notebook
-EXPOSE 8888
-{% endif %}
-
-# Install Open VS Code is requested
-{% if 'vscode' in services %}
-RUN apt-get update && apt-get install -y wget tar gzip \
-    && wget https://github.com/gitpod-io/openvscode-server/releases/download/openvscode-server-v1.95.2/openvscode-server-v1.95.2-linux-x64.tar.gz \ 
-    && tar -xzf openvscode-server-v1.95.2-linux-x64.tar.gz \
-    && rm openvscode-server-v1.95.2-linux-x64.tar.gz \
-    && mv openvscode-server-v1.95.2-linux-x64 /opt/openvscode-server \
+# Install basic system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    wget \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
-EXPOSE 8842
+
+{% if "jupyter" in SERVICES %}
+# Install Python and pip if not present
+RUN which python3 || (apt-get update && apt-get install -y --no-install-recommends python3 && rm -rf /var/lib/apt/lists/*)
+RUN which pip3 || (apt-get update && apt-get install -y --no-install-recommends python3-pip && rm -rf /var/lib/apt/lists/*)
+
+# Install Jupyter
+RUN pip3 list | grep -i jupyter || pip3 install jupyter notebook
 {% endif %}
 
-# Create the entrypoint script
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+{% if "rstudio" in SERVICES %}
+# Install R if not present
+RUN which R || (apt-get update && apt-get install -y --no-install-recommends r-base && rm -rf /var/lib/apt/lists/*)
+
+# Install RStudio Server
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gdebi-core \
+    && wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-2022.02.0-443-amd64.deb \
+    && gdebi -n rstudio-server-2022.02.0-443-amd64.deb \
+    && rm rstudio-server-2022.02.0-443-amd64.deb \
+    && rm -rf /var/lib/apt/lists/*
+{% endif %}
+
+{% if "vscode" in SERVICES %}
+# Install VS Code Server
+RUN curl -fsSL https://code-server.dev/install.sh | sh \
+    && rm -rf /var/lib/apt/lists/*
+{% endif %}
+
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD []

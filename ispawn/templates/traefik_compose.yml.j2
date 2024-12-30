@@ -1,27 +1,62 @@
+version: '3'
+
 services:
   traefik:
-    image: traefik:v3.2.2
-    container_name: {{name}}-traefik
-    restart: always
+    image: traefik:v2.10
+    container_name: ispawn-traefik
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network={{ network_name }}"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      {% if mode == "local" %}
+      - "--providers.file.directory=/etc/traefik/certs"
+      {% elif cert_mode == "letsencrypt" %}
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.letsencrypt.acme.email={{ email }}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      {% endif %}
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - "/etc/ispawn/shared_providers_dynamic.yml:/etc/traefik/shared_providers_dynamic.yml:ro"
-      - "/etc/ispawn/traefik.yml:/traefik.yml:ro"
-      - {{web.cert_path}}:/certs/cert.pem:ro
-      - {{web.key_path}}:/certs/key.pem:ro
+      {% if mode == "local" or cert_mode == "provided" %}
+      - {{ cert_dir }}:/etc/traefik/certs:ro
+      {% elif cert_mode == "letsencrypt" %}
+      - {{ cert_dir }}:/letsencrypt
+      {% endif %}
     networks:
-      - {{name}}
+      - ispawn
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.{{ domain }}`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      {% if cert_mode == "letsencrypt" %}
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      {% else %}
+      - "traefik.http.routers.dashboard.tls=true"
+      {% endif %}
+    {% if cert_mode == "letsencrypt" %}
     environment:
-      - "NO_PROXY={{subnet}}"
-      - "no_proxy={{subnet}}"
+      - "CF_API_EMAIL={{ email }}"
+      - "CF_DNS_API_TOKEN_FILE=/run/secrets/cf_token"
+    secrets:
+      - cf_token
+    {% endif %}
+
 networks:
-  {{name}}:
-    name: {{name}}
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: {{subnet}}
+  ispawn:
+    external: true
+    name: {{ network_name }}
+
+{% if cert_mode == "letsencrypt" %}
+secrets:
+  cf_token:
+    file: {{ cert_dir }}/cloudflare_token.txt
+{% endif %}

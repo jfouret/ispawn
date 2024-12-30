@@ -2,3 +2,6 @@
 /prompt.txt
 /build
 /ispawn.egg-info
+/test.ipynb
+*pyc
+.coverage
