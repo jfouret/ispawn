@@ -40,7 +40,7 @@ def run_container(args) -> None:
         # Setup container configuration
         container_config = ContainerConfig(
             name=args.name,
-            ispawn_prefix=config.container_prefix,
+            name_prefix=config.container_prefix,
             network_name=config.network_name,
             image=args.image,
             services=services,

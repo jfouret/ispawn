@@ -46,14 +46,14 @@ class ContainerConfig:
         dns (List[str]): List of DNS servers
         volumes (List[str]): List of volume mount configurations
         host_prefix (str): Prefix to add to volumes mounted from the host
-        log_dir (Path): Directory for container logs
+        log_dir (str): Directory for container logs
         cert_mode (str): Certificate mode ('provided' or 'letsencrypt')
     """
 
     def __init__(
         self,
         name: str,
-        ispawn_prefix: str,
+        name_prefix: str,
         network_name: str,
         image: str,
         services: Union[List[Service], List[str]],
@@ -62,18 +62,18 @@ class ContainerConfig:
         uid: int,
         gid: int,
         domain: str,
-        dns: Optional[List[str]] = None,
-        volumes: Optional[List[str]] = None,
-        host_prefix: str = "/mnt/host",
-        log_base_dir: Optional[Union[str, Path]] = None,
-        cert_mode: str = "provided"
+        dns: List[str],
+        volumes: List[str],
+        host_prefix: str,
+        log_base_dir: str,
+        cert_mode: str
     ):
         """
         Initialize container configuration.
         
         Args:
             name (str): Container name
-            ispawn_prefix (str): Prefix for container naming
+            name_prefix (str): Prefix for container naming
             network_name (str): Docker network name
             image (str): Docker image to use
             services (List[Service] or List[str]): Services to run
@@ -96,7 +96,7 @@ class ContainerConfig:
             raise ValueError("cert_mode must be 'provided' or 'letsencrypt'")
 
         self.raw_name = name
-        self.container_name = f"{ispawn_prefix}-{name}"
+        self.container_name = f"{name_prefix}-{name}"
         self.network_name = network_name
         self.image = image
         
@@ -124,31 +124,9 @@ class ContainerConfig:
             for volume in self._raw_volumes
         ]
         
-        # Setup log directory
-        if log_base_dir:
-            log_base_path = Path(log_base_dir) / name
-            self.log_dir = self._setup_log_dir(log_base_path)
-            self.volumes.append(f"{self.log_dir}:/var/log/ispawn:rw")
-        else:
-            self.log_dir = None
-
-    def _setup_log_dir(self, base_path: Path) -> Path:
-        """
-        Setup log directory with automatic numbering.
-        
-        Args:
-            base_path (Path): Base path for log directory
-        
-        Returns:
-            Path: Path to the unique log directory
-        """
-        counter = 1
-        while True:
-            log_dir = base_path.with_name(f"{base_path.name}.{counter}")
-            if not log_dir.exists():
-                log_dir.mkdir(parents=True, exist_ok=True)
-                return log_dir
-            counter += 1
+        log_base_path = Path(log_base_dir) / name
+        self.log_dir = str(log_base_path)
+        self.volumes.append(f"{self.log_dir}:/var/log/ispawn:rw")
 
     def get_labels(self) -> List[str]:
         """

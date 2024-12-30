@@ -28,7 +28,7 @@ def test_container():
     """Create a test container configuration."""
     return ContainerConfig(
         name="test",
-        ispawn_prefix="ispawn",
+        name_prefix="ispawn",
         network_name="test-network",
         image="test:latest",
         services=[Service.RSTUDIO, Service.JUPYTER],
@@ -197,7 +197,7 @@ class TestDockerIntegration:
         # Use Ubuntu image with a command that keeps container running
         config = ContainerConfig(
             name="integration-test",
-            ispawn_prefix="ispawn",
+            name_prefix="ispawn",
             network_name=network_name,
             image="ubuntu:20.04",
             services=[Service.RSTUDIO],
