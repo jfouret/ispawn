@@ -1,25 +1,19 @@
 import pytest
-from unittest.mock import Mock, patch, mock_open, ANY
-import docker
+import uuid
 from pathlib import Path
-import tempfile
-import os
 
 from ispawn.services.image import ImageService
-from ispawn.domain.image import ImageBuilder, ImageConfig
+from ispawn.domain.image import ImageConfig
 from ispawn.domain.container import Service
 from ispawn.domain.exceptions import ImageError
 
-@pytest.fixture
-def mock_docker_client():
-    """Create a mock Docker client."""
-    with patch('docker.from_env') as mock_client:
-        mock_client.return_value.images = Mock()
-        yield mock_client.return_value
+def generate_test_name():
+    """Generate a unique test name using UUID."""
+    return f"test-{uuid.uuid4().hex[:8]}"
 
 @pytest.fixture
-def image_service(mock_docker_client):
-    """Create ImageService instance with mocked Docker client."""
+def image_service():
+    """Create ImageService instance."""
     return ImageService()
 
 @pytest.fixture
@@ -27,110 +21,138 @@ def basic_config():
     """Create a basic image configuration."""
     return ImageConfig(
         base_image="ubuntu:20.04",
-        services=[Service.RSTUDIO, Service.JUPYTER]
+        services=[Service.JUPYTER],  # Use Jupyter as it's simpler than RStudio
+        name_prefix=f"alpha-{uuid.uuid4().hex[:8]}",
+        env_file=None,
+        setup_file=None
     )
 
-@pytest.fixture
-def image_builder(basic_config):
-    """Create ImageBuilder instance."""
-    return ImageBuilder(basic_config)
-
-@pytest.fixture
-def mock_templates(tmp_path):
-    """Create mock template files."""
-    dockerfile = tmp_path / "Dockerfile.j2"
-    entrypoint = tmp_path / "entrypoint.sh.j2"
-    
-    dockerfile.write_text("FROM {{ BASE_IMAGE }}\nSERVICES={{ SERVICES }}")
-    entrypoint.write_text("#!/bin/bash\necho {{ SERVICES }}")
-    
-    return {"dockerfile": dockerfile, "entrypoint": entrypoint}
-
-def test_build_image_success(image_service, image_builder, mock_docker_client, mock_templates):
-    """Test successful image build."""
-    # Setup mock image
-    mock_image = Mock()
-    mock_docker_client.images.build.return_value = (mock_image, [])
-    
-    # Mock template paths
-    with patch.object(image_builder, 'get_dockerfile_path') as mock_dockerfile_path:
-        with patch.object(image_builder, 'get_entrypoint_path') as mock_entrypoint_path:
-            mock_dockerfile_path.return_value = mock_templates["dockerfile"]
-            mock_entrypoint_path.return_value = mock_templates["entrypoint"]
+def test_build_and_remove_image(image_service, basic_config):
+    """Test building and removing an image."""
+    try:
+        # Get build context and print Dockerfile content
+        context = basic_config.get_build_context()
+        dockerfile_content = image_service._render_template(
+            context["dockerfile"]["template"],
+            context["dockerfile"]["args"]
+        )
+        print("\n=== Dockerfile Content ===")
+        print(dockerfile_content)
+        print("=========================\n")
+        
+        # Build image
+        image = image_service.build_image(basic_config)
+        assert image is not None
+        assert basic_config.target_image in image.tags
+        
+        # Print debug info
+        print("\n=== Image Info ===")
+        print(f"Expected tag: {basic_config.target_image}")
+        print("\nAvailable images:")
+        images = image_service.list_images(prefix=basic_config.name_prefix)
+        for img in images:
+            print(f"  Tags: {img['tags']}")
+        print("=================\n")
+        
+        # Verify image exists
+        assert any(basic_config.target_image in img["tags"] for img in images), \
+            f"Image with tag {basic_config.target_image} not found in list"
+        
+        # Test image info
+        image_info = next(img for img in images if basic_config.target_image in img["tags"])
+        assert "id" in image_info
+        assert "size" in image_info
+        assert "created" in image_info
+        
+    finally:
+        # Cleanup
+        try:
+            image_service.remove_image(basic_config.target_image, force=True)
             
-            # Build image
-            result = image_service.build_image(image_builder)
-            
-            # Verify build was called with correct arguments
-            mock_docker_client.images.build.assert_called_once()
-            build_args = mock_docker_client.images.build.call_args[1]
-            assert build_args["tag"] == image_builder.config.target_image
-            assert build_args["rm"] is True
-            assert "buildargs" in build_args
-            
-            assert result == mock_image
+            # Verify image was removed
+            images = image_service.list_images()
+            assert not any(basic_config.target_image in img["tags"] for img in images)
+        except ImageError:
+            pass  # Ignore cleanup errors
 
-def test_build_image_error(image_service, image_builder, mock_docker_client, mock_templates):
-    """Test image build error handling."""
-    mock_docker_client.images.build.side_effect = docker.errors.BuildError("Build failed", "")
-    
-    with patch.object(image_builder, 'get_dockerfile_path') as mock_dockerfile_path:
-        with patch.object(image_builder, 'get_entrypoint_path') as mock_entrypoint_path:
-            mock_dockerfile_path.return_value = mock_templates["dockerfile"]
-            mock_entrypoint_path.return_value = mock_templates["entrypoint"]
-            
-            with pytest.raises(ImageError, match="Failed to build image"):
-                image_service.build_image(image_builder)
-
-def test_list_images(image_service, mock_docker_client):
-    """Test listing images."""
-    # Setup mock images
-    mock_image = Mock()
-    mock_image.short_id = "abc123"
-    mock_image.tags = ["ispawn-test:latest"]
-    mock_image.attrs = {
-        "Size": 1024 * 1024 * 100,  # 100MB
-        "Created": "2023-01-01T00:00:00Z"
-    }
-    mock_docker_client.images.list.return_value = [mock_image]
-    
-    images = image_service.list_images()
-    
-    assert len(images) == 1
-    assert images[0]["id"] == "abc123"
-    assert images[0]["tags"] == ["ispawn-test:latest"]
-    assert images[0]["size"] == "100.0 MB"
-    assert images[0]["created"] == "2023-01-01T00:00:00Z"
-
-def test_list_images_error(image_service, mock_docker_client):
-    """Test error handling when listing images."""
-    mock_docker_client.images.list.side_effect = docker.errors.APIError("API error")
-    
-    with pytest.raises(ImageError, match="Failed to list images"):
-        image_service.list_images()
-
-def test_remove_image(image_service, mock_docker_client):
-    """Test image removal."""
-    image_service.remove_image("ispawn-test:latest")
-    
-    mock_docker_client.images.remove.assert_called_once_with(
-        "ispawn-test:latest",
-        force=False
+def test_build_nonexistent_image(image_service):
+    """Test building from a non-existent base image."""
+    config = ImageConfig(
+        base_image="nonexistent:latest",
+        services=[Service.RSTUDIO],
+        name_prefix="ispawn",
+        env_file=None,
+        setup_file=None
     )
-
-def test_remove_image_not_found(image_service, mock_docker_client):
-    """Test error handling when removing non-existent image."""
-    mock_docker_client.images.remove.side_effect = docker.errors.ImageNotFound("not found")
     
+    with pytest.raises(ImageError, match="Failed to build image"):
+        image_service.build_image(config)
+
+def test_remove_nonexistent_image(image_service):
+    """Test removing a non-existent image."""
     with pytest.raises(ImageError, match="Image not found"):
         image_service.remove_image("nonexistent:latest")
 
-def test_remove_image_error(image_service, mock_docker_client):
-    """Test error handling when image removal fails."""
-    mock_docker_client.images.remove.side_effect = docker.errors.APIError("API error")
+def test_list_images_with_prefix(image_service):
+    """Test listing images with different prefixes."""
+    # Create two configs with different prefixes
+    config1 = ImageConfig(
+        base_image="ubuntu:20.04",
+        services=[Service.JUPYTER],
+        name_prefix=f"alpha-{uuid.uuid4().hex[:8]}",
+        env_file=None,
+        setup_file=None
+    )
     
-    with pytest.raises(ImageError, match="Failed to remove image"):
-        image_service.remove_image("test:latest")
+    config2 = ImageConfig(
+        base_image="ubuntu:22.04",
+        services=[Service.JUPYTER],
+        name_prefix=f"beta-{uuid.uuid4().hex[:8]}",
+        env_file=None,
+        setup_file=None
+    )
+    
+    try:
+        # Build both images
+        image1 = image_service.build_image(config1)
+        image2 = image_service.build_image(config2)
+        
+        # List with first prefix (keep the hyphen)
+        prefix1 = config1.name_prefix.split('-', 1)[0] + '-'
+        print(f"\n=== Testing prefix filtering ===")
+        print(f"Config1 prefix: {prefix1}")
+        print(f"Config1 target: {config1.target_image}")
+        print(f"Config2 target: {config2.target_image}")
+        
+        images = image_service.list_images(prefix=prefix1)
+        print("\nFound images:")
+        for img in images:
+            print(f"  Tags: {img['tags']}")
+        print("===========================\n")
+        import docker
+        client = docker.from_env()
+        imgs = client.images.list()
+        for img in imgs:
+            tags = img.tags
+            print(f"  Tags: {tags}")
+        print("===========================\n")
+        
+        assert any(config1.target_image in img["tags"] for img in images)
+        assert not any(config2.target_image in img["tags"] for img in images)
+        
+        # List with second prefix (keep the hyphen)
+        prefix2 = config2.name_prefix.split('-', 1)[0] + '-'
+        images = image_service.list_images(prefix=prefix2)
+        assert not any(config1.target_image in img["tags"] for img in images)
+        assert any(config2.target_image in img["tags"] for img in images)
+        
+    finally:
+        # Cleanup
+        try:
+            image_service.remove_image(config1.target_image, force=True)
+            image_service.remove_image(config2.target_image, force=True)
+        except ImageError:
+            pass  # Ignore cleanup errors
 
 def test_format_size():
     """Test size formatting."""
@@ -141,32 +163,3 @@ def test_format_size():
     assert service._format_size(1024 * 1024) == "1.0 MB"
     assert service._format_size(1024 * 1024 * 1024) == "1.0 GB"
     assert service._format_size(1024 * 1024 * 1024 * 1024) == "1.0 TB"
-
-@pytest.mark.integration
-class TestImageServiceIntegration:
-    """Integration tests that require a running Docker daemon."""
-    
-    @pytest.fixture
-    def image_service_real(self):
-        """Create a real ImageService instance."""
-        return ImageService()
-    
-    def test_build_and_remove_image(self, image_service_real, basic_config, tmp_path):
-        """Test building and removing an image."""
-        builder = ImageBuilder(basic_config)
-        
-        try:
-            # Build image
-            image = image_service_real.build_image(builder)
-            assert image is not None
-            
-            # Verify image exists
-            images = image_service_real.list_images()
-            assert any(basic_config.target_image in img["tags"] for img in images)
-            
-        finally:
-            # Cleanup
-            try:
-                image_service_real.remove_image(basic_config.target_image, force=True)
-            except ImageError:
-                pass  # Ignore cleanup errors

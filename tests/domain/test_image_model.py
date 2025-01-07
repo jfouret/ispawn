@@ -1,138 +1,151 @@
+"""Tests for image configuration."""
+
 import pytest
 from pathlib import Path
 from ispawn.domain.image import ImageConfig
-from ispawn.domain.container import Service
+from ispawn.domain.image import Service
+from ispawn.domain.exceptions import ImageError
 
-@pytest.fixture(params=[
-    # Basic configuration
+from ispawn.services.image import ImageService
+
+VALID_CONFIGS = [
     {
-        "base_image": "ubuntu:20.04",
-        "services": [Service.RSTUDIO],
-        "name_prefix": "ispawn",
-        "env_file": None,
-        "setup_file": None,
-        "templates_dir": None
+        "id": "jupyter_only",
+        "params": {
+            "base_image": "ubuntu:latest",
+            "services": ["jupyter"],
+            "name_prefix": "ispawn"
+        }
     },
-    # Full configuration with all services
     {
-        "base_image": "python:3.9",
-        "services": [Service.RSTUDIO, Service.JUPYTER, Service.VSCODE],
-        "name_prefix": "custom",
-        "env_file": "env_file_path",  # Will be replaced with actual path
-        "setup_file": "setup_file_path",  # Will be replaced with actual path
-        "templates_dir": None
+        "id": "multi_service_with_env",
+        "params": {
+            "base_image": "python:3.9",
+            "services": ["jupyter", "vscode"],
+            "name_prefix": "ispawn",
+            "env_chunk_path": True
+        }
     },
-    # Configuration with string services
     {
-        "base_image": "debian:11",
-        "services": ["jupyter", "vscode"],
-        "name_prefix": "test",
-        "env_file": None,
-        "setup_file": None,
-        "templates_dir": None
+        "id": "rstudio_with_setup",
+        "params": {
+            "base_image": "debian:bullseye",
+            "services": ["rstudio"],
+            "name_prefix": "custom",
+            "entrypoint_chunk_path": True
+        }
     }
-])
-def valid_args(request, tmp_path):
-    """Provide different valid argument configurations."""
-    args = request.param
-    
-    # Create actual files for configurations that need them
-    if args["env_file"] is not None:
-        env_file = tmp_path / "environment"
-        env_file.write_text("TEST_VAR=value")
-        args["env_file"] = env_file
-    
-    if args["setup_file"] is not None:
-        setup_file = tmp_path / "setup.sh"
-        setup_file.write_text("#!/bin/bash\necho 'setup'")
-        args["setup_file"] = setup_file
+]
 
-    if args["templates_dir"] is not None:
-        templates_dir = tmp_path / "templates"
-        templates_dir.mkdir()
-        args["templates_dir"] = templates_dir
-    
-    return args
+@pytest.fixture(params=VALID_CONFIGS)
+def valid_config_params(request):
+    """Fixture providing valid configuration parameters."""
+    return request.param
 
 @pytest.fixture
-def image_config(valid_args):
-    """Create an image configuration from valid arguments."""
-    return ImageConfig(**valid_args)
-
-def test_image_basic_properties(image_config, valid_args):
-    """Test basic image properties are set correctly."""
-    assert image_config.base_image == valid_args["base_image"]
-    assert len(image_config.services) == len(valid_args["services"])
-    assert image_config.name_prefix == valid_args["name_prefix"]
-    assert image_config.env_file == valid_args["env_file"]
-    assert image_config.setup_file == valid_args["setup_file"]
-    assert isinstance(image_config.templates_dir, Path)
-
-def test_target_image_name(image_config, valid_args):
-    """Test target image name generation."""
-    base_name = valid_args["base_image"].split(':')[0].split('/')[-1]
-    tag = valid_args["base_image"].split(':')[1]
-    expected = f"{valid_args['name_prefix']}-{base_name}:{tag}"
-    assert image_config.target_image == expected
-
-def test_build_args(image_config):
-    """Test build arguments generation."""
-    args = image_config.get_build_args()
-    assert args["BASE_IMAGE"] == image_config.base_image
-    assert args["SERVICES"] == ",".join(s.value for s in image_config.services)
-
-def test_context_files(image_config, valid_args):
-    """Test context files collection."""
-    context_files = image_config.get_context_files()
+def mock_files(tmp_path):
+    """Create mock files for testing."""
+    # Create env file
+    env_file = tmp_path / "test.env"
+    env_file.write_text("TEST_VAR=value")
     
-    if valid_args["env_file"]:
-        assert "environment" in context_files
-        assert context_files["environment"] == valid_args["env_file"]
+    # Create setup file
+    setup_file = tmp_path / "setup.sh"
+    setup_file.write_text("echo setup")
+
+    build_file = tmp_path / "Dockerfile"
+    build_file.write_text("RUN touch /test.txt")
     
-    if valid_args["setup_file"]:
-        assert "setup" in context_files
-        assert context_files["setup"] == valid_args["setup_file"]
+    return {
+        "env_chunk_path": env_file,
+        "dockerfile_chunk_path": build_file,
+        "entrypoint_chunk_path": setup_file
+    }
 
-def test_build_context(image_config):
-    """Test complete build context generation."""
-    context = image_config.get_build_context()
+@pytest.fixture
+def valid_image_config(valid_config_params, mock_files):
+    """Create a valid ImageConfig instance."""
+    params = valid_config_params["params"].copy()
     
-    assert context["dockerfile"] == image_config.dockerfile_path
-    assert context["entrypoint"] == image_config.entrypoint_path
-    assert context["build_args"] == image_config.get_build_args()
-    assert context["target_image"] == image_config.target_image
-    assert isinstance(context["context_files"], dict)
+    # Set file paths if specified
+    for k in ["env_chunk_path", "dockerfile_chunk_path", "entrypoint_chunk_path"]:
+        if k in params and params[k]:
+            params[k] = mock_files[k]
+        
+    return ImageConfig(**params)
 
-def test_template_paths(image_config):
-    """Test template path resolution."""
-    assert image_config.dockerfile_path.name == "Dockerfile.j2"
-    assert image_config.entrypoint_path.name == "entrypoint.sh.j2"
-
-@pytest.mark.parametrize("invalid_service", [
-    ["invalid_service"],
-    ["not_a_service"],
-    ["unknown"]
-])
-def test_invalid_services(invalid_service, valid_args):
-    """Test that invalid services raise appropriate errors."""
-    invalid_args = valid_args.copy()
-    invalid_args["services"] = invalid_service
+def test_valid_image_config(valid_config_params, valid_image_config):
+    """Test valid image configurations."""
+    params = valid_config_params["params"]
     
-    with pytest.raises(ValueError):
-        ImageConfig(**invalid_args)
+    # Test basic attributes
+    assert valid_image_config.base_image == params["base_image"]
+    assert len(valid_image_config.services) == len(params["services"])
+    assert valid_image_config.target_image.startswith(f"{params['name_prefix']}-{params['base_image']}")
+    
+    # Test build context
+    context = valid_image_config.get_build_context()
+    
+    # Verify template paths
+    assert context["Dockerfile"]["template"].exists()
+    assert context["entrypoint.sh"]["template"].exists()
+    
+    # Verify template arguments
+    assert context["Dockerfile"]["args"]["base_image"] == params["base_image"]
+    assert isinstance(context["Dockerfile"]["args"]["service_chunks"], str)
 
-@pytest.mark.parametrize("registry_image,expected_name", [
-    ("docker.io/library/ubuntu:20.04", "ispawn-ubuntu:20.04"),
-    ("quay.io/centos/centos:7", "ispawn-centos:7"),
-    ("gcr.io/project/image:latest", "ispawn-image:latest")
-])
-def test_target_image_name_with_registry(registry_image, expected_name):
-    """Test target image name generation with various registry paths."""
-    config = ImageConfig(
-        base_image=registry_image,
-        services=[Service.RSTUDIO],
-        name_prefix="ispawn",
-        env_file=None,
-        setup_file=None
-    )
-    assert config.target_image == expected_name
+def test_build_image(valid_image_config):
+    im = ImageService()
+    im.build_image(valid_image_config)
+    im.remove_image(valid_image_config.target_image)
+
+INVALID_CONFIG_PARAMS=[
+    {
+        "id": "unknown_service",
+        "params": {
+            "base_image": "ubuntu:latest",
+            "services": ["unknown"],
+            "name_prefix": "ispawn"
+        }
+    },
+    {
+        "id": "path_do_not_exists",
+        "params": {
+            "base_image": "python:3.9",
+            "services": ["jupyter", "vscode"],
+            "name_prefix": "ispawn",
+            "env_chunk_path": "/path/to/file/that/does/not/exists"
+        }
+    }
+]
+
+@pytest.fixture(params=INVALID_CONFIG_PARAMS)
+def invalid_config_params(request):
+    """Fixture providing valid configuration parameters."""
+    return request.param
+
+@pytest.fixture
+def invalid_image_config(invalid_config_params, mock_files):
+    """Create a valid ImageConfig instance."""
+    params = invalid_config_params["params"].copy()
+    
+    # Set file paths if specified
+    for k in ["env_chunk_path", "dockerfile_chunk_path", "entrypoint_chunk_path"]:
+        if k in params and params[k]:
+            if params[k] is True:
+                params[k] = mock_files[k]
+
+    error = False
+        
+    try:
+        ImageConfig(**params)
+    except:
+        error = True
+    
+    return error
+
+
+def test_invalid_image_config(invalid_config_params, invalid_image_config):
+    """Test valid image configurations."""
+    params = invalid_config_params["params"]
+    assert invalid_image_config is True

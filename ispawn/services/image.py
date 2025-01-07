@@ -1,13 +1,15 @@
 import os
 import tempfile
 import shutil
+import importlib
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import jinja2
 import docker
 from docker.models.images import Image
 
-from ispawn.domain.image import ImageBuilder, ImageConfig
+from ispawn.domain.image import ImageConfig
+from ispawn.domain.container import Service
 from ispawn.domain.exceptions import ImageError
 
 class ImageService:
@@ -20,11 +22,11 @@ class ImageService:
         except docker.errors.DockerException as e:
             raise ImageError(f"Failed to initialize Docker client: {str(e)}")
 
-    def build_image(self, builder: ImageBuilder) -> Image:
-        """Build a Docker image using the provided builder.
+    def build_image(self, config: ImageConfig) -> Image:
+        """Build a Docker image using the provided configuration.
         
         Args:
-            builder: ImageBuilder instance with build configuration
+            config: ImageConfig instance with build configuration
             
         Returns:
             Built Docker image
@@ -32,49 +34,43 @@ class ImageService:
         Raises:
             ImageError: If image build fails
         """
-        try:
-            # Get build context
-            context = builder.get_build_context()
-            
-            # Create temporary build directory
-            with tempfile.TemporaryDirectory() as build_dir:
-                build_path = Path(build_dir)
-                
-                # Render Dockerfile from template
-                dockerfile_content = self._render_template(
-                    context["dockerfile"],
-                    context["build_args"]
-                )
-                dockerfile_path = build_path / "Dockerfile"
-                dockerfile_path.write_text(dockerfile_content)
-                
-                # Render entrypoint script from template
-                entrypoint_content = self._render_template(
-                    context["entrypoint"],
-                    context["build_args"]
-                )
-                entrypoint_path = build_path / "entrypoint.sh"
-                entrypoint_path.write_text(entrypoint_content)
-                os.chmod(entrypoint_path, 0o755)  # Make executable
-                
-                # Copy context files
-                for name, path in context["context_files"].items():
-                    shutil.copy2(path, build_path / name)
-                
-                # Build image
-                image, _ = self.client.images.build(
-                    path=str(build_path),
-                    tag=context["target_image"],
-                    buildargs=context["build_args"],
-                    rm=True  # Remove intermediate containers
-                )
-                
-                return image
+        # Get build context
+        context = config.get_build_context()
+        
+        # Create temporary build directory
+        build_dir = tempfile.mkdtemp()
+        build_path = Path(build_dir)
 
-        except (docker.errors.BuildError, docker.errors.APIError) as e:
-            raise ImageError(f"Failed to build image: {str(e)}")
+        try:
+            for context_id, context_dict in context.items():
+                file_path = build_path / context_id
+                if "file" in context_dict.keys():
+                    shutil.copy2(
+                        context_dict["file"], 
+                        file_path)
+                elif "template" in context_dict.keys():
+                    context_content = self._render_template(
+                        context_dict["template"],
+                        context_dict["args"])
+                    file_path.write_text(context_content)
+                else:
+                    raise ImageError(f"Invalid build context: {context_id}")
+            # Build image
+            image, _ = self.client.images.build(
+                path=str(build_path),
+                tag=config.target_image,
+                rm=True  # Remove intermediate containers
+            )
+            
+            # Clean up build directory only on success
+            shutil.rmtree(build_dir)
+            return image
         except Exception as e:
-            raise ImageError(f"Unexpected error during build: {str(e)}")
+            # Keep build directory in case of error and include path in error message
+            error_msg = f"Build failed (build files preserved in {build_dir}): {str(e)}"
+            if isinstance(e, (docker.errors.BuildError, docker.errors.APIError, ImageError)):
+                raise ImageError(error_msg) from e
+            raise ImageError(f"{error_msg} (unexpected error)")
 
     def _render_template(self, template_path: Path, context: Dict[str, Any]) -> str:
         """Render a Jinja2 template.
@@ -109,9 +105,15 @@ class ImageService:
             ImageError: If listing images fails
         """
         try:
-            images = self.client.images.list(
-                filters={"reference": f"{prefix}*"}
-            )
+            # Get all images and filter manually since Docker's filter doesn't work reliably
+            images = self.client.images.list()
+            # Filter images by prefix
+            filtered_images = []
+            for img in images:
+                # Only include images that have exactly one tag and it starts with our prefix
+                if any(tag.startswith(prefix) for tag in img.tags):
+                    filtered_images.append(img)
+            images = filtered_images
             return [
                 {
                     "id": image.short_id,

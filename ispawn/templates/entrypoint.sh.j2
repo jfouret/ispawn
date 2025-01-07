@@ -1,13 +1,17 @@
 #!/bin/bash
 set -e
 
+apt-get update && apt-get upgrade -y ca-certificates
+
 # Setup logging
-LOG_DIR=/var/log/ispawn
+export LOG_DIR=/var/log/ispawn
 mkdir -p $LOG_DIR
 exec 1> >(tee -a "${LOG_DIR}/entrypoint.log")
 exec 2>&1
 
 echo "[$(date)] Starting container initialization..."
+
+{{ entrypoint_chunk|safe }}
 
 # Create user if it doesn't exist
 if ! id "$USERNAME" &>/dev/null; then
@@ -15,108 +19,15 @@ if ! id "$USERNAME" &>/dev/null; then
     useradd -m -s /bin/bash -u $UID -g $GID "$USERNAME"
     echo "$USERNAME:$PASSWORD" | chpasswd
     adduser "$USERNAME" sudo
-    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
     echo "[$(date)] User $USERNAME created successfully"
 fi
 
-{% if "jupyter" in SERVICES %}
-# Start Jupyter
-echo "[$(date)] Starting Jupyter server..."
-mkdir -p "${LOG_DIR}/jupyter"
-sudo -u "$USERNAME" jupyter notebook \
-    --ip=0.0.0.0 \
-    --port=8888 \
-    --NotebookApp.token="$PASSWORD" \
-    --NotebookApp.password="" \
-    --allow-root \
-    --no-browser \
-    > "${LOG_DIR}/jupyter/jupyter.log" 2>&1 &
+echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Wait for Jupyter to start
-echo "[$(date)] Waiting for Jupyter to start..."
-for i in {1..30}; do
-    if grep -q "Jupyter Server .* is running" "${LOG_DIR}/jupyter/jupyter.log"; then
-        echo "[$(date)] Jupyter server started successfully"
-        break
-    fi
-    if [ $i -eq 30 ]; then
-        echo "[$(date)] ERROR: Jupyter server failed to start"
-        exit 1
-    fi
-    sleep 1
-done
-{% endif %}
+{% for service in services %}
+echo "[$(date)] Starting {{ service }} service..."
+bash /usr/local/bin/ispawn-entrypoint-{{ service }}.sh
+echo "[$(date)] {{ service }} initiated."
+{% endfor %}
 
-{% if "rstudio" in SERVICES %}
-# Start RStudio Server
-echo "[$(date)] Starting RStudio server..."
-mkdir -p "${LOG_DIR}/rstudio"
-rstudio-server start > "${LOG_DIR}/rstudio/rstudio.log" 2>&1
-
-# Wait for RStudio to start
-echo "[$(date)] Waiting for RStudio to start..."
-for i in {1..30}; do
-    if rstudio-server status > /dev/null 2>&1; then
-        echo "[$(date)] RStudio server started successfully"
-        break
-    fi
-    if [ $i -eq 30 ]; then
-        echo "[$(date)] ERROR: RStudio server failed to start"
-        exit 1
-    fi
-    sleep 1
-done
-{% endif %}
-
-{% if "vscode" in SERVICES %}
-# Start VS Code Server
-echo "[$(date)] Starting VS Code server..."
-mkdir -p "${LOG_DIR}/vscode"
-sudo -u "$USERNAME" code-server \
-    --bind-addr 0.0.0.0:8842 \
-    --auth password \
-    --password "$PASSWORD" \
-    > "${LOG_DIR}/vscode/vscode.log" 2>&1 &
-
-# Wait for VS Code to start
-echo "[$(date)] Waiting for VS Code to start..."
-for i in {1..30}; do
-    if grep -q "HTTP server listening" "${LOG_DIR}/vscode/vscode.log"; then
-        echo "[$(date)] VS Code server started successfully"
-        break
-    fi
-    if [ $i -eq 30 ]; then
-        echo "[$(date)] ERROR: VS Code server failed to start"
-        exit 1
-    fi
-    sleep 1
-done
-{% endif %}
-
-echo "[$(date)] All services started successfully"
-
-# Keep container running and log any service failures
-while true; do
-    {% if "jupyter" in SERVICES %}
-    if ! pgrep -f "jupyter-notebook" > /dev/null; then
-        echo "[$(date)] ERROR: Jupyter server stopped unexpectedly"
-        exit 1
-    fi
-    {% endif %}
-
-    {% if "rstudio" in SERVICES %}
-    if ! rstudio-server status > /dev/null 2>&1; then
-        echo "[$(date)] ERROR: RStudio server stopped unexpectedly"
-        exit 1
-    fi
-    {% endif %}
-
-    {% if "vscode" in SERVICES %}
-    if ! pgrep -f "code-server" > /dev/null; then
-        echo "[$(date)] ERROR: VS Code server stopped unexpectedly"
-        exit 1
-    fi
-    {% endif %}
-
-    sleep 5
-done
+sleep infinity

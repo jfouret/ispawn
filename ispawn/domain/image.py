@@ -1,6 +1,24 @@
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from ispawn.domain.container import Service
+from enum import Enum
+
+# Get available services from directory structure
+SERVICES = {
+    d.name.upper(): d.name 
+    for d in (Path(__file__).parent / "services").iterdir() 
+    if d.is_dir()
+}
+
+Service = Enum('Service', SERVICES)
+
+@classmethod
+def from_str(cls, s: str):
+    try:
+        return cls(s)
+    except ValueError:
+        raise ValueError(f"No matching service found for '{s}'")
+
+Service.from_str = from_str
 
 class ImageConfig:
     """
@@ -8,21 +26,21 @@ class ImageConfig:
     
     Attributes:
         base_image (str): Base Docker image to build from
-        services (List[Service]): List of services to include in the image
+        services (List[str]): List of services to include in the image
         name_prefix (str): Prefix for the target image name
-        env_file (Optional[Path]): Path to environment file to include
-        setup_file (Optional[Path]): Path to setup script to include
-        templates_dir (Path): Directory containing template files
+        env_chunk_path (Optional[str]): Path to environment file to append to /etc/environment in Dockerfile at build-time
+        dockerfile_chunk_path (Optional[str]): Path to Dockerfile chunk to insert into Dockerfile and executed at build-time
+        entrypoint_chunk_path (Optional[str]): Path to entrypoint chunk to insert into the entrypoint script and executed at run-time
     """
 
     def __init__(
         self,
         base_image: str,
-        services: List[Service],
+        services: List[str],
         name_prefix: str,
-        env_file: Optional[Path],
-        setup_file: Optional[Path],
-        templates_dir: Optional[Path] = None
+        env_chunk_path: Optional[str] = None,
+        dockerfile_chunk_path: Optional[str] = None,
+        entrypoint_chunk_path: Optional[str] = None
     ):
         """
         Initialize image configuration.
@@ -32,19 +50,21 @@ class ImageConfig:
             services (List[Service]): Services to include in the image
             name_prefix (str): Prefix for the target image name
             env_file (Optional[Path]): Path to environment file
-            setup_file (Optional[Path]): Path to setup script
             templates_dir (Optional[Path]): Directory containing templates
         """
         self.base_image = base_image
         # Convert string services to enum if needed
-        self.services = [
-            Service.from_str(s) if isinstance(s, str) else s 
-            for s in services
-        ]
+        self.services = [ Service.from_str(s) for s in services ]
         self.name_prefix = name_prefix
-        self.env_file = env_file
-        self.setup_file = setup_file
-        self.templates_dir = templates_dir or Path(__file__).parent.parent / "templates"
+        self.env_chunk_path = Path(env_chunk_path) if env_chunk_path else None
+        self.dockerfile_chunk_path = Path(dockerfile_chunk_path) if dockerfile_chunk_path else None
+        self.entrypoint_chunk_path = Path(entrypoint_chunk_path) if entrypoint_chunk_path else None
+        for path in ["env_chunk_path", "dockerfile_chunk_path", "entrypoint_chunk_path"]:
+            v_path = self.__getattribute__(path)
+            if v_path is not None:
+                if not v_path.exists():
+                    raise FileNotFoundError(f"File not found: {v_path}")
+        self.templates_dir = Path(__file__).parent.parent / "templates"
 
     @property
     def target_image(self) -> str:
@@ -54,12 +74,15 @@ class ImageConfig:
         Returns:
             str: Target image name with prefix and tag
         """
+
         base_name, tag = self.base_image.split(':')
-        base_name = base_name.split('/')[-1]  # Handle registry paths
-        return f"{self.name_prefix}-{base_name}:{tag}"
+        services = [s.value for s in self.services]
+        services.sort()
+        services = "-".join(services)
+        return f"{self.name_prefix}-{base_name}:{tag}-{services}"
 
     @property
-    def dockerfile_path(self) -> Path:
+    def dockerfile_template_path(self) -> Path:
         """
         Get path to the Dockerfile template.
         
@@ -69,7 +92,7 @@ class ImageConfig:
         return self.templates_dir / "Dockerfile.j2"
 
     @property
-    def entrypoint_path(self) -> Path:
+    def entrypoint_template_path(self) -> Path:
         """
         Get path to the entrypoint script template.
         
@@ -78,34 +101,66 @@ class ImageConfig:
         """
         return self.templates_dir / "entrypoint.sh.j2"
 
-    def get_build_args(self) -> Dict[str, str]:
+    def _load_dockerfile_chunks(self, chunk_type: str) -> List[str]:
         """
-        Get build arguments for the Dockerfile.
+        Load chunks of specified type for each service.
         
+        Args:
+            chunk_type: Type of chunk to load ('Dockerfile' or 'entrypoint.sh')
+            
         Returns:
-            Dict[str, str]: Dictionary of build arguments
+            List[str]: List of chunks
         """
-        return {
-            "BASE_IMAGE": self.base_image,
-            "SERVICES": ",".join(s.value for s in self.services)
+        chunks = []
+        for service in self.services:
+            chunk_path = Path(__file__).parent / "services" / service.value / "Dockerfile"
+            if chunk_path.exists():
+                # Read content and normalize line endings
+                content = chunk_path.read_text()
+                content = content.replace('\r\n', '\n').strip()
+                chunks.append(content)
+            else:
+                raise FileNotFoundError(f"Dockerfile chunk  not found for service: {service.value}")
+        return "\n\n".join(chunks) + "\n"
+
+    def get_template_context(self, template_type: str) -> Dict[str, Any]:
+        """
+        Get template context for specified template type.
+        
+        Args:
+            template_type: Type of template ('Dockerfile' or 'entrypoint.sh')
+            
+        Returns:
+            Dict[str, Any]: Template context variables
+        """
+        context = {
+            "services": [s.value for s in self.services]
         }
-
-    def get_context_files(self) -> Dict[str, Path]:
-        """
-        Get files needed for the build context.
         
-        Returns:
-            Dict[str, Path]: Dictionary of context files
-        """
-        context = {}
-        
-        # Add optional files if they exist
-        if self.env_file and self.env_file.exists():
-            context["environment"] = self.env_file
-        if self.setup_file and self.setup_file.exists():
-            context["setup"] = self.setup_file
-
+        # Add template-specific variables
+        if template_type == "Dockerfile":
+            context = {
+                **context,
+                "service_chunks": self._load_dockerfile_chunks(template_type),
+                "has_env_in_context": True if self.env_chunk_path else False,
+                "dockerfile_chunk": self.dockerfile_chunk_path.read_text() if self.dockerfile_chunk_path else "",
+                "base_image": self.base_image
+            }
+        if template_type == "entrypoint.sh":
+            context = {
+                **context,
+                "entrypoint_chunk": self.entrypoint_chunk_path.read_text() if self.entrypoint_chunk_path else ""
+            }
+            
         return context
+
+    def get_dockerfile_args(self) -> Dict[str, str]:
+        """Get Dockerfile template context."""
+        return self.get_template_context("Dockerfile")
+
+    def get_entrypoint_args(self) -> Dict[str, str]:
+        """Get entrypoint template context."""
+        return self.get_template_context("entrypoint.sh")
 
     def get_build_context(self) -> Dict[str, Any]:
         """
@@ -114,10 +169,22 @@ class ImageConfig:
         Returns:
             Dict[str, Any]: Complete build context including all necessary files and arguments
         """
-        return {
-            "dockerfile": self.dockerfile_path,
-            "entrypoint": self.entrypoint_path,
-            "context_files": self.get_context_files(),
-            "build_args": self.get_build_args(),
-            "target_image": self.target_image
+        context =  {
+            "Dockerfile": {
+                "template": self.dockerfile_template_path,
+                "args": self.get_dockerfile_args()
+            },
+            "entrypoint.sh": {
+                "template": self.entrypoint_template_path,
+                "args": self.get_entrypoint_args()
+            }
         }
+        if self.env_chunk_path:
+            context["environment"] = {
+                "file": self.env_chunk_path.resolve()
+            }
+        for service in self.services:
+            context[f"ispawn-entrypoint-{service.value}.sh"] = {
+                "file": Path(__file__).parent / "services" / service.value / "entrypoint.sh"
+            }
+        return context

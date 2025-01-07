@@ -1,188 +1,214 @@
+"""Tests for configuration manager."""
+
+import os
 import pytest
 from pathlib import Path
-import yaml
-import tempfile
-from ispawn.services.config import Config
-from ispawn.domain.deployment import Mode, CertMode
+from unittest.mock import patch
+
+from ispawn.domain.proxy import ProxyConfig, ProxyMode, InstallMode
 from ispawn.domain.exceptions import ConfigurationError
+from ispawn.services.config import ConfigManager
 
-@pytest.fixture
-def temp_config_file():
-    """Create a temporary config file."""
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
-        yield Path(f.name)
-        Path(f.name).unlink()
-
-@pytest.fixture
-def sample_config():
-    """Sample configuration data."""
-    return {
-        "name": "test-ispawn",
-        "web": {
-            "domain": "test.local",
-            "subnet": "172.30.0.0/24",
-            "mode": Mode.LOCAL.value,
-            "ssl": {
-                "cert_dir": "/path/to/certs",
-                "cert_mode": CertMode.LETSENCRYPT.value,
+TEST_CONFIGS = [
+    pytest.param(
+        {
+            "config": {
+                "install_mode": InstallMode.USER.value,
+                "mode": ProxyMode.LOCAL.value,
+                "domain": "test.localhost",
+                "subnet": "172.31.0.0/24",
+                "name": "test-proxy-1",
+                "cert_mode": None,
+                "cert_dir": None,  # Will be set to tmp_path/certs
+                "email": None
+            },
+            "force": False,
+            "should_succeed": True,
+            "description": "Fresh config creation (user mode)"
+        },
+        id="user-config"
+    ),
+    pytest.param(
+        {
+            "config": {
+                "install_mode": InstallMode.SYSTEM.value,
+                "mode": ProxyMode.LOCAL.value,
+                "domain": "test.localhost",
+                "subnet": "172.32.0.0/24",
+                "name": "test-proxy-2",
+                "cert_mode": None,
+                "cert_dir": None,  # Will be set to tmp_path/etc/ispawn/certs
+                "email": None
+            },
+            "force": False,
+            "should_succeed": True,
+            "description": "System-wide installation (with root)"
+        },
+        id="system-config-root"
+    ),
+    pytest.param(
+        {
+            "config": {
+                "install_mode": InstallMode.SYSTEM.value,
+                "mode": ProxyMode.LOCAL.value,
+                "domain": "test.localhost",
+                "subnet": "172.33.0.0/24",
+                "name": "test-proxy-3",
+                "cert_mode": None,
+                "cert_dir": None,
+                "email": None
+            },
+            "force": False,
+            "should_succeed": False,  # Should fail without root
+            "description": "System-wide installation (without root)"
+        },
+        id="system-config-no-root"
+    ),
+    pytest.param(
+        {
+            "config": {
+                "install_mode": InstallMode.USER.value,
+                "mode": ProxyMode.LOCAL.value,
+                "domain": "test.localhost",
+                "subnet": "172.34.0.0/24",
+                "name": "test-proxy-4",  # Different name
+                "cert_mode": None,
+                "cert_dir": None,
+                "email": None
+            },
+            "force": False,
+            "should_succeed": False,  # Should fail with existing different config
+            "description": "Existing config conflict",
+            "existing_config": {  # Config to pre-create
+                "install_mode": InstallMode.USER.value,
+                "mode": ProxyMode.LOCAL.value,
+                "domain": "test.localhost",
+                "subnet": "172.34.0.0/24",
+                "name": "test-proxy-existing",  # Different name
+                "cert_mode": None,
+                "cert_dir": None,
                 "email": None
             }
         },
-        "logs": {
-            "dir": "/path/to/logs"
-        },
-        "services": {
-            "rstudio": {
-                "port": 8787,
-                "enabled": True
+        id="existing-config-conflict"
+    ),
+    pytest.param(
+        {
+            "config": {
+                "install_mode": InstallMode.USER.value,
+                "mode": ProxyMode.LOCAL.value,
+                "domain": "test.localhost",
+                "subnet": "172.35.0.0/24",
+                "name": "test-proxy-5",
+                "cert_mode": None,
+                "cert_dir": None,
+                "email": None
             },
-            "jupyter": {
-                "port": 8888,
-                "enabled": True
+            "force": True,  # Force overwrite
+            "should_succeed": True,
+            "description": "Force overwrite existing config",
+            "existing_config": {
+                "install_mode": InstallMode.USER.value,
+                "mode": ProxyMode.LOCAL.value,
+                "domain": "test.localhost",
+                "subnet": "172.35.0.0/24",
+                "name": "test-proxy-existing",
+                "cert_mode": None,
+                "cert_dir": None,
+                "email": None
             }
-        }
-    }
+        },
+        id="force-overwrite-existing"
+    )
+]
 
-def test_default_config_creation(temp_config_file):
-    """Test creation of default configuration."""
-    config = Config(temp_config_file)
+def _run_config_test(proxy_config, test_case, is_system):
+    """Run the actual config test with proper mocking."""
+    # Initialize and apply config
+    manager = ConfigManager(proxy_config, force=test_case["force"])
+    manager.apply_config()
     
-    assert config.name == "ispawn"
-    assert config.deployment.domain == "ispawn.localhost"
-    assert config.deployment.subnet == "172.30.0.0/24"
-    assert config.deployment.is_local is True
+    # Verify config was applied
+    config_path = Path(proxy_config.config_path)
+    compose_path = Path(manager.compose_path)
+    traefik_path = Path(manager.traefik_config_path)
+    
+    assert config_path.exists(), "Config file not created"
+    assert compose_path.exists(), "Compose file not created"
+    assert traefik_path.exists(), "Traefik config not created"
+    
+    # Verify system-specific requirements
+    if is_system:
+        # Check file permissions
+        assert oct(config_path.stat().st_mode)[-3:] == '644', "Wrong config file permissions"
+        # Note: can't check root ownership in tests as we're mocking root
+    else:
+        assert oct(config_path.stat().st_mode)[-3:] == '600', "Wrong config file permissions"
+    
+    if not test_case["should_succeed"]:
+        pytest.fail("Expected failure but operation succeeded")
+        
+    # Clean up Docker resources
+    manager.remove_config()
 
-def test_load_existing_config(temp_config_file, sample_config):
-    """Test loading existing configuration."""
-    # Write sample config
-    with open(temp_config_file, 'w') as f:
-        yaml.dump(sample_config, f)
+def _setup_existing_config(tmp_path, config_params, cert_dir):
+    """Setup pre-existing config if specified in test case."""
+    if not config_params:
+        return
+        
+    config_params = config_params.copy()
+    config_params["cert_dir"] = str(cert_dir)
+    existing_config = ProxyConfig(**config_params)
     
-    config = Config(temp_config_file)
+    # Create config file
+    config_dir = Path(existing_config.config_dir)
+    config_dir.mkdir(parents=True, exist_ok=True)
     
-    assert config.name == "test-ispawn"
-    assert config.deployment.domain == "test.local"
-    assert config.deployment.subnet == "172.30.0.0/24"
-    assert config.deployment.is_local is True
+    with open(existing_config.config_path, 'w') as f:
+        existing_config.to_yaml(f)
 
-def test_save_config_changes(temp_config_file):
-    """Test saving configuration changes."""
-    config = Config(temp_config_file)
+@pytest.mark.parametrize("test_case", TEST_CONFIGS)
+def test_config_manager(tmp_path, test_case):
+    """Test ConfigManager's core functionality."""
+    # Setup directories
+    is_system = test_case["config"]["install_mode"] == InstallMode.SYSTEM.value
     
-    # Make changes
-    config.set_domain("new.local")
-    config.set_subnet("172.31.0.0/24")
-    config.set_mode("remote")
+    if is_system:
+        # For system mode, setup mock system dir
+        system_dir = tmp_path / "system"
+        cert_dir = system_dir / "certs"
+    else:
+        # For user mode, use ~/.ispawn
+        cert_dir = tmp_path / "certs"
     
-    # Load config again to verify changes were saved
-    new_config = Config(temp_config_file)
-    assert new_config.deployment.domain == "new.local"
-    assert new_config.deployment.subnet == "172.31.0.0/24"
-    assert new_config.deployment.is_local is False
-
-def test_service_config_management(temp_config_file):
-    """Test service configuration management."""
-    config = Config(temp_config_file)
+    # Update cert_dir in config
+    config_params = test_case["config"].copy()
+    config_params["cert_dir"] = str(cert_dir)
     
-    # Get default service config
-    rstudio_config = config.get_service_config("rstudio")
-    assert rstudio_config["port"] == 8787
-    assert rstudio_config["enabled"] is True
-
-def test_invalid_service_config(temp_config_file):
-    """Test error handling for invalid service configuration."""
-    config = Config(temp_config_file)
+    # Create proxy config
+    proxy_config = ProxyConfig(**config_params)
     
-    with pytest.raises(ConfigurationError):
-        config.get_service_config("nonexistent")
-
-def test_invalid_mode_setting(temp_config_file):
-    """Test error handling for invalid mode setting."""
-    config = Config(temp_config_file)
-    
-    with pytest.raises(ConfigurationError):
-        config.set_mode("invalid")
-
-def test_config_file_permissions(temp_config_file):
-    """Test handling of permission errors."""
-    config = Config(temp_config_file)
-    
-    # Make file read-only
-    temp_config_file.chmod(0o444)
-    
-    with pytest.raises(ConfigurationError):
-        config.set_domain("new.local")
-
-def test_get_all_config(temp_config_file, sample_config):
-    """Test getting complete configuration."""
-    with open(temp_config_file, 'w') as f:
-        yaml.dump(sample_config, f)
-    
-    config = Config(temp_config_file)
-    all_config = config.get_all()
-    
-    assert all_config == sample_config
-    
-    # Verify it's a copy
-    all_config["name"] = "modified"
-    assert config.name == "test-ispawn"
-
-def test_config_directory_creation(temp_config_file):
-    """Test configuration directory creation."""
-    # Use a path in a non-existent directory
-    config_path = temp_config_file.parent / "subdir" / "config.yml"
-    
-    config = Config(config_path)
-    config.set_domain("test.local")  # This should create the directory
-    
-    assert config_path.exists()
-    assert config_path.parent.exists()
-    
-    # Cleanup
-    config_path.unlink()
-    config_path.parent.rmdir()
-
-def test_invalid_yaml_handling(temp_config_file):
-    """Test handling of invalid YAML content."""
-    # Write invalid YAML
-    with open(temp_config_file, 'w') as f:
-        f.write("invalid: yaml: content:\nindentation")
-    
-    with pytest.raises(ConfigurationError):
-        Config(temp_config_file)
-
-def test_deployment_config_integration(temp_config_file):
-    """Test integration with DeploymentConfig."""
-    config = Config(temp_config_file)
-    deployment = config.deployment
-    
-    assert isinstance(deployment.mode, Mode)
-    assert isinstance(deployment.cert_mode, CertMode)
-    assert deployment.domain == "ispawn.localhost"
-    assert deployment.subnet == "172.30.0.0/24"
-    
-    # Test mode changes
-    config.set_mode("remote")
-    new_deployment = config.deployment
-    assert new_deployment.mode == Mode.REMOTE
-    assert new_deployment.cert_mode == CertMode.LETSENCRYPT
-
-def test_cert_configuration(temp_config_file):
-    """Test certificate configuration."""
-    config = Config(temp_config_file)
-    
-    # Test remote mode with Let's Encrypt
-    config.set_mode("remote")
-    config.set_cert_mode("letsencrypt")
-    config.set_email("test@example.com")
-    
-    deployment = config.deployment
-    assert deployment.cert_mode == CertMode.LETSENCRYPT
-    assert deployment.email == "test@example.com"
-    assert deployment.requires_email is True
-    
-    # Test remote mode with provided certificates
-    config.set_cert_mode("provided")
-    deployment = config.deployment
-    assert deployment.cert_mode == CertMode.PROVIDED
-    assert deployment.requires_email is False
+    # Mock home directory for all tests
+    with patch('pathlib.Path.home', return_value=tmp_path):
+        # Setup any pre-existing config
+        if "existing_config" in test_case:
+            _setup_existing_config(tmp_path, test_case["existing_config"], cert_dir)
+            
+        # Additional mocks for system mode
+        if is_system:
+            # Only mock root for tests that should have root access
+            geteuid_value = 0 if test_case["should_succeed"] else 1000
+            with patch('os.geteuid', return_value=geteuid_value), \
+                 patch('os.chown', return_value=None), \
+                 patch('ispawn.domain.proxy.ProxyConfig.get_system_dir', return_value=str(system_dir)):
+                try:
+                    _run_config_test(proxy_config, test_case, is_system)
+                except ConfigurationError:
+                    if test_case["should_succeed"]:
+                        raise
+        else:
+            try:
+                _run_config_test(proxy_config, test_case, is_system)
+            except ConfigurationError:
+                if test_case["should_succeed"]:
+                    raise

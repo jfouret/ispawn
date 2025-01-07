@@ -4,6 +4,7 @@ from pathlib import Path
 from docker.models.containers import Container as DockerContainer
 from docker.models.networks import Network
 from ispawn.domain.container import ContainerConfig, Service
+from ispawn.domain.proxy import ProxyConfig
 from ispawn.domain.exceptions import ContainerError, NetworkError, ImageError
 
 class DockerService:
@@ -16,19 +17,29 @@ class DockerService:
         except docker.errors.DockerException as e:
             raise ContainerError(f"Failed to initialize Docker client: {str(e)}")
 
-    def create_network(self, name: str, subnet: str) -> Network:
-        """Create a Docker network for ispawn containers."""
+    def create_network(self, config: ProxyConfig) -> Network:
+        """Create a Docker network for ispawn containers.
+        
+        Args:
+            config: Proxy configuration containing network settings
+            
+        Returns:
+            Created Docker network
+            
+        Raises:
+            NetworkError: If network creation fails
+        """
         try:
             return self.client.networks.create(
-                name,
+                config.network_name,
                 driver="bridge",
                 ipam=docker.types.IPAMConfig(
-                    pool_configs=[docker.types.IPAMPool(subnet=subnet)]
+                    pool_configs=[docker.types.IPAMPool(subnet=config.subnet)]
                 ),
                 labels={"created_by": "ispawn"}
             )
         except docker.errors.APIError as e:
-            raise NetworkError(f"Failed to create network {name}: {str(e)}")
+            raise NetworkError(f"Failed to create network {config.network_name}: {str(e)}")
 
     def get_network(self, name: str) -> Optional[Network]:
         """Get a Docker network by name."""
@@ -38,11 +49,21 @@ class DockerService:
         except docker.errors.APIError as e:
             raise NetworkError(f"Failed to get network {name}: {str(e)}")
 
-    def ensure_network(self, name: str, subnet: str) -> Network:
-        """Ensure a Docker network exists, creating it if necessary."""
-        network = self.get_network(name)
+    def ensure_network(self, config: ProxyConfig) -> Network:
+        """Ensure a Docker network exists, creating it if necessary.
+        
+        Args:
+            config: Proxy configuration containing network settings
+            
+        Returns:
+            Existing or newly created Docker network
+            
+        Raises:
+            NetworkError: If network operations fail
+        """
+        network = self.get_network(config.network_name)
         if not network:
-            network = self.create_network(name, subnet)
+            network = self.create_network(config)
         return network
 
     def run_container(self, config: ContainerConfig, force: bool = False, command: Optional[str] = None) -> DockerContainer:
@@ -50,7 +71,6 @@ class DockerService:
         
         Args:
             container: Container configuration
-            network_name: Name of the network to connect to
             force: Force replace existing container if it exists
             command: Optional command to run in the container
             
@@ -68,6 +88,16 @@ class DockerService:
                     raise ContainerError(f"Container {config.container_name} already exists")
                 self.remove_container(config.container_name)
 
+            # Parse volume mounts
+            volumes = {}
+            for mount in config.get_volume_mounts():
+                parts = mount.split(":")
+                if len(parts) >= 2:
+                    src = parts[0]
+                    dst = parts[1]
+                    mode = parts[2] if len(parts) > 2 else "rw"
+                    volumes[str(src)] = {"bind": str(dst), "mode": mode}
+
             # Prepare container configuration
             container_config = {
                 "name": config.container_name,
@@ -76,10 +106,7 @@ class DockerService:
                 "environment": config.get_environment(),
                 "labels": {label: "true" for label in config.get_labels()},
                 "network": config.network_name,
-                "volumes": {
-                    str(src): {"bind": str(dst), "mode": "rw"}
-                    for src, dst in [v.split(":") for v in config.get_volume_mounts()]
-                }
+                "volumes": volumes
             }
 
             # Add command if provided

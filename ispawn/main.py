@@ -2,49 +2,139 @@ import click
 from pathlib import Path
 from typing import List
 import sys
+from datetime import datetime
 
-from ispawn.config import Config, Mode, CertMode
-from ispawn.commands.setup import setup_command
-from ispawn.commands.run import run_container
-from ispawn.commands.image import build_image, list_images, remove_images
-from ispawn.commands.list_containers import list_running_containers
-from ispawn.commands.logs import logs_command
+from ispawn.domain.proxy import InstallMode, CertMode, ProxyMode, ProxyConfig
+from ispawn.services.config import ConfigManager
+
+from ispawn.domain.image import Service, ImageConfig
+
+#from ispawn.commands.setup import setup_command
+#from ispawn.commands.run import run_container
+#from ispawn.commands.image import build_image, list_images, remove_images
+#from ispawn.commands.list_containers import list_running_containers
+#from ispawn.commands.logs import logs_command
 
 @click.group()
-@click.option('--config', type=click.Path(exists=True, path_type=Path),
-              help='Path to configuration file')
+@click.option('--force',
+              default = False,
+              is_flag = True,
+              help = 'Overwrite existing')
+@click.option('--user',
+              default = False,
+              is_flag = True,
+              help = 'Priorize user config over system config')
 @click.pass_context
-def cli(ctx, config: Path):
-    """ispawn - Interactive Scientific Python Workspace And Notebook."""
+def cli(ctx, force, user):
+    ctx.obj = {'force': force}
+    user_config = Path.home() / '.ispawn' / 'config.yaml'
+    system_config = Path('/etc/ispawn/config.yaml')
+    if user:
+        configs = [user_config, system_config]
+    else:
+        configs = [system_config, user_config]
+    
+    if all(c.exists() for c in configs):
+        warning_msg = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - WARN: 2 configs found both at user-lever ({user_config}) and system-level ({system_config})."
+        click.echo(click.style(warning_msg, fg='yellow'), err=True)
+        if not user:
+            warning_msg = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - WARN: system config in {system_config} will be used as default, use --user to change this behaviour"
+            click.echo(click.style(warning_msg, fg='yellow'), err=True)
+    
+    for config in configs:
+        if config.exists():
+            ctx.obj['config'] = ProxyConfig.from_yaml(open(config,"r"))
+            info_msg = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - INFO: Loaded config from {config}"
+            click.echo(click.style(info_msg, fg='green'))
+            break
+    
+    if "config" not in ctx.obj and ctx.invoked_subcommand != 'setup':
+        click.echo(click.style("Error: No valid config found, run ispawn setup", fg='red'), err=True)
+        sys.exit(1)
+         
+@cli.command()
+@click.option('--install-mode',
+              default=InstallMode.USER.value,
+              type=click.Choice([m.value for m in InstallMode]),
+              help='Where to install (user in ~/.ispawn or system in /etc/ispawn)')
+@click.option('--mode', 
+              default = ProxyMode.LOCAL.value,
+              type=click.Choice([m.value for m in ProxyMode]),
+              help='Proxy mode, from where do the client connect (local or remote)')
+@click.option('--domain',
+              default = 'ispawn.localhost',
+              help='Domain name')
+@click.option('--subnet',
+              default='172.30.0.0/24', 
+              help='Subnet CIDR string (docker internal subnet)')
+@click.option('--name',
+              default="ispawn",
+              help="Name for docker namespace"
+              )
+@click.option('--user-in-namespace',
+              is_flag = True,
+              help= 'If set, add username to namespace when running container')
+@click.option('--cert-mode',
+              type=click.Choice([m.value for m in CertMode]),
+              help='If Remote, Certificate mode (letsencrypt or provided)')
+@click.option('--cert-dir',
+              help = 'If provided, directory containing SSL certificate (cert.pem) and key (key.pem)'
+              )
+@click.option('--email',
+              help='if Letsencrypt, email')
+
+@click.pass_context
+def setup(ctx, **kwargs):
+    """Setup ispawn environment."""
+    proxy_config = ProxyConfig(**kwargs)
+    config_manager = ConfigManager(proxy_config, ctx.obj['force'])
+    config_manager.apply_config()
+
+@cli.group()
+def image():
+    """Manage Docker images."""
+    pass
+
+@image.command(name='build')
+@click.option('--base', required=True, help='Base image')
+@click.option('--name', required=True, help='Image name')
+@click.option('--service', 'services', multiple=True, required=True,
+              type=click.Choice([s.value for s in Service]),
+              help='Services to include (can be specified multiple times)')
+@click.option('--env-file', type=click.Path(exists=True, path_type=Path),
+              help='Path to environment file')
+@click.option('--setup-file', type=click.Path(exists=True, path_type=Path),
+              help='Path to setup script')
+@click.pass_context
+def build(ctx, **kwargs):
+    """Build a Docker image."""
+    kwargs["name"]
+    image_config = ImageConfig(**kwargs)
+    image_manager = ImageManager(image_config, ctx.obj['force'])
+    image_manager.build_image()
+
+
+@image.command(name='list')
+@click.pass_context
+def list_cmd(ctx):
+    """List Docker images."""
     try:
-        ctx.ensure_object(dict)
-        ctx.obj['config'] = Config(config)
+        list_images(config=ctx.obj['config'])
     except Exception as e:
         click.echo(f"Error: {str(e)}", err=True)
         sys.exit(1)
 
-@cli.command()
-@click.option('--mode', type=click.Choice([m.value for m in Mode]),
-              help='Deployment mode (local or remote)')
-@click.option('--domain', help='Domain name')
-@click.option('--subnet', help='Subnet configuration')
-@click.option('--cert-mode', type=click.Choice([m.value for m in CertMode]),
-              help='Certificate mode for remote deployment (letsencrypt or provided)')
-@click.option('--email', help='Email for Let\'s Encrypt certificates')
-@click.option('--env-file', type=click.Path(exists=True, path_type=Path),
-              help='Path to environment file')
+@image.command(name='remove')
+@click.argument('images', nargs=-1)
+@click.option('--all', is_flag=True, help='Remove all images')
 @click.pass_context
-def setup(ctx, mode, domain, subnet, cert_mode, email, env_file):
-    """Setup ispawn environment."""
+def remove(ctx, images: List[str], all: bool):
+    """Remove Docker images."""
     try:
-        setup_command(
+        remove_images(
             config=ctx.obj['config'],
-            mode=mode,
-            domain=domain,
-            subnet=subnet,
-            cert_mode=cert_mode,
-            email=email,
-            env_file=env_file
+            images=images,
+            remove_all=all
         )
     except Exception as e:
         click.echo(f"Error: {str(e)}", err=True)
@@ -84,63 +174,6 @@ def run(ctx, name, image, services, username, password, uid, gid, volumes, force
         click.echo(f"Error: {str(e)}", err=True)
         sys.exit(1)
 
-@cli.group()
-def image():
-    """Manage Docker images."""
-    pass
-
-@image.command(name='build')
-@click.option('--base', required=True, help='Base image')
-@click.option('--name', required=True, help='Image name')
-@click.option('--service', 'services', multiple=True, required=True,
-              type=click.Choice(['jupyter', 'rstudio', 'vscode']),
-              help='Services to include (can be specified multiple times)')
-@click.option('--env-file', type=click.Path(exists=True, path_type=Path),
-              help='Path to environment file')
-@click.option('--setup-file', type=click.Path(exists=True, path_type=Path),
-              help='Path to setup script')
-@click.pass_context
-def build(ctx, base, name, services, env_file, setup_file):
-    """Build a Docker image."""
-    try:
-        build_image(
-            config=ctx.obj['config'],
-            base_image=base,
-            name=name,
-            services=services,
-            env_file=env_file,
-            setup_file=setup_file
-        )
-    except Exception as e:
-        click.echo(f"Error: {str(e)}", err=True)
-        sys.exit(1)
-
-@image.command(name='list')
-@click.pass_context
-def list_cmd(ctx):
-    """List Docker images."""
-    try:
-        list_images(config=ctx.obj['config'])
-    except Exception as e:
-        click.echo(f"Error: {str(e)}", err=True)
-        sys.exit(1)
-
-@image.command(name='remove')
-@click.argument('images', nargs=-1)
-@click.option('--all', is_flag=True, help='Remove all images')
-@click.pass_context
-def remove(ctx, images: List[str], all: bool):
-    """Remove Docker images."""
-    try:
-        remove_images(
-            config=ctx.obj['config'],
-            images=images,
-            remove_all=all
-        )
-    except Exception as e:
-        click.echo(f"Error: {str(e)}", err=True)
-        sys.exit(1)
-
 @cli.command(name='list')
 @click.pass_context
 def list_cmd(ctx):
@@ -166,6 +199,3 @@ def logs(ctx, container: str, follow: bool):
     except Exception as e:
         click.echo(f"Error: {str(e)}", err=True)
         sys.exit(1)
-
-if __name__ == '__main__':
-    cli()

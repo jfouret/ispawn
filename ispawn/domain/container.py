@@ -1,32 +1,8 @@
-from enum import Enum
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union
 from pathlib import Path
 import os
 
-class Service(str, Enum):
-    """Available services that can be run in containers."""
-    JUPYTER = "jupyter"
-    RSTUDIO = "rstudio"
-    VSCODE = "vscode"
-
-    @classmethod
-    def from_str(cls, value: str) -> "Service":
-        """
-        Create Service from string.
-        
-        Args:
-            value (str): Service name to convert
-        
-        Returns:
-            Service: Corresponding Service enum value
-        
-        Raises:
-            ValueError: If the service name is invalid
-        """
-        try:
-            return cls(value.lower())
-        except ValueError:
-            raise ValueError(f"Invalid service: {value}")
+from ispawn.domain.image import Service
 
 class ContainerConfig:
     """
