@@ -21,4 +21,8 @@ classifiers = [
 ispawn = "ispawn.main:cli"
 
 [tool.setuptools.package-data]
-mypkg = ["templates/*.j2"]
+ispawn = [
+  "templates/*.j2",
+  "domain/services/*/Dockerfile",
+  "domain/services/*/entrypoint.sh"
+]

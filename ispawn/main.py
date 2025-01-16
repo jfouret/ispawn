@@ -6,14 +6,8 @@ from datetime import datetime
 
 from ispawn.domain.proxy import InstallMode, CertMode, ProxyMode, ProxyConfig
 from ispawn.services.config import ConfigManager
-
 from ispawn.domain.image import Service, ImageConfig
-
-#from ispawn.commands.setup import setup_command
-#from ispawn.commands.run import run_container
-#from ispawn.commands.image import build_image, list_images, remove_images
-#from ispawn.commands.list_containers import list_running_containers
-#from ispawn.commands.logs import logs_command
+from ispawn.services.image import ImageService
 
 @click.group()
 @click.option('--force',
@@ -26,32 +20,20 @@ from ispawn.domain.image import Service, ImageConfig
               help = 'Priorize user config over system config')
 @click.pass_context
 def cli(ctx, force, user):
-    ctx.obj = {'force': force}
-    user_config = Path.home() / '.ispawn' / 'config.yaml'
-    system_config = Path('/etc/ispawn/config.yaml')
-    if user:
-        configs = [user_config, system_config]
-    else:
-        configs = [system_config, user_config]
-    
-    if all(c.exists() for c in configs):
-        warning_msg = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - WARN: 2 configs found both at user-lever ({user_config}) and system-level ({system_config})."
-        click.echo(click.style(warning_msg, fg='yellow'), err=True)
-        if not user:
-            warning_msg = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - WARN: system config in {system_config} will be used as default, use --user to change this behaviour"
-            click.echo(click.style(warning_msg, fg='yellow'), err=True)
-    
-    for config in configs:
-        if config.exists():
-            ctx.obj['config'] = ProxyConfig.from_yaml(open(config,"r"))
-            info_msg = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - INFO: Loaded config from {config}"
-            click.echo(click.style(info_msg, fg='green'))
-            break
-    
-    if "config" not in ctx.obj and ctx.invoked_subcommand != 'setup':
+    ctx.obj = {
+      'force': force,
+      'user': user
+    }
+    config = ProxyConfig.load(user_mode = user)
+    if config is None:
+        config = ProxyConfig.load(user_mode = (not user))
+    if config is not None:
+        ctx.obj['config'] = config
+    if "config" not in ctx.obj.keys() and ctx.invoked_subcommand != 'setup':
         click.echo(click.style("Error: No valid config found, run ispawn setup", fg='red'), err=True)
+        print(ctx.obj)
         sys.exit(1)
-         
+
 @cli.command()
 @click.option('--install-mode',
               default=InstallMode.USER.value,
@@ -82,10 +64,16 @@ def cli(ctx, force, user):
               )
 @click.option('--email',
               help='if Letsencrypt, email')
-
+@click.option('--volumes',
+              help='Comma separated list of volumes to mounts by default',
+              default = '~')
+@click.option('--mount-point',
+              help='Default mount point for volumes',
+              default = '/mnt')
 @click.pass_context
 def setup(ctx, **kwargs):
     """Setup ispawn environment."""
+    kwargs['volumes'] = kwargs['volumes'].split(',')
     proxy_config = ProxyConfig(**kwargs)
     config_manager = ConfigManager(proxy_config, ctx.obj['force'])
     config_manager.apply_config()
@@ -96,33 +84,30 @@ def image():
     pass
 
 @image.command(name='build')
-@click.option('--base', required=True, help='Base image')
-@click.option('--name', required=True, help='Image name')
-@click.option('--service', 'services', multiple=True, required=True,
-              type=click.Choice([s.value for s in Service]),
+@click.option('-b', '--base', required=True, help='Base image')
+@click.option('-s', '--service', 'services', multiple=True, required=True,
+              type=click.Choice([s.value for s in Service], case_sensitive=False),
               help='Services to include (can be specified multiple times)')
-@click.option('--env-file', type=click.Path(exists=True, path_type=Path),
+@click.option('-e', '--env-chunk-path', type=click.Path(exists=True, path_type=str),
               help='Path to environment file')
-@click.option('--setup-file', type=click.Path(exists=True, path_type=Path),
-              help='Path to setup script')
+@click.option('-d', '--dockerfile-chunk-path', type=click.Path(exists=True, path_type=str),
+              help='Path to dockerfile chunk to add to the image')
+@click.option('-i','--entrypoint-chunk-path', type=click.Path(exists=True, path_type=str),
+              help='Path to entrypoint chunk to add to the image')
 @click.pass_context
 def build(ctx, **kwargs):
     """Build a Docker image."""
-    kwargs["name"]
+    kwargs["proxy_config"] = ctx.obj['config']
     image_config = ImageConfig(**kwargs)
-    image_manager = ImageManager(image_config, ctx.obj['force'])
-    image_manager.build_image()
-
+    im = ImageService(ctx.obj['config'])
+    im.build_image(image_config)
 
 @image.command(name='list')
 @click.pass_context
 def list_cmd(ctx):
     """List Docker images."""
-    try:
-        list_images(config=ctx.obj['config'])
-    except Exception as e:
-        click.echo(f"Error: {str(e)}", err=True)
-        sys.exit(1)
+    im = ImageService()
+    im.list_images()
 
 @image.command(name='remove')
 @click.argument('images', nargs=-1)

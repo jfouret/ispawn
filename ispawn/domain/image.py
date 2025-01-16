@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from enum import Enum
+from ispawn.domain.proxy import ProxyConfig
 
 # Get available services from directory structure
 SERVICES = {
@@ -25,9 +26,8 @@ class ImageConfig:
     Configuration for building a Docker image with comprehensive settings.
     
     Attributes:
-        base_image (str): Base Docker image to build from
+        base (str): Base Docker image to build from
         services (List[str]): List of services to include in the image
-        name_prefix (str): Prefix for the target image name
         env_chunk_path (Optional[str]): Path to environment file to append to /etc/environment in Dockerfile at build-time
         dockerfile_chunk_path (Optional[str]): Path to Dockerfile chunk to insert into Dockerfile and executed at build-time
         entrypoint_chunk_path (Optional[str]): Path to entrypoint chunk to insert into the entrypoint script and executed at run-time
@@ -35,9 +35,9 @@ class ImageConfig:
 
     def __init__(
         self,
-        base_image: str,
+        proxy_config: ProxyConfig,
+        base: str,
         services: List[str],
-        name_prefix: str,
         env_chunk_path: Optional[str] = None,
         dockerfile_chunk_path: Optional[str] = None,
         entrypoint_chunk_path: Optional[str] = None
@@ -46,16 +46,15 @@ class ImageConfig:
         Initialize image configuration.
         
         Args:
-            base_image (str): Base Docker image to build from
+            base (str): Base Docker image to build from
             services (List[Service]): Services to include in the image
-            name_prefix (str): Prefix for the target image name
             env_file (Optional[Path]): Path to environment file
             templates_dir (Optional[Path]): Directory containing templates
         """
-        self.base_image = base_image
+        self.base = base
         # Convert string services to enum if needed
         self.services = [ Service.from_str(s) for s in services ]
-        self.name_prefix = name_prefix
+        self.proxy_config = proxy_config
         self.env_chunk_path = Path(env_chunk_path) if env_chunk_path else None
         self.dockerfile_chunk_path = Path(dockerfile_chunk_path) if dockerfile_chunk_path else None
         self.entrypoint_chunk_path = Path(entrypoint_chunk_path) if entrypoint_chunk_path else None
@@ -74,12 +73,14 @@ class ImageConfig:
         Returns:
             str: Target image name with prefix and tag
         """
-
-        base_name, tag = self.base_image.split(':')
         services = [s.value for s in self.services]
         services.sort()
         services = "-".join(services)
-        return f"{self.name_prefix}-{base_name}:{tag}-{services}"
+        if ":" in self.base:
+            base_name, tag = self.base.split(':')
+            return f"{self.proxy_config.image_name_prefix}-{base_name}:{tag}-{services}"
+        else:
+            return f"{self.proxy_config.image_name_prefix}-{self.base}:{services}"
 
     @property
     def dockerfile_template_path(self) -> Path:
@@ -120,7 +121,7 @@ class ImageConfig:
                 content = content.replace('\r\n', '\n').strip()
                 chunks.append(content)
             else:
-                raise FileNotFoundError(f"Dockerfile chunk  not found for service: {service.value}")
+                raise FileNotFoundError(f"Dockerfile chunk  not found for service: {service.value} ({chunk_path})")
         return "\n\n".join(chunks) + "\n"
 
     def get_template_context(self, template_type: str) -> Dict[str, Any]:
@@ -144,7 +145,7 @@ class ImageConfig:
                 "service_chunks": self._load_dockerfile_chunks(template_type),
                 "has_env_in_context": True if self.env_chunk_path else False,
                 "dockerfile_chunk": self.dockerfile_chunk_path.read_text() if self.dockerfile_chunk_path else "",
-                "base_image": self.base_image
+                "base": self.base
             }
         if template_type == "entrypoint.sh":
             context = {

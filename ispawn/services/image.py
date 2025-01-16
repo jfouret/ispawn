@@ -11,16 +11,18 @@ from docker.models.images import Image
 from ispawn.domain.image import ImageConfig
 from ispawn.domain.container import Service
 from ispawn.domain.exceptions import ImageError
+from ispawn.domain.proxy import ProxyConfig
 
 class ImageService:
     """Service for handling Docker image operations."""
 
-    def __init__(self):
+    def __init__(self, proxy_config: ProxyConfig):
         """Initialize the Docker client."""
         try:
             self.client = docker.from_env()
         except docker.errors.DockerException as e:
             raise ImageError(f"Failed to initialize Docker client: {str(e)}")
+        self.proxy_config = proxy_config
 
     def build_image(self, config: ImageConfig) -> Image:
         """Build a Docker image using the provided configuration.
@@ -92,7 +94,7 @@ class ImageService:
         except Exception as e:
             raise ImageError(f"Failed to render template {template_path}: {str(e)}")
 
-    def list_images(self, prefix: str = "ispawn-") -> List[Dict[str, str]]:
+    def list_images(self) -> List[Dict[str, str]]:
         """List all ispawn images.
         
         Args:
@@ -111,7 +113,7 @@ class ImageService:
             filtered_images = []
             for img in images:
                 # Only include images that have exactly one tag and it starts with our prefix
-                if any(tag.startswith(prefix) for tag in img.tags):
+                if any(tag.startswith(f"{self.proxy_config.name}-") for tag in img.tags):
                     filtered_images.append(img)
             images = filtered_images
             return [
@@ -136,6 +138,8 @@ class ImageService:
         Raises:
             ImageError: If image removal fails
         """
+        if not name.startswith(f"{self.proxy_config.name}-"):
+            name = f"{self.proxy_config.name}-{name}"
         try:
             self.client.images.remove(name, force=force)
         except docker.errors.ImageNotFound:

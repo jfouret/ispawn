@@ -1,2 +1,4 @@
 include ispawn/templates/*.j2
 include ispawn/files/*
+include ispawn/domain/services/*/Dockerfile
+include ispawn/domain/services/*/entrypoint.sh
