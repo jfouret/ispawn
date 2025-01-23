@@ -1,8 +1,7 @@
 import docker
 from typing import List, Dict, Optional
 from pathlib import Path
-from docker.models.containers import Container as DockerContainer
-from docker.models.networks import Network
+from docker.models.containers import Container
 from docker.types import Mount
 from ispawn.domain.container import ContainerConfig
 from ispawn.domain.config import Config
@@ -19,7 +18,7 @@ class ContainerService:
         except docker.errors.DockerException as e:
             raise ContainerError(f"Failed to initialize Docker client: {str(e)}")
         self.config = config
-    def run_container(self, config: ContainerConfig, force: bool = False) -> DockerContainer:
+    def run_container(self, config: ContainerConfig, force: bool = False) -> Container:
         """Run a Docker container with the specified configuration.
         
         Args:
@@ -95,66 +94,46 @@ class ContainerService:
         Raises:
             ContainerError: If container listing fails
         """
-        try:
-            containers = self.client.containers.list(all=True)
-            result = []
-            for c in containers:
-                if not c.name.startswith(self.config.container_name_prefix):
-                    continue
-                    
-                # Handle containers with no tags
-                image_name = c.image.tags[0] if c.image.tags else "none:latest"
-                
-                # Get service URLs from Traefik labels
-                service_urls = []
-                
-                for label, value in c.labels.items():
-                    # Match router rule labels
-                    router_match = re.match(r'traefik\.http\.routers\.([^.]+)\.rule', label)
-                    if router_match:
-                        service_id = router_match.group(1)
-                        service_match = re.match(f'([^-]+)-{c.name}$', service_id)
-                        if service_match:
-                            domain_match = re.search(r'Host\(`([^`]+)`\)', value)
-                            if domain_match:
-                                domain = domain_match.group(1)
-                                service_urls.append(f"https://{domain}")
-                
-                result.append({
-                    "name": c.name,
-                    "urls": service_urls,
-                    "image": image_name,
-                    "status": c.status,
-                    "id": c.short_id
-                })
-            return result
-        except docker.errors.APIError as e:
-            raise ContainerError(f"Failed to list containers: {str(e)}")
-
-    def get_container(self, name: str) -> Optional[DockerContainer]:
-        """Get a Docker container by name.
-        
-        Args:
-            name: Container name
+        containers = self.client.containers.list(all=True)
+        result = []
+        for c in containers:
+            if not c.name.startswith(self.config.container_name_prefix):
+                continue
+            if c.name.endswith("-traefik"):
+                continue
+            try:
+                image_name = c.image.tags[0]
+            except:
+                image_name = c.attrs["Image"].split(":")[-1][:12]
             
-        Returns:
-            Optional[DockerContainer]: Container if found, None otherwise
+            # Get service URLs from Traefik labels
+            service_urls = []
             
-        Raises:
-            ContainerError: If container operations fail
-        """
-        try:
-            containers = self.client.containers.list(all=True, filters={"name": f"^{name}$"})
-            return containers[0] if containers else None
-        except docker.errors.APIError as e:
-            raise ContainerError(f"Failed to get container {name}: {str(e)}")
+            for label, value in c.labels.items():
+                # Match router rule labels
+                router_match = re.match(r'traefik\.http\.routers\.([^.]+)\.rule', label)
+                if router_match:
+                    service_id = router_match.group(1)
+                    service_match = re.match(f'([^-]+)-{c.name}$', service_id)
+                    if service_match:
+                        domain_match = re.search(r'Host\(`([^`]+)`\)', value)
+                        if domain_match:
+                            domain = domain_match.group(1)
+                            service_urls.append(f"https://{domain}")
+            
+            result.append({
+                "name": c.name,
+                "urls": service_urls,
+                "image": image_name,
+                "status": c.status,
+                "id": c.short_id
+            })
+        return result
 
-    def get_image(self, name: str) -> bool:
-        """Check if a Docker image exists."""
-        try:
-            self.client.images.get(name)
-            return True
-        except docker.errors.ImageNotFound:
-            return False
-        except docker.errors.APIError as e:
-            raise ImageError(f"Failed to check image {name}: {str(e)}")
+    def stop_container(self, container_id: str) -> None:
+        container: Container = self.client.containers.get(container_id)
+        container.stop()
+
+    def remove_container(self, container_id: str, force: bool = False) -> None:
+        container: Container = self.client.containers.get(container_id)
+        container.remove(force = force)

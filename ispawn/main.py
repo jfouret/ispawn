@@ -220,11 +220,9 @@ def list_containers(ctx):
     try:
         container_service = ContainerService(ctx.obj['config'])
         containers = container_service.list_containers()
-        
         if not containers:
             click.echo("No containers found")
             return
-            
         table = tabulate(
             [
                 [
@@ -243,23 +241,33 @@ def list_containers(ctx):
         click.echo(f"Error: {str(e)}", err=True)
         sys.exit(1)
 
-@cli.command()
-@click.argument('container')
-@click.option('--follow', '-f', is_flag=True, help='Follow log output')
+@cli.command(name='stop')
+@click.argument('containers', nargs = -1)
+@click.option('--all', is_flag=True, help='Stop all running containers')
+@click.option('--remove', is_flag=True, help='Remove also the containers')
 @click.pass_context
-def logs(ctx, container: str, follow: bool):
-    """Display container logs."""
-    try:
-        container_service = ContainerService(ctx.obj['config'])
-        docker_container = container_service.get_container(container)
-        
-        if not docker_container:
-            click.echo(f"Container {container} not found", err=True)
-            sys.exit(1)
-            
-        for line in docker_container.logs(stream=follow, follow=follow):
-            click.echo(line.decode().strip())
-            
-    except Exception as e:
-        click.echo(f"Error: {str(e)}", err=True)
-        sys.exit(1)
+def stop(ctx, containers, all, remove):
+    """Stop a running container."""
+    container_service = ContainerService(ctx.obj['config'])
+    if all:
+        container_list = [c["id"] for c in container_service.list_containers()]
+    else:
+        container_list = containers
+    for c_id in container_list:
+        container_service.stop_container(c_id)
+        if remove:
+            container_service.remove_container(c_id)
+
+@cli.command(name="rm")
+@click.argument('containers', nargs = -1)
+@click.option('--all', is_flag=True, help='Remove all containers')
+@click.pass_context
+def rm(ctx, containers, all):
+    """Remove a container."""
+    container_service = ContainerService(ctx.obj['config'])
+    if all:
+        container_list = [c["id"] for c in container_service.list_containers()]
+    else:
+        container_list = containers
+    for c_id in container_list:
+        container_service.remove_container(c_id, ctx.obj['force'])
