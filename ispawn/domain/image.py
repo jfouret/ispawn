@@ -1,7 +1,8 @@
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from enum import Enum
-from ispawn.domain.proxy import ProxyConfig
+from importlib import import_module
+from ispawn.domain.config import Config
 
 # Get available services from directory structure
 SERVICES = {
@@ -10,7 +11,20 @@ SERVICES = {
     if d.is_dir()
 }
 
+# Create the Enum as before
 Service = Enum('Service', SERVICES)
+
+# Add property to access config
+def port(self) -> Optional[int]:
+    """Get the port number defined in the service's config."""
+    try:
+        config = import_module(f"ispawn.domain.services.{self.value}.config")
+        return getattr(config, 'PORT', None)
+    except ImportError:
+        return None
+
+# Add the property to the Enum
+Service.port = property(port)
 
 @classmethod
 def from_str(cls, s: str):
@@ -35,7 +49,7 @@ class ImageConfig:
 
     def __init__(
         self,
-        proxy_config: ProxyConfig,
+        config: Config,
         base: str,
         services: List[str],
         env_chunk_path: Optional[str] = None,
@@ -54,7 +68,7 @@ class ImageConfig:
         self.base = base
         # Convert string services to enum if needed
         self.services = [ Service.from_str(s) for s in services ]
-        self.proxy_config = proxy_config
+        self.config = config
         self.env_chunk_path = Path(env_chunk_path) if env_chunk_path else None
         self.dockerfile_chunk_path = Path(dockerfile_chunk_path) if dockerfile_chunk_path else None
         self.entrypoint_chunk_path = Path(entrypoint_chunk_path) if entrypoint_chunk_path else None
@@ -78,9 +92,9 @@ class ImageConfig:
         services = "-".join(services)
         if ":" in self.base:
             base_name, tag = self.base.split(':')
-            return f"{self.proxy_config.image_name_prefix}-{base_name}:{tag}-{services}"
+            return f"{self.config.image_name_prefix}{base_name}:{tag}-{services}"
         else:
-            return f"{self.proxy_config.image_name_prefix}-{self.base}:{services}"
+            return f"{self.config.image_name_prefix}{self.base}:{services}"
 
     @property
     def dockerfile_template_path(self) -> Path:

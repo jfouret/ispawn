@@ -1,7 +1,7 @@
 from enum import Enum, EnumMeta
 from typing import Optional, TextIO
 from ispawn.domain.exceptions import ConfigurationError
-from yaml import dump, safe_load, Loader, Dumper, SafeDumper, SafeLoader
+from yaml import dump, safe_load
 from pathlib import Path
 from typing import List
 
@@ -34,7 +34,7 @@ class InstallMode(BaseMode):
     SYSTEM = "system"  # Install system-wide
     USER = "user"      # Install for current user
 
-class ProxyConfig:
+class Config:
     """Configuration for reverse proxy and SSL certificates.
     
     Attrs:
@@ -65,6 +65,7 @@ class ProxyConfig:
         domain: str,
         subnet: str,
         name: str,
+        dns: List[str],
         user_in_namespace: bool = False,
         cert_mode: Optional[str] = None,
         cert_dir: Optional[str] = None,
@@ -95,24 +96,14 @@ class ProxyConfig:
         self.name = name
         self.user_in_namespace = user_in_namespace
         self.mount_point = mount_point.rstrip("/") if mount_point else ""
-        self.volumes = []
-        for i in range(len(volumes)):
-            if len(volumes[i]) == 2 and isinstance(volumes[i], list):
-                self.volumes.append(volumes[i])
-            elif ":" in volumes[i]:
-                self.volumes.append(volumes[i].split(":"))
-                if len(self.volumes[i]) != 2:
-                    raise ConfigurationError(f"Invalid volume format: {volumes[i]}")
-            else:
-                v1 = volumes[i]
-                if self.mount_point:
-                    v2 = f"{self.mount_point}/{v1}"
-                else:
-                    v2 = v1
-                self.volumes.append([v1, v2])
-            for v in self.volumes[i]:
-                if not (v.startswith("/") or v.startswith("~")) :
-                    raise ConfigurationError(f"Volume path must be absolute: {v}")
+        self.volumes = volumes
+        
+        # Create user root directory and logs directory
+        user_root = Path(self.user_root_dir)
+        user_root.mkdir(parents=True, exist_ok=True)
+        
+        log_dir = Path(self.base_log_dir)
+        log_dir.mkdir(parents=True, exist_ok=True)
         
         # Certificate configuration
         if self.mode == ProxyMode.REMOTE:
@@ -147,29 +138,27 @@ class ProxyConfig:
             self.to_yaml(fh)
 
     @classmethod
-    def from_yaml(cls, fh: TextIO) -> "ProxyConfig":
-        """Create ProxyConfig from YAML."""
+    def from_yaml(cls, fh: TextIO) -> "Config":
+        """Create Config from YAML."""
         data = safe_load(fh)
         return cls(**data)
 
     @classmethod
-    def load(cls, user_mode = False) -> "ProxyConfig":
-        """Create ProxyConfig from system configuration using from_yaml."""
+    def load(cls, user_mode = False) -> "Config":
+        """Create Config from system configuration using from_yaml."""
         if user_mode:
             conf_path = Path.home() / ".ispawn" / "config.yaml"
         else:
             conf_path = Path("/etc/ispawn/config.yaml")
-        print(f"Loading proxy config from {conf_path}")
         if conf_path.exists():
-            print(f"Loading proxy config from {conf_path}")
             with open(conf_path, "r") as fh:
                 return cls.from_yaml(fh)
         else:
             return None
 
-    def __eq__(self, value: "ProxyConfig") -> bool:
-        if not isinstance(value, ProxyConfig):
-            print(f"{value} is not a ProxyConfig")
+    def __eq__(self, value: "Config") -> bool:
+        if not isinstance(value, Config):
+            print(f"{value} is not a Config")
             return False
         for k in self.__dict__.keys():
             if self.__dict__[k] != value.__dict__[k]:
@@ -208,17 +197,35 @@ class ProxyConfig:
         return str(Path.home() / ".ispawn")
 
     @property
+    def user_root_dir(self) -> str:
+        """Get user root directory path."""
+        return str(Path.home() / ".ispawn" / "user" / self.name)
+
+    @property
+    def base_log_dir(self) -> str:
+        """Get base log directory path."""
+        return str(Path(self.user_root_dir) / "logs")
+
+    @property
     def image_name_prefix(self) -> str:
         """Get image name prefix"""
-        return f"{self.name}"
+        return f"{self.name}-"
     
     @property
     def container_name_prefix(self) -> str:
         """Get container name prefix"""
         if self.user_in_namespace:
-            return f"{self.name}-{self.user}"
+            return f"{self.name}-{self.user}-"
         else:
-            return f"{self.name}"
+            return f"{self.name}-"
+
+    @property
+    def domain_prefix(self) -> str:
+        """Get domain prefix"""
+        if self.user_in_namespace:
+            return f"{self.user}-"
+        else:
+            return ""
 
     @property
     def config_path(self) -> str:

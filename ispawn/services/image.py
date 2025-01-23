@@ -1,4 +1,4 @@
-import os
+import sys
 import tempfile
 import shutil
 import importlib
@@ -9,20 +9,19 @@ import docker
 from docker.models.images import Image
 
 from ispawn.domain.image import ImageConfig
-from ispawn.domain.container import Service
 from ispawn.domain.exceptions import ImageError
-from ispawn.domain.proxy import ProxyConfig
+from ispawn.domain.config import Config
 
 class ImageService:
     """Service for handling Docker image operations."""
 
-    def __init__(self, proxy_config: ProxyConfig):
+    def __init__(self, config: Config):
         """Initialize the Docker client."""
         try:
             self.client = docker.from_env()
         except docker.errors.DockerException as e:
             raise ImageError(f"Failed to initialize Docker client: {str(e)}")
-        self.proxy_config = proxy_config
+        self.config = config
 
     def build_image(self, config: ImageConfig) -> Image:
         """Build a Docker image using the provided configuration.
@@ -58,11 +57,30 @@ class ImageService:
                 else:
                     raise ImageError(f"Invalid build context: {context_id}")
             # Build image
-            image, _ = self.client.images.build(
-                path=str(build_path),
-                tag=config.target_image,
-                rm=True  # Remove intermediate containers
-            )
+            try:
+                image, _ = self.client.images.build(
+                    path=str(build_path),
+                    tag=config.target_image,
+                    rm=True,
+                    quiet=False
+                )
+            except docker.errors.BuildError as e:
+                print(f"Build dir in {build_path}")
+                print("=================")
+                # Print the build logs from the error
+                for log in e.build_log:
+                    if 'stream' in log:
+                        print(log['stream'].strip())
+                    if 'error' in log:
+                        print(f"ERROR: {log['error'].strip()}")
+                    if 'errorDetail' in log:
+                        print(f"Error Detail: {log['errorDetail'].get('message', '').strip()}")
+                sys.exit(1)
+            except docker.errors.APIError as e:
+                print(f"Docker API error: {str(e)}")
+                sys.exit(1)
+            except Exception as e:
+                raise ImageError(f"Unexpected error: {str(e)}") from e
             
             # Clean up build directory only on success
             shutil.rmtree(build_dir)
@@ -113,12 +131,12 @@ class ImageService:
             filtered_images = []
             for img in images:
                 # Only include images that have exactly one tag and it starts with our prefix
-                if any(tag.startswith(f"{self.proxy_config.name}-") for tag in img.tags):
+                if any(tag.startswith(f"{self.config.image_name_prefix}") for tag in img.tags):
                     filtered_images.append(img)
             images = filtered_images
             return [
                 {
-                    "id": image.short_id,
+                    "id": image.short_id[7:],
                     "tags": image.tags,
                     "size": self._format_size(image.attrs["Size"]),
                     "created": image.attrs["Created"]
@@ -128,7 +146,7 @@ class ImageService:
         except docker.errors.APIError as e:
             raise ImageError(f"Failed to list images: {str(e)}")
 
-    def remove_image(self, name: str, force: bool = False) -> None:
+    def remove_image(self, digest: str, force: bool = False) -> None:
         """Remove a Docker image.
         
         Args:
@@ -138,14 +156,12 @@ class ImageService:
         Raises:
             ImageError: If image removal fails
         """
-        if not name.startswith(f"{self.proxy_config.name}-"):
-            name = f"{self.proxy_config.name}-{name}"
         try:
-            self.client.images.remove(name, force=force)
+            self.client.images.remove(digest, force=force)
         except docker.errors.ImageNotFound:
-            raise ImageError(f"Image not found: {name}")
+            raise ImageError(f"Image not found: {digest}")
         except docker.errors.APIError as e:
-            raise ImageError(f"Failed to remove image {name}: {str(e)}")
+            raise ImageError(f"Failed to remove image {digest}: {str(e)}")
 
     def _format_size(self, size_bytes: int) -> str:
         """Format size in bytes to human readable string.
@@ -161,3 +177,4 @@ class ImageService:
                 return f"{size_bytes:.1f} {unit}"
             size_bytes /= 1024
         return f"{size_bytes:.1f} TB"
+

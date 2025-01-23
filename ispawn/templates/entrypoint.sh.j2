@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-apt-get update && apt-get upgrade -y ca-certificates
+apt-get update
+
+apt-get upgrade -y --no-install-recommends ca-certificates adduser
 
 # Setup logging
 export LOG_DIR=/var/log/ispawn
@@ -9,23 +11,30 @@ mkdir -p $LOG_DIR
 exec 1> >(tee -a "${LOG_DIR}/entrypoint.log")
 exec 2>&1
 
+userdel -r $(id -nu 1000) || true
+
 echo "[$(date)] Starting container initialization..."
 
 {{ entrypoint_chunk|safe }}
 
 # Create user if it doesn't exist
-if ! id "$USERNAME" &>/dev/null; then
-    echo "[$(date)] Creating user $USERNAME..."
-    useradd -m -s /bin/bash -u $UID -g $GID "$USERNAME"
-    echo "$USERNAME:$PASSWORD" | chpasswd
-    adduser "$USERNAME" sudo
-    echo "[$(date)] User $USERNAME created successfully"
+if ! getent passwd "$USER_NAME" &>/dev/null; then
+    echo "[$(date)] Creating user $USER_NAME..."
+    useradd -m -s /bin/bash -u $USER_UID "$USER_NAME"
+    echo "$USER_NAME:$USER_PASS" | chpasswd
+    adduser "$USER_NAME" sudo
+    echo "[$(date)] User $USER_NAME created successfully"
 fi
 
-echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+
+mkdir -p /var/log/ispawn/services
+chown -R $USER_NAME:$USER_NAME /var/log/ispawn/services
 {% for service in services %}
 echo "[$(date)] Starting {{ service }} service..."
+touch /var/log/ispawn/services/{{ service }}.log
+chown $USER_NAME:$USER_NAME /var/log/ispawn/services/{{ service }}.log
 bash /usr/local/bin/ispawn-entrypoint-{{ service }}.sh
 echo "[$(date)] {{ service }} initiated."
 {% endfor %}

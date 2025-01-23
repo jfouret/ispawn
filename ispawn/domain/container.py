@@ -1,192 +1,100 @@
 from typing import List, Dict, Union
 from pathlib import Path
 import os
+import getpass
 
-from ispawn.domain.image import Service
+from ispawn.domain.image import Service, ImageConfig
+from ispawn.domain.config import Config
 
 class ContainerConfig:
     """
     Configuration for a container with comprehensive settings.
     
     Attributes:
-        raw_name (str): Original container name
-        container_name (str): Fully qualified container name with prefix
-        network_name (str): Docker network name
-        image (str): Docker image to use
-        services (List[Service]): List of services to run in the container
-        username (str): Username for services
-        password (str): Password for services
-        uid (int): User ID to run services as
-        gid (int): Group ID to run services as
-        domain (str): Domain for service URLs
-        dns (List[str]): List of DNS servers
-        volumes (List[str]): List of volume mount configurations
-        host_prefix (str): Prefix to add to volumes mounted from the host
-        log_dir (str): Directory for container logs
-        cert_mode (str): Certificate mode ('provided' or 'letsencrypt')
+        name (str): Original container name
     """
 
     def __init__(
         self,
         name: str,
-        name_prefix: str,
-        network_name: str,
-        image: str,
-        services: Union[List[Service], List[str]],
-        username: str,
-        password: str,
-        uid: int,
-        gid: int,
-        domain: str,
-        dns: List[str],
-        volumes: List[str],
-        host_prefix: str,
-        log_base_dir: str,
-        cert_mode: str
+        config: Config,
+        image_config: ImageConfig,
+        volumes: List[List[str]]
     ):
         """
         Initialize container configuration.
         
         Args:
-            name (str): Container name
-            name_prefix (str): Prefix for container naming
-            network_name (str): Docker network name
-            image (str): Docker image to use
-            services (List[Service] or List[str]): Services to run
-            username (str): Username for services
-            password (str): Password for services
-            uid (int): User ID to run services
-            gid (int): Group ID to run services
-            domain (str): Domain for service URLs
-            dns (Optional[List[str]], optional): DNS servers. Defaults to Google DNS.
-            volumes (Optional[List[str]], optional): Volume mounts
-            host_prefix (str, optional): Prefix for host volumes. Defaults to "/mnt/host".
-            log_base_dir (Optional[Union[str, Path]], optional): Base log directory
-            cert_mode (str, optional): Certificate mode. Defaults to "provided".
         
         Raises:
             ValueError: If cert_mode is invalid
         """
-        # Validate inputs
-        if cert_mode not in ["provided", "letsencrypt"]:
-            raise ValueError("cert_mode must be 'provided' or 'letsencrypt'")
 
+        self.config = config
         self.raw_name = name
-        self.container_name = f"{name_prefix}-{name}"
-        self.network_name = network_name
-        self.image = image
-        
-        # Convert services to Service enum if needed
-        self.services = [
-            Service.from_str(s) if isinstance(s, str) else s 
-            for s in services
-        ]
-        
-        self.username = username
-        self.password = password
-        self.uid = uid
-        self.gid = gid
-        self.domain = domain
-        
-        # Default DNS if not provided
-        self.dns = dns or ["8.8.8.8", "8.8.4.4"]
-        self.cert_mode = cert_mode
-        self.host_prefix = host_prefix
+        self.container_name = f"{config.container_name_prefix}{name}"
+        self.image_config = image_config
+        log_dir = Path(config.base_log_dir) / self.container_name
+        log_dir.mkdir(parents=True, exist_ok=True)
+        self.log_dir = str(log_dir)
         
         # Process volumes
-        self._raw_volumes = volumes or [str(Path.home())]
-        self.volumes = [
-            f"{volume}:{os.path.join(self.host_prefix, volume.lstrip('/'))}"
-            for volume in self._raw_volumes
-        ]
-        
-        log_base_path = Path(log_base_dir) / name
-        self.log_dir = str(log_base_path)
-        self.volumes.append(f"{self.log_dir}:/var/log/ispawn:rw")
+        self.volumes = config.volumes
+        self.volumes.extend(volumes)
+        self.volumes.append([f"{self.log_dir}", "/var/log/ispawn"])
 
-    def get_labels(self) -> List[str]:
+    def get_labels(self) -> Dict[str, str]:
         """
         Generate container labels for Traefik routing and service identification.
         
         Returns:
-            List[str]: List of Docker labels
+            Dict[str, str]: Dictionary of Docker labels
         """
-        labels = [
-            f"ispawn.container={self.raw_name}",
-            f"ispawn.domain={self.domain}",
-            "traefik.enable=true",
-            "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https",
-            "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
-        ]
-        
-        # Service-specific labels
-        service_configs = {
-            Service.JUPYTER: {"port": 8888, "prefix": "jupyter"},
-            Service.RSTUDIO: {"port": 8787, "prefix": "rstudio"},
-            Service.VSCODE: {"port": 8842, "prefix": "vscode"}
+        labels = {
+            "traefik.enable": "true",
+            "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme": "https",
+            "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent": "true"
         }
         
-        for service in self.services:
-            config = service_configs.get(service)
-            if config:
-                service_labels = [
-                    f"ispawn.service.{config['prefix']}=true",
-                    f"ispawn.port.{config['prefix']}={config['port']}",
-                    f"traefik.http.routers.{config['prefix']}-{self.raw_name}.rule=Host(`{config['prefix']}-{self.raw_name}.{self.domain}`)",
-                    f"traefik.http.routers.{config['prefix']}-{self.raw_name}.entrypoints=websecure",
-                    f"traefik.http.services.{config['prefix']}-{self.raw_name}.loadbalancer.server.port={config['port']}",
-                    f"traefik.http.routers.{config['prefix']}-{self.raw_name}.middlewares=redirect-to-https"
-                ]
+        for service in self.image_config.services:
+            service_domain = self.get_service_domain(service)
+            service_id = f"{service.value}-{self.container_name}"
+            
+            labels.update({
+                f"ispawn.port.{service.value}": str(service.port),
+                f"traefik.http.routers.{service_id}.rule": f"Host(`{service_domain}`)",
+                f"traefik.http.routers.{service_id}.entrypoints": "websecure",
+                f"traefik.http.services.{service_id}.loadbalancer.server.port": str(service.port),
+                f"traefik.http.routers.{service_id}.middlewares": "redirect-to-https",
+                f"traefik.http.routers.{service_id}.tls": "true"
+            })
+            
+            if self.config.cert_mode == "letsencrypt":
+                labels[f"traefik.http.routers.{service_id}.tls.certresolver"] = "letsencrypt"
                 
-                # TLS configuration
-                tls_label = (
-                    f"traefik.http.routers.{config['prefix']}-{self.raw_name}.tls.certresolver=letsencrypt"
-                    if self.cert_mode == "letsencrypt" 
-                    else f"traefik.http.routers.{config['prefix']}-{self.raw_name}.tls=true"
-                )
-                service_labels.append(tls_label)
-                
-                labels.extend(service_labels)
-        
         return labels
 
-    def get_environment(self) -> Dict[str, str]:
+    def environment(self) -> Dict[str, str]:
         """
         Generate environment variables for the container.
-        
-        Returns:
-            Dict[str, str]: Dictionary of environment variables
         """
         return {
-            "USERNAME": self.username,
-            "PASSWORD": self.password,
-            "UID": str(self.uid),
-            "GID": str(self.gid),
-            "SERVICES": ",".join(s.value for s in self.services)
+            "USER_NAME": getpass.getuser(),
+            "USER_PASS": getpass.getpass("Enter password: "),
+            "USER_UID": str(os.getuid()),
+            "USER_GID": str(os.getgid()),
+            "LOG_DIR": "/var/log/ispawn",
+            "SERVICES": ",".join(s.value for s in self.image_config.services)
         }
 
-    def get_volume_mounts(self) -> List[str]:
+    def get_service_domain(self, service: Service) -> str:
         """
-        Get container volume mount configurations.
+        Generate service domain name.
         
+        Args:
+            service: Service type
+            
         Returns:
-            List[str]: List of volume mount configurations
+            str: Service domain name
         """
-        return self.volumes
-
-    def get_service_urls(self) -> Dict[Service, str]:
-        """
-        Generate service access URLs.
-        
-        Returns:
-            Dict[Service, str]: Dictionary of service URLs
-        """
-        urls = {}
-        for service in self.services:
-            if service == Service.JUPYTER:
-                urls[service] = f"https://jupyter-{self.raw_name}.{self.domain}?token={self.password}"
-            elif service == Service.RSTUDIO:
-                urls[service] = f"https://rstudio-{self.raw_name}.{self.domain}"
-            elif service == Service.VSCODE:
-                urls[service] = f"https://vscode-{self.raw_name}.{self.domain}"
-        return urls
+        return f"{self.config.domain_prefix}{service.value}-{self.raw_name}.{self.config.domain}"

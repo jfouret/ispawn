@@ -3,7 +3,7 @@ from pathlib import Path
 import time
 import docker
 
-from ispawn.services.docker import DockerService
+from ispawn.services.container import DockerService
 from ispawn.domain.container import ContainerConfig, Service
 from ispawn.domain.proxy import ProxyConfig, ProxyMode, CertMode
 from ispawn.domain.exceptions import ContainerError, NetworkError, ImageError
