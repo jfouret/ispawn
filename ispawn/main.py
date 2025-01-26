@@ -101,6 +101,12 @@ def cli(ctx, force, user):
               default = ["8.8.8.8", "8.8.4.4"],
               multiple=True,
               help='')
+@click.option('--env-chunk-path', type=click.Path(exists=True, path_type=str),
+              help='Default path to environment file for Docker builds')
+@click.option('--dockerfile-chunk-path', type=click.Path(exists=True, path_type=str),
+              help='Default path to dockerfile chunk for Docker builds')
+@click.option('--entrypoint-chunk-path', type=click.Path(exists=True, path_type=str),
+              help='Default path to entrypoint chunk for Docker builds')
 @click.pass_context
 def setup(ctx, **kwargs):
     """Setup ispawn environment."""
@@ -115,12 +121,6 @@ def setup(ctx, **kwargs):
 @click.option('-s', '--service', 'services', multiple=True,
               type=click.Choice([s.value for s in Service], case_sensitive=False),
               help='Services to run (can be specified multiple times). Defaults to vscode, rstudio, and jupyter if not specified.')
-@click.option('-e', '--env-chunk-path', type=click.Path(exists=True, path_type=str),
-              help='Path to environment file')
-@click.option('-d', '--dockerfile-chunk-path', type=click.Path(exists=True, path_type=str),
-              help='Path to dockerfile chunk to add to the image')
-@click.option('-i','--entrypoint-chunk-path', type=click.Path(exists=True, path_type=str),
-              help='Path to entrypoint chunk to add to the image')
 @click.pass_context
 def build(ctx, **kwargs):
     """Build a Docker image."""
@@ -180,8 +180,10 @@ def remove(ctx, images: List[str], all: bool):
               help='Services to run (can be specified multiple times). Defaults to vscode, rstudio, and jupyter if not specified.')
 @click.option('-v', '--volume', 'volumes', multiple=True,
               help='Volume mounts (can be specified multiple times)')
+@click.option('-g', '--group',
+              help='Required group for RStudio access (defaults to username)')
 @click.pass_context
-def run(ctx, name, base: str, services: List[str], volumes: List[str], build):
+def run(ctx, name, base: str, services: List[str], volumes: List[str], build, group: str):
     """Run a container."""
     try:
         # Parse volumes
@@ -213,7 +215,8 @@ def run(ctx, name, base: str, services: List[str], volumes: List[str], build):
             name=name,
             config=ctx.obj['config'],
             image_config=image_config,
-            volumes=parsed_volumes
+            volumes=parsed_volumes,
+            group=group
         )
         
         # Initialize container service

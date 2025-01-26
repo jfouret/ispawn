@@ -19,3 +19,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && gdebi --n rstudio-server-${RSTUDIO_VERSION}-${ARCH}.deb \
   && rm rstudio-server-${RSTUDIO_VERSION}-${ARCH}.deb \
   && rm -rf /var/lib/apt/lists/*
+
+RUN  echo "" >> $(Rscript -e 'cat(R.home())')/etc/Renviron.site \\
+  && cat /etc/environment >> $(Rscript -e 'cat(R.home())')/etc/Renviron.site

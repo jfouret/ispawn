@@ -47,6 +47,9 @@ class Config:
       cert_mode: Certificate mode (required for remote proxy)
       cert_dir: Directory for SSL certificates
       email: Email for Let's Encrypt (required if cert_mode is letsencrypt)
+      env_chunk_path: Path to environment file for Docker builds
+      dockerfile_chunk_path: Path to dockerfile chunk for Docker builds
+      entrypoint_chunk_path: Path to entrypoint chunk for Docker builds
     """
     
     @staticmethod
@@ -65,13 +68,16 @@ class Config:
         domain: str,
         subnet: str,
         name: str,
-        dns: List[str],
+        dns: List[str] = None,
         user_in_namespace: bool = False,
         cert_mode: Optional[str] = None,
         cert_dir: Optional[str] = None,
         email: Optional[str] = None,
         volumes: str = None,
-        mount_point: str = None
+        mount_point: str = None,
+        env_chunk_path: Optional[str] = None,
+        dockerfile_chunk_path: Optional[str] = None,
+        entrypoint_chunk_path: Optional[str] = None
     ):
         """Initialize reverse proxy configuration.
         
@@ -84,6 +90,9 @@ class Config:
             cert_mode: Certificate mode (required for remote proxy)
             cert_dir: Directory for SSL certificates
             email: Email for Let's Encrypt (required if cert_mode is letsencrypt)
+            env_chunk_path: Path to environment file for Docker builds
+            dockerfile_chunk_path: Path to dockerfile chunk for Docker builds
+            entrypoint_chunk_path: Path to entrypoint chunk for Docker builds
             
         Raises:
             ConfigurationError: If configuration is invalid
@@ -91,12 +100,16 @@ class Config:
         
         self.mode = ProxyMode.from_str(mode)
         self.install_mode = InstallMode.from_str(install_mode)
+        self.dns = dns or ["8.8.8.8", "8.8.4.4"]
         self.domain = domain
         self.subnet = subnet
         self.name = name
         self.user_in_namespace = user_in_namespace
         self.mount_point = mount_point.rstrip("/") if mount_point else ""
         self.volumes = volumes
+        self.env_chunk_path = str(Path(env_chunk_path).resolve()) if env_chunk_path else None
+        self.dockerfile_chunk_path = str(Path(dockerfile_chunk_path).resolve()) if dockerfile_chunk_path else None
+        self.entrypoint_chunk_path = str(Path(entrypoint_chunk_path).resolve()) if entrypoint_chunk_path else None
         
         # Create user root directory and logs directory
         user_root = Path(self.user_root_dir)
