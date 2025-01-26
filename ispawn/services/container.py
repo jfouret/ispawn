@@ -31,50 +31,48 @@ class ContainerService:
         Raises:
             ContainerError: If container operations fail
         """
+        # Check if container already exists
         try:
-            # Check if container already exists
-            existing = self.get_container(config.container_name)
-            if existing:
-                if not force:
-                    raise ContainerError(f"Container {config.container_name} already exists")
-                self.remove_container(config.container_name)
+            existing = self.client.containers.get(config.container_name)
+        except:
+            existing = False
+        if existing:
+            if force:
+                self.remove_container(config.container_name, force = True)
+            else:
+                raise ContainerError(f"Container {config.container_name} already exists")
 
-            # Parse volume mounts
-            mounts = []
-            for volume in config.volumes:
-                src, dst = volume[:2]
-                if len(volume) == 3:
-                    mode = volume[2]
-                else:
-                    mode = "rw"
-                mounts.append(
-                    Mount(
-                        target = dst,
-                        source = src,
-                        type = "bind",
-                        read_only = (mode == "ro")
-                    )
+        # Parse volume mounts
+        mounts = []
+        for volume in config.volumes:
+            src, dst = volume[:2]
+            if len(volume) == 3:
+                mode = volume[2]
+            else:
+                mode = "rw"
+            mounts.append(
+                Mount(
+                    target = dst,
+                    source = src,
+                    type = "bind",
+                    read_only = (mode == "ro")
                 )
+            )
 
-            # Prepare container configuration
-            container_config = {
-                "name": config.container_name,
-                "image": config.image_config.target_image,
-                "detach": True,
-                "environment": config.environment(),
-                "labels": config.get_labels(),
-                "network": config.config.network_name,
-                "mounts": mounts,
-                "command": "sleep infinity"
-            }
+        # Prepare container configuration
+        container_config = {
+            "name": config.container_name,
+            "image": config.image_config.target_image,
+            "detach": True,
+            "environment": config.environment(),
+            "labels": config.get_labels(),
+            "network": config.config.network_name,
+            "mounts": mounts,
+            "command": "sleep infinity"
+        }
 
-
-            # Run the container
-            return self.client.containers.run(**container_config)
-        except docker.errors.ImageNotFound:
-            raise ImageError(f"Image {config.image_config.target_image} not found")
-        except docker.errors.APIError as e:
-            raise ContainerError(f"Failed to run container {config.container_name}: {str(e)}")
+        # Run the container
+        return self.client.containers.run(**container_config)
 
     def remove_container(self, name: str, force: bool = True) -> None:
         """Remove a Docker container."""

@@ -58,19 +58,21 @@ class ContainerConfig:
         
         for service in self.image_config.services:
             service_domain = self.get_service_domain(service)
-            service_id = f"{service.value}-{self.container_name}"
+            router_id = f"{self.container_name}-{service.value}"
+            service_id = f"{self.container_name}-{service.value}-service"
             
             labels.update({
                 f"ispawn.port.{service.value}": str(service.port),
-                f"traefik.http.routers.{service_id}.rule": f"Host(`{service_domain}`)",
-                f"traefik.http.routers.{service_id}.entrypoints": "websecure",
-                f"traefik.http.services.{service_id}.loadbalancer.server.port": str(service.port),
-                f"traefik.http.routers.{service_id}.middlewares": "redirect-to-https",
-                f"traefik.http.routers.{service_id}.tls": "true"
+                f"traefik.http.routers.{router_id}.rule": f"Host(`{service_domain}`)",
+                f"traefik.http.routers.{router_id}.entrypoints": "websecure",
+                f"traefik.http.routers.{router_id}.middlewares": "redirect-to-https",
+                f"traefik.http.routers.{router_id}.tls": "true",
+                f"traefik.http.routers.{router_id}.service": service_id,
+                f"traefik.http.services.{service_id}.loadbalancer.server.port": str(service.port)
             })
             
             if self.config.cert_mode == "letsencrypt":
-                labels[f"traefik.http.routers.{service_id}.tls.certresolver"] = "letsencrypt"
+                labels[f"traefik.http.routers.{router_id}.tls.certresolver"] = "letsencrypt"
                 
         return labels
 

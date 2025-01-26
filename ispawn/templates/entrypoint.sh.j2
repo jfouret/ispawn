@@ -8,12 +8,9 @@ apt-get upgrade -y --no-install-recommends ca-certificates adduser
 # Setup logging
 export LOG_DIR=/var/log/ispawn
 mkdir -p $LOG_DIR
+echo "[$(date)] Starting container initialization..." > "${LOG_DIR}/entrypoint.log"
 exec 1> >(tee -a "${LOG_DIR}/entrypoint.log")
 exec 2>&1
-
-userdel -r $(id -nu 1000) || true
-
-echo "[$(date)] Starting container initialization..."
 
 {{ entrypoint_chunk|safe }}
 
@@ -28,12 +25,11 @@ fi
 
 echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-
 mkdir -p /var/log/ispawn/services
 chown -R $USER_NAME:$USER_NAME /var/log/ispawn/services
 {% for service in services %}
 echo "[$(date)] Starting {{ service }} service..."
-touch /var/log/ispawn/services/{{ service }}.log
+echo "" > /var/log/ispawn/services/{{ service }}.log
 chown $USER_NAME:$USER_NAME /var/log/ispawn/services/{{ service }}.log
 bash /usr/local/bin/ispawn-entrypoint-{{ service }}.sh
 echo "[$(date)] {{ service }} initiated."

@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bzip2 \
     wget \
     sudo \
+    passwd \
     && rm -rf /var/lib/apt/lists/*
 
 {% if has_env_in_context %}
@@ -29,6 +30,8 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 {% for service in services %}
 COPY ispawn-entrypoint-{{service}}.sh /usr/local/bin/ispawn-entrypoint-{{service}}.sh
 {% endfor %}
+
+RUN for i in $(seq -w 0 100) ; do (userdel $(id -nu 1$i) || true) ; done
 
 # Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

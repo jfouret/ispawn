@@ -110,16 +110,11 @@ def setup(ctx, **kwargs):
     config_manager = ConfigManager(config, ctx.obj['force'])
     config_manager.apply_config()
 
-@cli.group()
-def image():
-    """Manage Docker images."""
-    pass
-
-@image.command(name='build')
+@cli.command(name='build')
 @click.option('-b', '--base', required=True, help='Base image')
-@click.option('-s', '--service', 'services', multiple=True, required=True,
+@click.option('-s', '--service', 'services', multiple=True,
               type=click.Choice([s.value for s in Service], case_sensitive=False),
-              help='Services to include (can be specified multiple times)')
+              help='Services to run (can be specified multiple times). Defaults to vscode, rstudio, and jupyter if not specified.')
 @click.option('-e', '--env-chunk-path', type=click.Path(exists=True, path_type=str),
               help='Path to environment file')
 @click.option('-d', '--dockerfile-chunk-path', type=click.Path(exists=True, path_type=str),
@@ -129,10 +124,20 @@ def image():
 @click.pass_context
 def build(ctx, **kwargs):
     """Build a Docker image."""
+    # Set default services if none specified
+    if "services" not in kwargs.keys():
+        kwargs["services"] = []
+    if len(kwargs["services"]) == 0:
+        kwargs["services"] = ["vscode", "rstudio", "jupyter"]
     kwargs["config"] = ctx.obj['config']
     image_config = ImageConfig(**kwargs)
     im = ImageService(ctx.obj['config'])
     im.build_image(image_config)
+
+@cli.group()
+def image():
+    """Manage Docker images."""
+    pass
 
 @image.command(name='list')
 @click.pass_context
@@ -169,17 +174,24 @@ def remove(ctx, images: List[str], all: bool):
 @cli.command()
 @click.option('-n', '--name', required=True, help='Container name')
 @click.option('-b' ,'--base', required=True, help='Base docker image')
-@click.option('-s', '--service', 'services', multiple=True, required=True,
+@click.option('--build', is_flag=True,  help='Build image if missing')
+@click.option('-s', '--service', 'services', multiple=True,
               type=click.Choice([s.value for s in Service], case_sensitive=False),
-              help='Services to run (can be specified multiple times)')
+              help='Services to run (can be specified multiple times). Defaults to vscode, rstudio, and jupyter if not specified.')
 @click.option('-v', '--volume', 'volumes', multiple=True,
               help='Volume mounts (can be specified multiple times)')
 @click.pass_context
-def run(ctx, name, base: str, services: List[str], volumes: List[str]):
+def run(ctx, name, base: str, services: List[str], volumes: List[str], build):
     """Run a container."""
     try:
         # Parse volumes
         parsed_volumes = parse_volumes(volumes, ctx.obj['config'].mount_point)
+        
+        # Set default services if none specified
+        if not services:
+            services = []
+        if len(services) == 0:
+            services = ["vscode", "rstudio", "jupyter"]
         
         # Create image config
         image_config = ImageConfig(
@@ -187,6 +199,14 @@ def run(ctx, name, base: str, services: List[str], volumes: List[str]):
             services=[Service(s) for s in services],
             config=ctx.obj['config']
         )
+
+        im = ImageService(ctx.obj['config'])
+        if not im.check_image(image_config):
+            if build:
+                im.build_image(image_config)
+            else:
+                print(f"Image {image_config.target_image} not found. Use build command or --build to build it.")
+                sys.exit(1)
         
         # Create container config
         container_config = ContainerConfig(
@@ -213,7 +233,7 @@ def run(ctx, name, base: str, services: List[str], volumes: List[str]):
         click.echo(f"Error: {str(e)}", err=True)
         sys.exit(1)
 
-@cli.command(name='ps')
+@cli.command(name='list')
 @click.pass_context
 def list_containers(ctx):
     """List running containers."""
@@ -258,11 +278,11 @@ def stop(ctx, containers, all, remove):
         if remove:
             container_service.remove_container(c_id)
 
-@cli.command(name="rm")
+@cli.command(name="remove")
 @click.argument('containers', nargs = -1)
 @click.option('--all', is_flag=True, help='Remove all containers')
 @click.pass_context
-def rm(ctx, containers, all):
+def remove(ctx, containers, all):
     """Remove a container."""
     container_service = ContainerService(ctx.obj['config'])
     if all:

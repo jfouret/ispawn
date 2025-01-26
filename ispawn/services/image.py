@@ -23,6 +23,14 @@ class ImageService:
             raise ImageError(f"Failed to initialize Docker client: {str(e)}")
         self.config = config
 
+    def check_image(self, config: ImageConfig) -> bool:
+        """Check if a Docker image exists based on the provided configuration."""
+        try:
+            image = self.client.images.get(config.target_image)
+            return True
+        except:
+            return False
+
     def build_image(self, config: ImageConfig) -> Image:
         """Build a Docker image using the provided configuration.
         
