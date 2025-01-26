@@ -13,11 +13,37 @@ ispawn is a command-line tool that makes it easy to create and manage Docker con
 - **👥 Access Control**: Group-based access control for RStudio
 - **💾 Data Persistence**: Service-specific data persistence with proper isolation
 
+## Requirements
+
+- Python 3.8 or higher
+- Docker
+- Git (for installation from GitHub)
+- Linux/Unix system (Windows support through WSL2)
+
 ## Installation
 
+### From GitHub (Recommended)
+
 ```bash
+pip install git+https://github.com/jfouret/ispawn.git
+```
+
+### From Source
+
+```bash
+git clone https://github.com/jfouret/ispawn.git
+cd ispawn
 pip install .
 ```
+
+### Dependencies
+
+The following Python packages will be automatically installed:
+- click: Command line interface creation
+- docker: Docker API interaction
+- pyyaml: YAML configuration handling
+- jinja2: Template processing
+- tabulate: Table formatting for listings
 
 ## Quick Start
 
