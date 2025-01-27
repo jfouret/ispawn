@@ -6,6 +6,11 @@ entryPoints:
 providers:
   docker:
     exposedByDefault: false
+  {% if cert_mode == "provided" or mode == "local" %}
+  file:
+    filename: /etc/traefik/shared_providers_dynamic.yml
+    watch: true
+  {% endif %}
 {% if cert_mode == "letsencrypt" %}
 certificatesResolvers:
   letsencrypt:
@@ -13,11 +18,4 @@ certificatesResolvers:
       email: {{email}}
       storage: "acme.json"
       tlsChallenge: true
-{% elif cert_mode == "provided" %}
-tls:
-  stores:
-    default:
-      defaultCertificate:
-        certFile: /certs/cert.pem
-        keyFile: /certs/key.pem
 {% endif %}

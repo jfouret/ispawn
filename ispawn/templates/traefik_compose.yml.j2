@@ -8,6 +8,7 @@ services:
       - "/etc/ispawn/traefik.yml:/traefik.yml:ro"
       {% if cert_mode == "provided" or mode == "local" %}
       - {{cert_dir}}:/certs:ro
+      - "/etc/ispawn/shared_providers_dynamic.yml:/etc/traefik/shared_providers_dynamic.yml:ro"
       {% endif %}
     ports:
       - "80:80"
@@ -26,4 +27,3 @@ networks:
       driver: default
       config:
         - subnet: {{subnet}}
-

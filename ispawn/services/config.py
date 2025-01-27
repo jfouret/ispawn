@@ -90,6 +90,13 @@ class ConfigManager:
         # Save traefik config file
         with open(self.traefik_config_path, "w") as f:
             f.write(traefik_config)
+            
+        # Copy shared providers dynamic config if using mkcert or provided certs
+        if self.config.is_local or (self.config.mode == "remote" and self.config.cert_mode == "provided"):
+            shared_providers_path = Path(__file__).parent.parent / 'files' / 'shared_providers_dynamic.yml'
+            target_path = Path(self.config.config_dir) / 'shared_providers_dynamic.yml'
+            with open(shared_providers_path, 'r') as src, open(target_path, 'w') as dst:
+                dst.write(src.read())
 
     def apply_config(self) -> None:
         """Apply the configuration.
