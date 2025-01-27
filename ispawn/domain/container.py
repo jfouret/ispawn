@@ -65,7 +65,7 @@ class ContainerConfig:
                 service_vol_dir.mkdir(parents=True, exist_ok=True)
                 # Add volume mapping
                 username = getpass.getuser()
-                self.volumes.append([str(service_vol_dir), container_path.replace("~", f"/home/{username}")])
+                self.volumes.append([str(service_vol_dir), container_path.replace("~", f"{self.config.home_prefix}/{username}")])
 
     def get_labels(self) -> Dict[str, str]:
         """

@@ -111,6 +111,9 @@ def cli(ctx, force, user):
               help='Default path to dockerfile chunk for Docker builds')
 @click.option('--entrypoint-chunk-path', type=click.Path(exists=True, path_type=str),
               help='Default path to entrypoint chunk for Docker builds')
+@click.option('--home-prefix',
+              default='/home/',
+              help='Home directory prefix (default: /home/)')
 @click.pass_context
 def setup(ctx, **kwargs):
     """Setup ispawn environment."""
