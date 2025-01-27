@@ -1,6 +1,6 @@
 """VSCode service configuration."""
 
-PORT = 8042
+PORT = 8842
 
 # Map host directory names to container paths
 VOLUMES = {
