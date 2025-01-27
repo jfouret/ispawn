@@ -21,9 +21,13 @@ def parse_volumes(volumes, mnt):
     results = []
     for volume in volumes:
         if ':' in volume:
-            if volume.count(':') != 1:
+            parsed = volume.split(':')
+            if len(parsed) > 3:
                 raise ValueError(f"Volume {volume} is not valid")
-            results.append(volume.split(':'))
+            if len(parsed) == 3:
+                if parsed[2] not in ['ro', 'rw']:
+                    raise ValueError(f"Volume {volume} is not valid")
+            results.append(parsed)
         else:
             p1 = mnt.rstrip('/')
             p2 = volume.lstrip('/').rstrip('/')
