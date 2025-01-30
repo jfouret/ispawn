@@ -188,9 +188,11 @@ def remove(ctx, images: List[str], all: bool):
 @click.option('-v', '--volume', 'volumes', multiple=True,
               help='Volume mounts (can be specified multiple times)')
 @click.option('-g', '--group',
-              help='Required group for RStudio access (defaults to username)')
+              help='Required group for RStudio access (defaults to primary group of specified user)')
+@click.option('--user',
+              help='Run container as specific user (defaults to current user)')
 @click.pass_context
-def run(ctx, name, base: str, services: List[str], volumes: List[str], build, group: str):
+def run(ctx, name, base: str, services: List[str], volumes: List[str], build, group: str, user: str):
     """Run a container."""
     try:
         # Parse volumes
@@ -223,7 +225,8 @@ def run(ctx, name, base: str, services: List[str], volumes: List[str], build, gr
             config=ctx.obj['config'],
             image_config=image_config,
             volumes=parsed_volumes,
-            group=group
+            group=group,
+            user=user
         )
         
         # Initialize container service

@@ -2,6 +2,8 @@ from typing import List, Dict, Union, Optional
 from pathlib import Path
 import os
 import getpass
+import pwd
+import grp
 
 from ispawn.domain.image import Service, ImageConfig
 from ispawn.domain.config import Config
@@ -21,7 +23,8 @@ class ContainerConfig:
         config: Config,
         image_config: ImageConfig,
         volumes: List[List[str]],
-        group: Optional[str] = None
+        group: Optional[str] = None,
+        user: Optional[str] = None
     ):
         """
         Initialize container configuration.
@@ -41,7 +44,18 @@ class ContainerConfig:
         self.raw_name = name
         self.container_name = f"{config.container_name_prefix}{name}"
         self.image_config = image_config
-        self.group = group or getpass.getuser()
+        
+        # Handle user for container execution
+        self.user = user or getpass.getuser()
+        try:
+            pwd_entry = pwd.getpwnam(self.user)
+            self.user_uid = pwd_entry.pw_uid
+            self.user_gid = pwd_entry.pw_gid
+        except KeyError as e:
+            raise ValueError(f"User {self.user} not found in the system")
+            
+        # Keep service group separate from user's system group
+        self.group = group or self.user
         
         # Create log and volume directories
         log_dir = Path(config.user_root_dir) / self.container_name / "logs"
@@ -64,8 +78,7 @@ class ContainerConfig:
                 service_vol_dir = Path(self.vol_dir) / service.value / host_dir
                 service_vol_dir.mkdir(parents=True, exist_ok=True)
                 # Add volume mapping
-                username = getpass.getuser()
-                self.volumes.append([str(service_vol_dir), container_path.replace("~", f"{self.config.home_prefix}/{username}")])
+                self.volumes.append([str(service_vol_dir), container_path.replace("~", f"{self.config.home_prefix}/{self.user}")])
 
     def get_labels(self) -> Dict[str, str]:
         """
@@ -105,10 +118,10 @@ class ContainerConfig:
         Generate environment variables for the container.
         """
         return {
-            "USER_NAME": getpass.getuser(),
+            "USER_NAME": self.user,
             "USER_PASS": getpass.getpass("Enter password: "),
-            "USER_UID": str(os.getuid()),
-            "USER_GID": str(os.getgid()),
+            "USER_UID": str(self.user_uid),
+            "USER_GID": str(self.user_gid),
             "LOG_DIR": "/var/log/ispawn",
             "SERVICES": ",".join(s.value for s in self.image_config.services),
             "REQUIRED_GROUP": self.group
