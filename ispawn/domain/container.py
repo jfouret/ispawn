@@ -24,7 +24,8 @@ class ContainerConfig:
         image_config: ImageConfig,
         volumes: List[List[str]],
         group: Optional[str] = None,
-        user: Optional[str] = None
+        user: Optional[str] = None,
+        sudo: bool = True
     ):
         """
         Initialize container configuration.
@@ -44,6 +45,7 @@ class ContainerConfig:
         self.raw_name = name
         self.container_name = f"{config.container_name_prefix}{name}"
         self.image_config = image_config
+        self.sudo = sudo
         
         # Handle user for container execution
         self.user = user or getpass.getuser()
@@ -193,7 +195,8 @@ class ContainerConfig:
             "USER_GID": str(self.user_gid),
             "LOG_DIR": "/var/log/ispawn",
             "SERVICES": ",".join(s.value for s in self.image_config.services),
-            "REQUIRED_GROUP": self.group
+            "REQUIRED_GROUP": self.group,
+            "USER_AS_SUDO": "1" if self.sudo else "0"
         }
 
     def get_service_domain(self, service: Service) -> str:

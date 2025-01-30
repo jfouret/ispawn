@@ -19,11 +19,15 @@ if ! getent passwd "$USER_NAME" &>/dev/null; then
     echo "[$(date)] Creating user $USER_NAME..."
     useradd -m -s /bin/bash -u $USER_UID "$USER_NAME"
     echo "$USER_NAME:$USER_PASS" | chpasswd
-    adduser "$USER_NAME" sudo
+    if [ "$USER_AS_SUDO" = "1" ]; then
+        adduser "$USER_NAME" sudo
+    fi
     echo "[$(date)] User $USER_NAME created successfully"
 fi
 
-echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+if [ "$USER_AS_SUDO" = "1" ]; then
+    echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+fi
 
 mkdir -p /var/log/ispawn/services
 chown -R $USER_NAME:$USER_NAME /var/log/ispawn/services

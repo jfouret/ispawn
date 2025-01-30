@@ -191,8 +191,11 @@ def remove(ctx, images: List[str], all: bool):
               help='Required group for RStudio access (defaults to primary group of specified user)')
 @click.option('--user',
               help='Run container as specific user (defaults to current user)')
+@click.option('--no-sudo',
+              is_flag=True,
+              help='Prevent sudo access within the container')
 @click.pass_context
-def run(ctx, name, base: str, services: List[str], volumes: List[str], build, group: str, user: str):
+def run(ctx, name, base: str, services: List[str], volumes: List[str], build, group: str, user: str, no_sudo: bool):
     """Run a container."""
     try:
         # Parse volumes
@@ -226,7 +229,8 @@ def run(ctx, name, base: str, services: List[str], volumes: List[str], build, gr
             image_config=image_config,
             volumes=parsed_volumes,
             group=group,
-            user=user
+            user=user,
+            sudo=not no_sudo
         )
         
         # Initialize container service
