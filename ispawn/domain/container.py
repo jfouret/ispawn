@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Tuple
 from pathlib import Path
 import os
 import getpass
@@ -65,18 +65,87 @@ class ContainerConfig:
         self.vol_dir = str(vol_dir)
         self.log_dir = str(log_dir)
         
+        def _has_rwx_permissions(path: Path) -> bool:
+            """
+            Check if current user has rwx permissions on a directory.
+            
+            Args:
+                path: Path to check permissions for
+                
+            Returns:
+                bool: True if user has rwx access, False otherwise
+            """
+            try:
+                stat = path.stat()
+                mode = stat.st_mode
+                uid = stat.st_uid
+                gid = stat.st_gid
+                
+                # Check user permissions
+                if uid == self.user_uid:
+                    if mode & 0o700 == 0o700:  # User has rwx
+                        return True
+                    
+                # Check group permissions
+                user_groups = [g.gr_gid for g in grp.getgrall() if self.user in g.gr_mem]
+                if gid in user_groups:
+                    if mode & 0o070 == 0o070:  # Group has rwx
+                        return True
+                
+                return False
+                
+            except (PermissionError, FileNotFoundError):
+                return False
+
+        def _ensure_source_directory(src_path: str) -> Tuple[bool, str]:
+            """
+            Ensure a source directory exists, creating it if possible.
+            
+            Args:
+                src_path: Path to check/create
+                
+            Returns:
+                Tuple of (success, message)
+            """
+            path = Path(src_path)
+            if path.exists():
+                if not path.is_dir():
+                    return False, f"Source path {src_path} exists but is not a directory"
+                if not self._has_rwx_permissions(path):
+                    return False, f"User {self.user} does not have rwx permissions on directory {src_path}"
+                return True, ""
+                
+            try:
+                path.mkdir(parents=True, exist_ok=True)
+                if not self._has_rwx_permissions(path):
+                    return False, f"Created directory {src_path} but user {self.user} does not have rwx permissions"
+                return True, ""
+            except PermissionError:
+                return False, f"Permission denied creating directory {src_path}"
+            except Exception as e:
+                return False, f"Failed to create directory {src_path}: {str(e)}"
+
         # Process volumes
         self.volumes = config.volumes.copy()
         self.volumes.extend(volumes)
         self.volumes.append([f"{self.log_dir}", "/var/log/ispawn"])
         
+        # Check and create source directories for user volumes
+        for volume in self.volumes:
+            src = volume[0]
+            success, message = _ensure_source_directory(src)
+            if not success:
+                print(f"INFO: {message}")
+        
         # Add service-specific volumes last
         for service in self.image_config.services:
             service_volumes = service.volumes
             for host_dir, container_path in service_volumes.items():
-                # Create service-specific directory
+                # Create and check service-specific directory
                 service_vol_dir = Path(self.vol_dir) / service.value / host_dir
-                service_vol_dir.mkdir(parents=True, exist_ok=True)
+                success, message = _ensure_source_directory(service_vol_dir)
+                if not success:
+                    print(f"INFO: {message}")
                 # Add volume mapping
                 self.volumes.append([str(service_vol_dir), container_path.replace("~", f"{self.config.home_prefix}/{self.user}")])
 
