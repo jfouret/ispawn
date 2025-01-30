@@ -18,9 +18,7 @@ RUN which micromamba > /dev/null 2>&1 || ( \
       && rm -r $tmpdir \
     )
 
-RUN which jupyter > /dev/null 2>&1 || ( \
-      mkdir -p /opt/conda && chmod 755 /opt/conda \
+RUN mkdir -p /opt/conda && chmod 755 /opt/conda \
       && . /etc/environment \
       && micromamba create -y -n jupyter_ispawn -c conda-forge jupyter \
-      && micromamba clean -ya \
-    )
+      && micromamba clean -ya 
