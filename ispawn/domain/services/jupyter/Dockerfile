@@ -5,7 +5,7 @@ ARG ARCH=linux-64
 # Set micromamba base prefix to a shared location and create directory with appropriate permissions
 ENV MAMBA_ROOT_PREFIX=/opt/conda
 # Check if jupyter and micromamba are already in PATH
-RUN which jupyter > /dev/null 2>&1 && which micromamba > /dev/null 2>&1 || ( \
+RUN which micromamba > /dev/null 2>&1 || ( \
       tmpdir=$(mktemp -d) \
       && cd $tmpdir \
       && . /etc/environment \
