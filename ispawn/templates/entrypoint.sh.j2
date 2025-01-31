@@ -1,16 +1,22 @@
 #!/bin/bash
 set -e
 
+export LOG_DIR=/var/log/ispawn
+mkdir -p $LOG_DIR
+echo "[$(date)] Starting container initialization..." > "${LOG_DIR}/entrypoint.log"
+chown $USER_UID:$USER_UID ${LOG_DIR}/entrypoint.log
+exec 1> >(tee -a "${LOG_DIR}/entrypoint.log")
+exec 2>&1
+
 apt-get update
 
 apt-get upgrade -y --no-install-recommends ca-certificates adduser
 
-# Setup logging
-export LOG_DIR=/var/log/ispawn
-mkdir -p $LOG_DIR
-echo "[$(date)] Starting container initialization..." > "${LOG_DIR}/entrypoint.log"
-exec 1> >(tee -a "${LOG_DIR}/entrypoint.log")
-exec 2>&1
+locale-gen en_US.UTF-8
+update-locale LANG=en_US.UTF-8
+dpkg-reconfigure -f noninteractive locales
+update-locale LANG=en_US.UTF-8
+ln -s /usr/share/zoneinfo/{{ timezone }} /etc/localtime
 
 {{ entrypoint_chunk|safe }}
 
@@ -38,5 +44,7 @@ chown $USER_NAME:$USER_NAME /var/log/ispawn/services/{{ service }}.log
 bash /usr/local/bin/ispawn-entrypoint-{{ service }}.sh
 echo "[$(date)] {{ service }} initiated."
 {% endfor %}
+
+chown -R $USER_UID:$USER_UID ${LOG_DIR}/services
 
 sleep infinity

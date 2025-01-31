@@ -78,7 +78,8 @@ class Config:
         env_chunk_path: Optional[str] = None,
         dockerfile_chunk_path: Optional[str] = None,
         entrypoint_chunk_path: Optional[str] = None,
-        home_prefix: str = "/home/"
+        home_prefix: str = "/home/",
+        timezone: str = "Europe/Paris"
     ):
         """Initialize reverse proxy configuration.
         
@@ -112,6 +113,7 @@ class Config:
         self.dockerfile_chunk_path = str(Path(dockerfile_chunk_path).resolve()) if dockerfile_chunk_path else None
         self.entrypoint_chunk_path = str(Path(entrypoint_chunk_path).resolve()) if entrypoint_chunk_path else None
         self.home_prefix = home_prefix.rstrip("/")
+        self.timezone = timezone
         
         # Create user root directory and logs directory
         user_root = Path(self.user_root_dir)

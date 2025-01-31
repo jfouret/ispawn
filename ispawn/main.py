@@ -114,6 +114,9 @@ def cli(ctx, force, user):
 @click.option('--home-prefix',
               default='/home/',
               help='Home directory prefix (default: /home/)')
+@click.option('--timezone',
+              default='Europe/Paris',
+              help='Container timezone (default: Europe/Paris)')
 @click.pass_context
 def setup(ctx, **kwargs):
     """Setup ispawn environment."""

@@ -176,7 +176,8 @@ class ImageConfig:
         if template_type == "entrypoint.sh":
             context = {
                 **context,
-                "entrypoint_chunk": self.entrypoint_chunk_path.read_text() if self.entrypoint_chunk_path else ""
+                "entrypoint_chunk": self.entrypoint_chunk_path.read_text() if self.entrypoint_chunk_path else "",
+                "timezone": self.config.timezone
             }
             
         return context
