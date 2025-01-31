@@ -8,10 +8,13 @@ chown $USER_UID:$USER_UID ${LOG_DIR}/entrypoint.log
 exec 1> >(tee -a "${LOG_DIR}/entrypoint.log")
 exec 2>&1
 
-apt-get update
+echo "[$(date)] Updating apt-get..."
+apt-get update > /dev/null
 
-apt-get upgrade -y --no-install-recommends ca-certificates adduser
+echo "[$(date)] Update certs"
+apt-get install -y --no-install-recommends ca-certificates
 
+echo "[$(date)] Updating locales"
 locale-gen en_US.UTF-8
 update-locale LANG=en_US.UTF-8
 dpkg-reconfigure -f noninteractive locales

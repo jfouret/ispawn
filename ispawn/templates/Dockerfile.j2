@@ -3,6 +3,7 @@ FROM {{ base }}
 # Install basic system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    adduser \
     ca-certificates \
     tar \
     bzip2 \
