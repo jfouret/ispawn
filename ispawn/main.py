@@ -130,7 +130,7 @@ def setup(ctx, **kwargs):
 @click.option('-b', '--base', required=True, help='Base image')
 @click.option('-s', '--service', 'services', multiple=True,
               type=click.Choice([s.value for s in Service], case_sensitive=False),
-              help='Services to run (can be specified multiple times). Defaults to vscode, rstudio, and jupyter if not specified.')
+              help='Services to run (can be specified multiple times). Defaults to rstudio and jupyterhub if not specified.')
 @click.pass_context
 def build(ctx, **kwargs):
     """Build a Docker image."""
@@ -138,7 +138,7 @@ def build(ctx, **kwargs):
     if "services" not in kwargs.keys():
         kwargs["services"] = []
     if len(kwargs["services"]) == 0:
-        kwargs["services"] = ["vscode", "rstudio", "jupyter"]
+        kwargs["services"] = ["rstudio", "jupyterhub"]
     kwargs["config"] = ctx.obj['config']
     image_config = ImageConfig(**kwargs)
     im = ImageService(ctx.obj['config'])

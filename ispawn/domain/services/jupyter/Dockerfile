@@ -1,11 +1,8 @@
 
-ARG MAMBA_VERSION=2.0.5-0
-ARG ARCH=linux-64
-
-# Set micromamba base prefix to a shared location and create directory with appropriate permissions
-ENV MAMBA_ROOT_PREFIX=/opt/conda
-# Check if jupyter and micromamba are already in PATH
-RUN which micromamba > /dev/null 2>&1 || ( \
+# Check if jupyter is already in PATH, if not install it using micromamba
+RUN which jupyter > /dev/null 2>&1 || ( \
+    export MAMBA_ROOT_PREFIX=/opt/conda \
+    && which micromamba > /dev/null 2>&1 || ( \
       tmpdir=$(mktemp -d) \
       && cd $tmpdir \
       && . /etc/environment \
@@ -18,7 +15,10 @@ RUN which micromamba > /dev/null 2>&1 || ( \
       && rm -r $tmpdir \
     )
 
-RUN mkdir -p /opt/conda && chmod 755 /opt/conda \
-      && . /etc/environment \
-      && micromamba create -y -n jupyter_ispawn -c conda-forge jupyter \
-      && micromamba clean -ya 
+RUN which jupyter > /dev/null 2>&1 || ( \
+  export MAMBA_ROOT_PREFIX=/opt/conda  \
+  mkdir -p /opt/conda && chmod 755 /opt/conda \
+    && . /etc/environment \
+    && micromamba create -y -n jupyter_ispawn -c conda-forge jupyter \
+    && micromamba clean -ya \
+  )

@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Run jupyter notebook with the specified options
+# Run jupyter lab with the specified options
 sudo -u "$USER_NAME" bash -c \
     'cd ~ && \
-    if which jupyter > /dev/null 2>&1; then \
-        jupyter notebook \
+    if which jupyter-lab > /dev/null 2>&1; then \
+        jupyter lab \
             --ip=0.0.0.0 \
-            --port=8888 \
+            --port=8889 \
             --ServerApp.token='"$USER_PASS"' \
             --notebook-dir="/" \
             --preferred-dir="$HOME" \
@@ -14,13 +14,13 @@ sudo -u "$USER_NAME" bash -c \
     else \
         eval "$(micromamba shell hook --shell bash --root-prefix /opt/conda)" && \
         export MAMBA_ROOT_PREFIX=/opt/conda && \
-        micromamba activate jupyter_ispawn && \
-        jupyter notebook \
+        micromamba activate jupyterlab_ispawn && \
+        jupyter lab \
             --ip=0.0.0.0 \
-            --port=8888 \
+            --port=8889 \
             --ServerApp.token='"$USER_PASS"' \
             --notebook-dir="/" \
             --preferred-dir="$HOME" \
             --no-browser \
     fi' \
-    > "${LOG_DIR}/services/jupyter.log" 2>&1 &
+    > "${LOG_DIR}/services/jupyterlab.log" 2>&1 &
