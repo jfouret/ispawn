@@ -5,7 +5,7 @@ ispawn is a command-line tool that makes it easy to create and manage Docker con
 ## Features
 
 - **🚀 Quick Setup**: Get started with a single command to set up your development environment
-- **🔧 Multiple Services**: Run VSCode, RStudio, and Jupyter Notebook in one container
+- **🔧 Multiple Services**: Run VSCode, RStudio, and Jupyter (default) in one container. Other variants like JupyterLab and JupyterHub are also available.
 - **🔒 Secure Access**: Automatic HTTPS setup with traefik reverse proxy
 - **📁 Volume Mapping**: Easy mounting of local directories
 - **🔄 Container Management**: Simple commands to manage your containers
@@ -15,7 +15,7 @@ ispawn is a command-line tool that makes it easy to create and manage Docker con
 
 ## Requirements
 
-- Python 3.8 or higher
+- Python >=3.10
 - Docker
 - Git (for installation from GitHub)
 - Linux/Unix system (Windows support through WSL2)
@@ -129,8 +129,12 @@ ispawn list
 
 Stop containers:
 ```bash
-ispawn stop [CONTAINER_NAMES...] [--all]
+ispawn stop [CONTAINER_NAMES...] [--all] [--remove]
 ```
+Options:
+- `CONTAINER_NAMES...`: Specific container names or IDs to stop.
+- `--all`: Stop all running ispawn containers.
+- `--remove`: Remove the container(s) after stopping.
 
 Remove containers:
 ```bash

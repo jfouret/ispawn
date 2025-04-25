@@ -6,25 +6,36 @@ This guide is for developers who want to contribute to ispawn. For user document
 
 ### Requirements
 
-- Python 3.8+
+- Python >=3.10
 - Docker
-- Development dependencies: `pip install -e ".[dev,test]"`
+- Poetry
+- Development dependencies: `poetry install --with dev`
 
 ### Project Structure
 
 ```
 ispawn/
-├── domain/         # Core business logic and data models
-│   ├── container.py  # Container configuration and management
-│   ├── image.py      # Docker image building and configuration
-│   ├── security.py   # Security utilities
-│   └── exceptions.py # Custom exceptions
-├── services/       # Business operations and external integrations
-│   ├── docker.py     # Docker API interactions
-│   ├── certificate.py # SSL certificate management
-│   └── image.py      # Image building and management
-├── templates/      # Jinja2 templates for Docker configs
-└── files/         # Static configuration files
+├── __init__.py
+├── main.py         # CLI entrypoint using Click
+├── domain/         # Core business logic, data models, and app service definitions
+│   ├── __init__.py
+│   ├── config.py     # Configuration models (InstallMode, CertMode, etc.)
+│   ├── container.py  # Container configuration logic
+│   ├── exceptions.py # Custom exceptions
+│   ├── image.py      # Image configuration logic (base image, services)
+│   └── services/     # Definitions for runnable applications (VSCode, RStudio, etc.)
+│       ├── jupyter/
+│       ├── jupyterhub/
+│       ├── jupyterlab/
+│       ├── rstudio/
+│       └── vscode/
+├── services/       # Business operations and external integrations (Docker API, Config Mgmt)
+│   ├── __init__.py
+│   ├── config.py     # Configuration management (reading/writing config files)
+│   ├── container.py  # Container lifecycle management (run, stop, list, remove)
+│   └── image.py      # Image management (build, list, remove)
+├── templates/      # Jinja2 templates for Dockerfiles, entrypoints, Traefik configs
+└── files/          # Static configuration files (e.g., Traefik dynamic providers)
 ```
 
 ## Architecture
