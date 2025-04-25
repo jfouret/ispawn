@@ -39,7 +39,7 @@ class ContainerService:
         # Check if container already exists
         try:
             existing = self.client.containers.get(config.container_name)
-        except:
+        except docker.errors.NotFound:
             existing = False
         if existing:
             if force:
@@ -81,17 +81,6 @@ class ContainerService:
         # Run the container
         return self.client.containers.run(**container_config)
 
-    def remove_container(self, name: str, force: bool = True) -> None:
-        """Remove a Docker container."""
-        container = self.get_container(name)
-        if container:
-            try:
-                container.remove(force=force)
-            except docker.errors.APIError as e:
-                raise ContainerError(
-                    f"Failed to remove container {name}: {str(e)}"
-                )
-
     def list_containers(self) -> List[Dict[str, str]]:
         """List all ispawn containers.
 
@@ -110,7 +99,7 @@ class ContainerService:
                 continue
             try:
                 image_name = c.image.tags[0]
-            except:
+            except IndexError:
                 image_name = c.attrs["Image"].split(":")[-1][:12]
 
             # Get service URLs from Traefik labels

@@ -76,7 +76,7 @@ TEST_CONFIGS = [
                 "email": None,
             },
             "force": False,
-            "should_succeed": False,  # Should fail with existing different config
+            "should_succeed": False,  # Should fail with existing diff configs
             "description": "Existing config conflict",
             "existing_config": {  # Config to pre-create
                 "install_mode": InstallMode.USER.value,

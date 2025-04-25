@@ -52,7 +52,7 @@ def _cleanup_network(docker_service, name: str):
     if network:
         try:
             network.remove()
-        except:
+        except Exception:
             pass  # Ignore cleanup errors
 
 

@@ -136,7 +136,8 @@ class ConfigManager:
                     write_config = True
                 elif existing_config != self.config and not self.force:
                     raise ConfigurationError(
-                        "Configuration mismatch. Use force=True to overwrite existing config."
+                        "Configuration mismatch. Use force=True to overwrite"
+                        "existing config."
                     )
         if write_config:
             with open(self.config.config_path, "w") as f:

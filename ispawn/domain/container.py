@@ -61,7 +61,8 @@ def _ensure_source_directory(src_path: str, user, user_uid) -> Tuple[bool, str]:
         if not _has_rwx_permissions(path, user, user_uid):
             return (
                 False,
-                f"User {user} does not have rwx permissions on directory {src_path}",
+                f"User {user} does not have rwx permissions on directory "
+                + src_path,
             )
         return True, ""
 
@@ -70,7 +71,8 @@ def _ensure_source_directory(src_path: str, user, user_uid) -> Tuple[bool, str]:
         if not _has_rwx_permissions(path, user, user_uid):
             return (
                 False,
-                f"Created directory {src_path} but user {user} does not have rwx permissions",
+                f"Created directory {src_path} but user {user} does not have"
+                "rwx permissions",
             )
         return True, ""
     except PermissionError:
@@ -175,7 +177,8 @@ class ContainerConfig:
 
     def get_labels(self) -> Dict[str, str]:
         """
-        Generate container labels for Traefik routing and service identification.
+        Generate container labels for Traefik routing and service
+            identification.
 
         Returns:
             Dict[str, str]: Dictionary of Docker labels
@@ -183,7 +186,10 @@ class ContainerConfig:
         labels = {
             "traefik.enable": "true",
             "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme": "https",
-            "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent": "true",
+            (
+                "traefik.http.middlewares.redirect-to-https."
+                "redirectscheme.permanent"
+            ): "true",
         }
 
         for service in self.image_config.services:
@@ -199,9 +205,10 @@ class ContainerConfig:
                     f"traefik.http.routers.{router_id}.middlewares": "redirect-to-https",
                     f"traefik.http.routers.{router_id}.tls": "true",
                     f"traefik.http.routers.{router_id}.service": service_id,
-                    f"traefik.http.services.{service_id}.loadbalancer.server.port": str(
-                        service.port
-                    ),
+                    (
+                        f"traefik.http.services.{service_id}."
+                        "loadbalancer.server.port"
+                    ): str(service.port),
                 }
             )
 
@@ -237,4 +244,7 @@ class ContainerConfig:
         Returns:
             str: Service domain name
         """
-        return f"{self.config.domain_prefix}{service.value}-{self.raw_name}.{self.config.domain}"
+        return (
+            f"{self.config.domain_prefix}{service.value}-"
+            f"{self.raw_name}.{self.config.domain}"
+        )

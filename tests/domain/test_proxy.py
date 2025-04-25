@@ -129,7 +129,10 @@ def valid_proxy_config(valid_config_params):
                 "name": "ispawn",
             },
             "error_type": ValueError,
-            "error_msg": "Invalid certmode: invalid. Must be one of: letsencrypt provided",
+            "error_msg": (
+                "Invalid certmode: invalid. Must be one of: "
+                "letsencrypt provided"
+            ),
         },
     ]
 )

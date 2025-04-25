@@ -28,7 +28,7 @@ class ImageService:
         try:
             self.client.images.get(config.target_image)
             return True
-        except:
+        except docker.errors.ImageNotFound:
             return False
 
     def build_image(self, config: ImageConfig) -> Image:
@@ -81,7 +81,8 @@ class ImageService:
                         print(f"ERROR: {log['error'].strip()}")
                     if "errorDetail" in log:
                         print(
-                            f"Error Detail: {log['errorDetail'].get('message', '').strip()}"
+                            "Error Detail: "
+                            + log["errorDetail"].get("message", "")
                         )
                 sys.exit(1)
             except docker.errors.APIError as e:
@@ -94,7 +95,8 @@ class ImageService:
             shutil.rmtree(build_dir)
             return image
         except Exception as e:
-            # Keep build directory in case of error and include path in error message
+            # Keep build directory in case of error and include path in error
+            # message
             error_msg = (
                 f"Build failed (build files preserved in {build_dir}): {str(e)}"
             )
@@ -142,12 +144,14 @@ class ImageService:
             ImageError: If listing images fails
         """
         try:
-            # Get all images and filter manually since Docker's filter doesn't work reliably
+            # Get all images and filter manually since Docker's filter doesn't
+            # work reliably
             images = self.client.images.list()
             # Filter images by prefix
             filtered_images = []
             for img in images:
-                # Only include images that have exactly one tag and it starts with our prefix
+                # Only include images that have exactly one tag and it starts
+                # with our prefix
                 if any(
                     tag.startswith(f"{self.config.image_name_prefix}")
                     for tag in img.tags

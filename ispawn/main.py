@@ -107,14 +107,20 @@ def cli(ctx, force, user):
 )
 @click.option(
     "--cert-dir",
-    help="If provided, directory containing SSL certificate (cert.pem) and key (key.pem)",
+    help=(
+        "If provided, directory containing SSL certificate (cert.pem) "
+        "and key (key.pem)"
+    ),
 )
 @click.option("--email", help="if Letsencrypt, email")
 @click.option(
     "-v",
     "--volume",
     "volumes",
-    help="Volumes to mount in containers by default, can specify a mount point with :",
+    help=(
+        "Volumes to mount in containers by default,"
+        " can specify a mount point with :"
+    ),
     multiple=True,
 )
 @click.option(
@@ -166,7 +172,10 @@ def setup(ctx, **kwargs):
     "services",
     multiple=True,
     type=click.Choice([s.value for s in Service], case_sensitive=False),
-    help="Services to run (can be specified multiple times). Defaults to rstudio and jupyterhub if not specified.",
+    help=(
+        "Services to run (can be specified multiple times)."
+        "Defaults to rstudio and jupyterhub if not specified."
+    ),
 )
 @click.pass_context
 def build(ctx, **kwargs):
@@ -233,7 +242,10 @@ def remove(ctx, images: List[str], all: bool):
     "services",
     multiple=True,
     type=click.Choice([s.value for s in Service], case_sensitive=False),
-    help="Services to run (can be specified multiple times). Defaults to vscode, rstudio, and jupyter if not specified.",
+    help=(
+        "Services to run (can be specified multiple times)."
+        "Defaults to vscode, rstudio, and jupyter if not specified."
+    ),
 )
 @click.option(
     "-v",
@@ -245,7 +257,10 @@ def remove(ctx, images: List[str], all: bool):
 @click.option(
     "-g",
     "--group",
-    help="Required group for RStudio access (defaults to primary group of specified user)",
+    help=(
+        "Required group for RStudio access "
+        "(defaults to primary group of specified user)"
+    ),
 )
 @click.option(
     "--user", help="Run container as specific user (defaults to current user)"
@@ -289,7 +304,8 @@ def run(
                 im.build_image(image_config)
             else:
                 print(
-                    f"Image {image_config.target_image} not found. Use build command or --build to build it."
+                    f"Image {image_config.target_image} not found. "
+                    "Use build command or --build to build it."
                 )
                 sys.exit(1)
 
@@ -375,7 +391,7 @@ def stop(ctx, containers, all, remove):
 @click.argument("containers", nargs=-1)
 @click.option("--all", is_flag=True, help="Remove all containers")
 @click.pass_context
-def remove(ctx, containers, all):
+def remove_container(ctx, containers, all):
     """Remove a container."""
     container_service = ContainerService(ctx.obj["config"])
     if all:

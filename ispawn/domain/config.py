@@ -16,7 +16,8 @@ class BaseMode(str, Enum):
             return cls(value.lower())
         except ValueError:
             raise ValueError(
-                f"Invalid {cls.__name__.lower()}: {value}. Must be one of: {' '.join(m.value for m in cls)}"
+                f"Invalid {cls.__name__.lower()}: {value}."
+                f"Must be one of: {' '.join(m.value for m in cls)}"
             )
 
     def __str__(self) -> str:
@@ -98,10 +99,12 @@ class Config:
             domain: Domain name for services
             subnet: Docker network subnet
             name: Base name
-            user_in_namespace: If true, add username to namespace when running container
+            user_in_namespace: If true, add username to namespace when running
+                container
             cert_mode: Certificate mode (required for remote proxy)
             cert_dir: Directory for SSL certificates
-            email: Email for Let's Encrypt (required if cert_mode is letsencrypt)
+            email: Email for Let's Encrypt (required if cert_mode is
+                letsencrypt)
             env_chunk_path: Path to environment file for Docker builds
             dockerfile_chunk_path: Path to dockerfile chunk for Docker builds
             entrypoint_chunk_path: Path to entrypoint chunk for Docker builds

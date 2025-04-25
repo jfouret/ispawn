@@ -154,7 +154,7 @@ def invalid_image_config(invalid_config_params, mock_files):
 
     try:
         ImageConfig(**params)
-    except:
+    except Exception:
         error = True
 
     return error

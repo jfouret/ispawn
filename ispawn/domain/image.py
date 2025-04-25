@@ -29,7 +29,8 @@ def volumes(self) -> Dict[str, str]:
     """Get the volume mappings defined in the service's config.
 
     Returns:
-        Dict[str, str]: Dictionary mapping host directory names to container paths
+        Dict[str, str]: Dictionary mapping host directory names to container
+            paths
     """
     try:
         config = import_module(f"ispawn.domain.services.{self.value}.config")
@@ -170,7 +171,10 @@ class ImageConfig:
                 chunks.append(content)
             else:
                 raise FileNotFoundError(
-                    f"Dockerfile chunk not found for service: {service.value} ({chunk_path})"
+                    (
+                        f"Dockerfile chunk not found for service: {service.value}"
+                        f"({chunk_path})"
+                    )
                 )
         return "\n\n".join(chunks) + "\n"
 
@@ -221,7 +225,8 @@ class ImageConfig:
         Get the complete build context for the image.
 
         Returns:
-            Dict[str, Any]: Complete build context including all necessary files and arguments
+            Dict[str, Any]: Complete build context including all necessary
+                files and arguments
         """
         context = {
             "Dockerfile": {
