@@ -1,7 +1,6 @@
 import pytest
 from pathlib import Path
 import subprocess
-import os
 
 from ispawn.services.certificate import CertificateService
 from ispawn.domain.proxy import ProxyConfig, ProxyMode, CertMode

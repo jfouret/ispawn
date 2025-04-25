@@ -2,7 +2,6 @@ import click
 from pathlib import Path
 from typing import List
 import sys
-from datetime import datetime
 from tabulate import tabulate
 
 from ispawn.domain.config import InstallMode, CertMode, ProxyMode, Config

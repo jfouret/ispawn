@@ -1,4 +1,4 @@
-from enum import Enum, EnumMeta
+from enum import Enum
 from typing import Optional, TextIO
 from ispawn.domain.exceptions import ConfigurationError
 from yaml import dump, safe_load

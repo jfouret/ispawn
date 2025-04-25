@@ -1,12 +1,10 @@
 import pytest
-from pathlib import Path
 import time
-import docker
 
 from ispawn.services.container import DockerService
 from ispawn.domain.container import ContainerConfig, Service
 from ispawn.domain.proxy import ProxyConfig, ProxyMode, CertMode
-from ispawn.domain.exceptions import ContainerError, NetworkError, ImageError
+from ispawn.domain.exceptions import ContainerError, NetworkError
 
 @pytest.fixture
 def docker_service():

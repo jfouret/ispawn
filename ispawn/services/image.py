@@ -1,9 +1,8 @@
 import sys
 import tempfile
 import shutil
-import importlib
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 import jinja2
 import docker
 from docker.models.images import Image

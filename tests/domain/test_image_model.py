@@ -1,10 +1,7 @@
 """Tests for image configuration."""
 
 import pytest
-from pathlib import Path
 from ispawn.domain.image import ImageConfig
-from ispawn.domain.image import Service
-from ispawn.domain.exceptions import ImageError
 
 from ispawn.services.image import ImageService
 

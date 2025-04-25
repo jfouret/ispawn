@@ -1,6 +1,5 @@
 import pytest
 import uuid
-from pathlib import Path
 
 from ispawn.services.image import ImageService
 from ispawn.domain.image import ImageConfig
@@ -119,7 +118,7 @@ def test_list_images_with_prefix(image_service):
         
         # List with first prefix (keep the hyphen)
         prefix1 = config1.name_prefix.split('-', 1)[0] + '-'
-        print(f"\n=== Testing prefix filtering ===")
+        print("\n=== Testing prefix filtering ===")
         print(f"Config1 prefix: {prefix1}")
         print(f"Config1 target: {config1.target_image}")
         print(f"Config2 target: {config2.target_image}")

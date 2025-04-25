@@ -1,6 +1,5 @@
-from typing import List, Dict, Union, Optional, Tuple
+from typing import List, Dict, Optional, Tuple
 from pathlib import Path
-import os
 import getpass
 import pwd
 import grp
@@ -113,7 +112,7 @@ class ContainerConfig:
             pwd_entry = pwd.getpwnam(self.user)
             self.user_uid = pwd_entry.pw_uid
             self.user_gid = pwd_entry.pw_gid
-        except KeyError as e:
+        except KeyError:
             raise ValueError(f"User {self.user} not found in the system")
             
         # Keep service group separate from user's system group

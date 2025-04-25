@@ -1,11 +1,10 @@
 import docker
-from typing import List, Dict, Optional
-from pathlib import Path
+from typing import List, Dict
 from docker.models.containers import Container
 from docker.types import Mount
 from ispawn.domain.container import ContainerConfig
 from ispawn.domain.config import Config
-from ispawn.domain.exceptions import ContainerError, NetworkError, ImageError
+from ispawn.domain.exceptions import ContainerError
 import re
 
 class ContainerService:

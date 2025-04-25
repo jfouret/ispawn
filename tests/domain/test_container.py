@@ -1,7 +1,6 @@
 import pytest
 from pathlib import Path
 from ispawn.domain.container import ContainerConfig, Service
-from ispawn.domain.exceptions import ValidationError
 
 @pytest.fixture(params=[
     # Basic configuration with minimal services

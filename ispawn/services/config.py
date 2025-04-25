@@ -1,11 +1,9 @@
 """Configuration manager for ispawn."""
 
 import os
-import socket
 import docker
 import subprocess
 from pathlib import Path
-from typing import Optional, List, Tuple
 from jinja2 import Environment, FileSystemLoader
 
 from ispawn.domain.config import Config
