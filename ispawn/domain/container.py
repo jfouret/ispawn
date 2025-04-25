@@ -7,13 +7,14 @@ import grp
 from ispawn.domain.image import Service, ImageConfig
 from ispawn.domain.config import Config
 
+
 def _has_rwx_permissions(path: Path, user, user_uid) -> bool:
     """
     Check if current user has rwx permissions on a directory.
-    
+
     Args:
         path: Path to check permissions for
-        
+
     Returns:
         bool: True if user has rwx access, False otherwise
     """
@@ -22,55 +23,66 @@ def _has_rwx_permissions(path: Path, user, user_uid) -> bool:
         mode = stat.st_mode
         uid = stat.st_uid
         gid = stat.st_gid
-        
+
         # Check user permissions
         if uid == user_uid:
             if mode & 0o700 == 0o700:  # User has rwx
                 return True
-            
+
         # Check group permissions
         user_groups = [g.gr_gid for g in grp.getgrall() if user in g.gr_mem]
         if gid in user_groups:
             if mode & 0o070 == 0o070:  # Group has rwx
                 return True
-        
+
         return False
-        
+
     except (PermissionError, FileNotFoundError):
         return False
+
 
 def _ensure_source_directory(src_path: str, user, user_uid) -> Tuple[bool, str]:
     """
     Ensure a source directory exists, creating it if possible.
-    
+
     Args:
         src_path: Path to check/create
-        
+
     Returns:
         Tuple of (success, message)
     """
     path = Path(src_path)
     if path.exists():
         if not path.is_dir():
-            return False, f"Source path {src_path} exists but is not a directory"
+            return (
+                False,
+                f"Source path {src_path} exists but is not a directory",
+            )
         if not _has_rwx_permissions(path, user, user_uid):
-            return False, f"User {user} does not have rwx permissions on directory {src_path}"
+            return (
+                False,
+                f"User {user} does not have rwx permissions on directory {src_path}",
+            )
         return True, ""
-        
+
     try:
         path.mkdir(parents=True, exist_ok=True)
         if not _has_rwx_permissions(path, user, user_uid):
-            return False, f"Created directory {src_path} but user {user} does not have rwx permissions"
+            return (
+                False,
+                f"Created directory {src_path} but user {user} does not have rwx permissions",
+            )
         return True, ""
     except PermissionError:
         return False, f"Permission denied creating directory {src_path}"
     except Exception as e:
         return False, f"Failed to create directory {src_path}: {str(e)}"
 
+
 class ContainerConfig:
     """
     Configuration for a container with comprehensive settings.
-    
+
     Attributes:
         name (str): Original container name
         group (str): Required group for RStudio access (defaults to username)
@@ -84,18 +96,18 @@ class ContainerConfig:
         volumes: List[List[str]],
         group: Optional[str] = None,
         user: Optional[str] = None,
-        sudo: bool = True
+        sudo: bool = True,
     ):
         """
         Initialize container configuration.
-        
+
         Args:
             name: Container name
             config: Global configuration
             image_config: Image configuration
             volumes: List of volume mappings
             group: Required group for RStudio access (defaults to username)
-        
+
         Raises:
             ValueError: If cert_mode is invalid
         """
@@ -105,7 +117,7 @@ class ContainerConfig:
         self.container_name = f"{config.container_name_prefix}{name}"
         self.image_config = image_config
         self.sudo = sudo
-        
+
         # Handle user for container execution
         self.user = user or getpass.getuser()
         try:
@@ -114,10 +126,10 @@ class ContainerConfig:
             self.user_gid = pwd_entry.pw_gid
         except KeyError:
             raise ValueError(f"User {self.user} not found in the system")
-            
+
         # Keep service group separate from user's system group
         self.group = group or self.user
-        
+
         # Create log and volume directories
         log_dir = Path(config.user_root_dir) / self.container_name / "logs"
         vol_dir = Path(config.user_root_dir) / self.container_name / "volumes"
@@ -130,57 +142,74 @@ class ContainerConfig:
         self.volumes = config.volumes.copy()
         self.volumes.extend(volumes)
         self.volumes.append([f"{self.log_dir}", "/var/log/ispawn"])
-        
+
         # Check and create source directories for user volumes
         for volume in self.volumes:
             src = volume[0]
-            success, message = _ensure_source_directory(src, self.user, self.user_uid)
+            success, message = _ensure_source_directory(
+                src, self.user, self.user_uid
+            )
             if not success:
                 print(f"INFO: {message}")
-        
+
         # Add service-specific volumes last
         for service in self.image_config.services:
             service_volumes = service.volumes
             for host_dir, container_path in service_volumes.items():
                 # Create and check service-specific directory
                 service_vol_dir = Path(self.vol_dir) / service.value / host_dir
-                success, message = _ensure_source_directory(service_vol_dir, self.user, self.user_uid)
+                success, message = _ensure_source_directory(
+                    service_vol_dir, self.user, self.user_uid
+                )
                 if not success:
                     print(f"INFO: {message}")
                 # Add volume mapping
-                self.volumes.append([str(service_vol_dir), container_path.replace("~", f"{self.config.home_prefix}/{self.user}")])
+                self.volumes.append(
+                    [
+                        str(service_vol_dir),
+                        container_path.replace(
+                            "~", f"{self.config.home_prefix}/{self.user}"
+                        ),
+                    ]
+                )
 
     def get_labels(self) -> Dict[str, str]:
         """
         Generate container labels for Traefik routing and service identification.
-        
+
         Returns:
             Dict[str, str]: Dictionary of Docker labels
         """
         labels = {
             "traefik.enable": "true",
             "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme": "https",
-            "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent": "true"
+            "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent": "true",
         }
-        
+
         for service in self.image_config.services:
             service_domain = self.get_service_domain(service)
             router_id = f"{self.container_name}-{service.value}"
             service_id = f"{self.container_name}-{service.value}-service"
-            
-            labels.update({
-                f"ispawn.port.{service.value}": str(service.port),
-                f"traefik.http.routers.{router_id}.rule": f"Host(`{service_domain}`)",
-                f"traefik.http.routers.{router_id}.entrypoints": "websecure",
-                f"traefik.http.routers.{router_id}.middlewares": "redirect-to-https",
-                f"traefik.http.routers.{router_id}.tls": "true",
-                f"traefik.http.routers.{router_id}.service": service_id,
-                f"traefik.http.services.{service_id}.loadbalancer.server.port": str(service.port)
-            })
-            
+
+            labels.update(
+                {
+                    f"ispawn.port.{service.value}": str(service.port),
+                    f"traefik.http.routers.{router_id}.rule": f"Host(`{service_domain}`)",
+                    f"traefik.http.routers.{router_id}.entrypoints": "websecure",
+                    f"traefik.http.routers.{router_id}.middlewares": "redirect-to-https",
+                    f"traefik.http.routers.{router_id}.tls": "true",
+                    f"traefik.http.routers.{router_id}.service": service_id,
+                    f"traefik.http.services.{service_id}.loadbalancer.server.port": str(
+                        service.port
+                    ),
+                }
+            )
+
             if self.config.cert_mode == "letsencrypt":
-                labels[f"traefik.http.routers.{router_id}.tls.certresolver"] = "letsencrypt"
-                
+                labels[f"traefik.http.routers.{router_id}.tls.certresolver"] = (
+                    "letsencrypt"
+                )
+
         return labels
 
     def environment(self) -> Dict[str, str]:
@@ -195,16 +224,16 @@ class ContainerConfig:
             "LOG_DIR": "/var/log/ispawn",
             "SERVICES": ",".join(s.value for s in self.image_config.services),
             "REQUIRED_GROUP": self.group,
-            "USER_AS_SUDO": "1" if self.sudo else "0"
+            "USER_AS_SUDO": "1" if self.sudo else "0",
         }
 
     def get_service_domain(self, service: Service) -> str:
         """
         Generate service domain name.
-        
+
         Args:
             service: Service type
-            
+
         Returns:
             str: Service domain name
         """

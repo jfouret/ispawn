@@ -5,38 +5,48 @@ from yaml import dump, safe_load
 from pathlib import Path
 from typing import List
 
+
 class BaseMode(str, Enum):
     """Base class for mode enums with common string conversion functionality."""
-    
+
     @classmethod
     def from_str(cls, value: str) -> "BaseMode":
         """Create mode from string."""
         try:
             return cls(value.lower())
         except ValueError:
-            raise ValueError(f"Invalid {cls.__name__.lower()}: {value}. Must be one of: {' '.join(m.value for m in cls)}")
+            raise ValueError(
+                f"Invalid {cls.__name__.lower()}: {value}. Must be one of: {' '.join(m.value for m in cls)}"
+            )
 
     def __str__(self) -> str:
         return self.value
 
+
 class ProxyMode(BaseMode):
     """Available reverse proxy modes."""
-    LOCAL = "local"   # Expose services through localhost with mkcert SSL
-    REMOTE = "remote" # Expose services through domain with wildcard SSL
+
+    LOCAL = "local"  # Expose services through localhost with mkcert SSL
+    REMOTE = "remote"  # Expose services through domain with wildcard SSL
+
 
 class CertMode(BaseMode):
     """Available certificate modes for remote proxy."""
+
     LETSENCRYPT = "letsencrypt"  # Use Let's Encrypt for certificates
-    PROVIDED = "provided"        # Use provided wildcard certificates
+    PROVIDED = "provided"  # Use provided wildcard certificates
+
 
 class InstallMode(BaseMode):
     """Available installation modes."""
+
     SYSTEM = "system"  # Install system-wide
-    USER = "user"      # Install for current user
+    USER = "user"  # Install for current user
+
 
 class Config:
     """Configuration for reverse proxy and SSL certificates.
-    
+
     Attrs:
       install_mode: Installation mode system or user
       mode: Proxy mode (local or remote)
@@ -51,11 +61,11 @@ class Config:
       dockerfile_chunk_path: Path to dockerfile chunk for Docker builds
       entrypoint_chunk_path: Path to entrypoint chunk for Docker builds
     """
-    
+
     @staticmethod
     def get_system_dir() -> str:
         """Get system-wide installation directory.
-        
+
         Returns:
             Path to system-wide installation directory (/etc/ispawn)
         """
@@ -79,10 +89,10 @@ class Config:
         dockerfile_chunk_path: Optional[str] = None,
         entrypoint_chunk_path: Optional[str] = None,
         home_prefix: str = "/home/",
-        timezone: str = "Europe/Paris"
+        timezone: str = "Europe/Paris",
     ):
         """Initialize reverse proxy configuration.
-        
+
         Args:
             mode: Proxy mode (local or remote)
             domain: Domain name for services
@@ -95,11 +105,11 @@ class Config:
             env_chunk_path: Path to environment file for Docker builds
             dockerfile_chunk_path: Path to dockerfile chunk for Docker builds
             entrypoint_chunk_path: Path to entrypoint chunk for Docker builds
-            
+
         Raises:
             ConfigurationError: If configuration is invalid
         """
-        
+
         self.mode = ProxyMode.from_str(mode)
         self.install_mode = InstallMode.from_str(install_mode)
         self.dns = dns or ["8.8.8.8", "8.8.4.4"]
@@ -109,45 +119,69 @@ class Config:
         self.user_in_namespace = user_in_namespace
         self.mount_point = mount_point.rstrip("/") if mount_point else ""
         self.volumes = volumes
-        self.env_chunk_path = str(Path(env_chunk_path).resolve()) if env_chunk_path else None
-        self.dockerfile_chunk_path = str(Path(dockerfile_chunk_path).resolve()) if dockerfile_chunk_path else None
-        self.entrypoint_chunk_path = str(Path(entrypoint_chunk_path).resolve()) if entrypoint_chunk_path else None
+        self.env_chunk_path = (
+            str(Path(env_chunk_path).resolve()) if env_chunk_path else None
+        )
+        self.dockerfile_chunk_path = (
+            str(Path(dockerfile_chunk_path).resolve())
+            if dockerfile_chunk_path
+            else None
+        )
+        self.entrypoint_chunk_path = (
+            str(Path(entrypoint_chunk_path).resolve())
+            if entrypoint_chunk_path
+            else None
+        )
         self.home_prefix = home_prefix.rstrip("/")
         self.timezone = timezone
-        
+
         # Create user root directory and logs directory
         user_root = Path(self.user_root_dir)
         user_root.mkdir(parents=True, exist_ok=True)
-        
+
         log_dir = Path(self.base_log_dir)
         log_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Certificate configuration
         if self.mode == ProxyMode.REMOTE:
             if cert_mode is None:
-                raise ConfigurationError("Certificate mode is required for remote proxy")
+                raise ConfigurationError(
+                    "Certificate mode is required for remote proxy"
+                )
             self.cert_mode = CertMode.from_str(cert_mode)
-            
+
             if self.cert_mode == CertMode.LETSENCRYPT and not email:
-                raise ConfigurationError("Email is required for Let's Encrypt certificates")
+                raise ConfigurationError(
+                    "Email is required for Let's Encrypt certificates"
+                )
         else:
             # Local mode uses mkcert
             self.cert_mode = None
             if email:
-                raise ConfigurationError("Email is not used in local proxy mode")
+                raise ConfigurationError(
+                    "Email is not used in local proxy mode"
+                )
             if not self.domain.endswith(".localhost"):
-                raise ConfigurationError("Domain must end with '.localhost' in local proxy mode")
+                raise ConfigurationError(
+                    "Domain must end with '.localhost' in local proxy mode"
+                )
 
-        self.cert_dir = str(Path(self.config_dir) / "certs") if cert_dir is None else cert_dir
+        self.cert_dir = (
+            str(Path(self.config_dir) / "certs")
+            if cert_dir is None
+            else cert_dir
+        )
         self.email = email if self.mode == ProxyMode.REMOTE else None
-    
+
     def to_yaml(self, fh: TextIO) -> None:
         """Serialize proxy configuration to YAML."""
         dump(
             {
                 k: str(v) if isinstance(v, BaseMode) else v
-                for k,v in self.__dict__.items()
-            }, fh)
+                for k, v in self.__dict__.items()
+            },
+            fh,
+        )
 
     def save(self) -> None:
         """Save proxy configuration to system or user configuration."""
@@ -161,7 +195,7 @@ class Config:
         return cls(**data)
 
     @classmethod
-    def load(cls, user_mode = False) -> "Config":
+    def load(cls, user_mode=False) -> "Config":
         """Create Config from system configuration using from_yaml."""
         if user_mode:
             conf_path = Path.home() / ".ispawn" / "config.yaml"
@@ -192,8 +226,8 @@ class Config:
     def requires_email(self) -> bool:
         """Check if email is required for certificate configuration."""
         return (
-            self.mode == ProxyMode.REMOTE and 
-            self.cert_mode == CertMode.LETSENCRYPT
+            self.mode == ProxyMode.REMOTE
+            and self.cert_mode == CertMode.LETSENCRYPT
         )
 
     @property
@@ -227,7 +261,7 @@ class Config:
     def image_name_prefix(self) -> str:
         """Get image name prefix"""
         return f"{self.name}-"
-    
+
     @property
     def container_name_prefix(self) -> str:
         """Get container name prefix"""
