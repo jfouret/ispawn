@@ -1,21 +1,17 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=2.1.2"]
+build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "ispawn"
 version = "0.2.14"
+description = "A tool to spawn docker containers holding multiple services with a single command"
 authors = [
   { name="jfouret" },
 ]
-description = "A tool to spawn docker containers holding multiple services with a single command"
 readme = "README.md"
-requires-python = ">=3.8"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
+license = { text = "MIT" } # Assuming MIT based on classifiers and LICENCE.txt
+requires-python = ">=3.10"
 dependencies = [
     "click>=8.0.0",
     "docker>=6.0.0",
@@ -24,13 +20,23 @@ dependencies = [
     "tabulate>=0.9.0"
 ]
 
+[project.urls]
+Homepage = "https://github.com/jfouret/ispawn"
+Repository = "https://github.com/jfouret/ispawn"
+
 [project.scripts]
 ispawn = "ispawn.main:cli"
 
-[tool.setuptools.package-data]
-ispawn = [
-  "templates/*.j2",
-  "domain/services/*/Dockerfile",
-  "domain/services/*/entrypoint.sh",
-  "files/*"
+[tool.poetry]
+packages = [{include = "ispawn"}]
+include = [
+    "ispawn/templates/*.j2",
+    "ispawn/domain/services/*/Dockerfile",
+    "ispawn/domain/services/*/entrypoint.sh",
+    "ispawn/files/*",
+    "LICENCE.txt",
 ]
+
+[tool.poetry.group.dev.dependencies]
+ruff = "*"
+pytest = "*"
