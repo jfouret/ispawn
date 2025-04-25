@@ -24,7 +24,9 @@ class ImageService:
         self.config = config
 
     def check_image(self, config: ImageConfig) -> bool:
-        """Check if a Docker image exists based on the provided configuration."""
+        """
+        Check if a Docker image exists based on the provided configuration.
+        """
         try:
             self.client.images.get(config.target_image)
             return True

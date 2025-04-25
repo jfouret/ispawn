@@ -172,8 +172,8 @@ class ImageConfig:
             else:
                 raise FileNotFoundError(
                     (
-                        f"Dockerfile chunk not found for service: {service.value}"
-                        f"({chunk_path})"
+                        "Dockerfile chunk not found for service:"
+                        f"{service.value} ({chunk_path})"
                     )
                 )
         return "\n\n".join(chunks) + "\n"

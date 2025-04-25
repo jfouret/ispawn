@@ -104,7 +104,9 @@ def valid_proxy_config(valid_config_params):
                 "name": "ispawn",
             },
             "error_type": ConfigurationError,
-            "error_msg": "Domain must end with '.localhost' in local proxy mode",
+            (
+                "error_msg"
+            ): "Domain must end with '.localhost' in local proxy mode",
         },
         {
             "id": "invalid_proxy_mode",
@@ -116,7 +118,9 @@ def valid_proxy_config(valid_config_params):
                 "name": "ispawn",
             },
             "error_type": ValueError,
-            "error_msg": "Invalid proxymode: invalid. Must be one of: local remote",
+            (
+                "error_msg"
+            ): "Invalid proxymode: invalid. Must be one of: local remote",
         },
         {
             "id": "invalid_cert_mode",

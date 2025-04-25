@@ -185,7 +185,10 @@ class ContainerConfig:
         """
         labels = {
             "traefik.enable": "true",
-            "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme": "https",
+            (
+                "traefik.http.middlewares.redirect-to-https."
+                "redirectscheme.scheme"
+            ): "https",
             (
                 "traefik.http.middlewares.redirect-to-https."
                 "redirectscheme.permanent"
@@ -200,9 +203,15 @@ class ContainerConfig:
             labels.update(
                 {
                     f"ispawn.port.{service.value}": str(service.port),
-                    f"traefik.http.routers.{router_id}.rule": f"Host(`{service_domain}`)",
-                    f"traefik.http.routers.{router_id}.entrypoints": "websecure",
-                    f"traefik.http.routers.{router_id}.middlewares": "redirect-to-https",
+                    (
+                        f"traefik.http.routers.{router_id}.rule"
+                    ): f"Host(`{service_domain}`)",
+                    (
+                        f"traefik.http.routers.{router_id}.entrypoints"
+                    ): "websecure",
+                    (
+                        f"traefik.http.routers.{router_id}.middlewares"
+                    ): "redirect-to-https",
                     f"traefik.http.routers.{router_id}.tls": "true",
                     f"traefik.http.routers.{router_id}.service": service_id,
                     (
