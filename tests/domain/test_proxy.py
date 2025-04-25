@@ -219,4 +219,4 @@ def test_proxy_config_equality(config_map, config1_id, config2_id, should_be_equ
     config2 = config_map[config2_id]
     
     assert (config1 == config2) == should_be_equal
-    assert (config1 != "not a config") == True
+    assert (config1 != "not a config") is True

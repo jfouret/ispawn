@@ -113,8 +113,8 @@ def test_list_images_with_prefix(image_service):
     
     try:
         # Build both images
-        image1 = image_service.build_image(config1)
-        image2 = image_service.build_image(config2)
+        image_service.build_image(config1)
+        image_service.build_image(config2)
         
         # List with first prefix (keep the hyphen)
         prefix1 = config1.name_prefix.split('-', 1)[0] + '-'

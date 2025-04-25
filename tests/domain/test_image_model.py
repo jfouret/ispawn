@@ -144,5 +144,5 @@ def invalid_image_config(invalid_config_params, mock_files):
 
 def test_invalid_image_config(invalid_config_params, invalid_image_config):
     """Test valid image configurations."""
-    params = invalid_config_params["params"]
+    invalid_config_params["params"]
     assert invalid_image_config is True

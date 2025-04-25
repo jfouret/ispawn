@@ -73,7 +73,7 @@ def _find_available_subnet(docker_service) -> tuple[ProxyConfig, str]:
         config = _create_proxy_config(network_name, subnet)
         
         try:
-            network = docker_service.create_network(config)
+            docker_service.create_network(config)
             return config, subnet
         except NetworkError as e:
             if "Pool overlaps" not in str(e):
