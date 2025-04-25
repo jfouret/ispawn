@@ -287,6 +287,43 @@ Example directory structure:
 - Check the [GitHub Issues](https://github.com/jfouret/ispawn/issues) for known problems
 - For development-related questions, see [CONTRIBUTING.md](CONTRIBUTING.md)
 
+## Documentation
+
+ispawn includes comprehensive documentation built with Sphinx and sphinx-click.
+
+### Online Documentation
+
+The documentation is available online at:
+
+- Latest version: https://jfouret.github.io/ispawn/
+- Specific versions: https://jfouret.github.io/ispawn/versions/X.Y.Z/
+
+### Building the Documentation Locally
+
+To build the documentation locally:
+
+```bash
+# Install development dependencies
+poetry install --with dev
+
+# Build the HTML documentation
+cd docs
+poetry run make html
+```
+
+The generated documentation will be available in `docs/build/html/index.html`.
+
+### Documentation Structure
+
+- **Installation**: How to install ispawn
+- **Usage**: Basic usage examples and patterns
+- **CLI Reference**: Detailed command-line interface documentation (auto-generated from code)
+- **API Reference**: Python API documentation for developers
+
+### Version-Specific Documentation
+
+The documentation is version-specific, with each release having its own documentation. The version selector in the documentation allows you to switch between different versions.
+
 ## License
 
 MIT License - see [LICENSE.txt](LICENSE.txt) for details
