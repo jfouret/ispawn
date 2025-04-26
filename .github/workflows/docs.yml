@@ -25,12 +25,8 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.7.1
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+      - name: Install dependencies
+        run: pip install poetry==2.1.2
 
       - name: Install dependencies
         run: poetry install --with dev
@@ -54,27 +50,8 @@ jobs:
           # Create versions directory structure
           mkdir -p site/versions
           
-          # Create versions.json for version switcher
-          if [ ! -f site/versions.json ]; then
-            echo '{"versions":[]}' > site/versions.json
-          fi
-          
-          # Update versions.json
-          if [[ $GITHUB_REF == refs/tags/v* ]]; then
-            # Add version to versions.json if it doesn't exist
-            if ! grep -q "\"$VERSION\"" site/versions.json; then
-              # Get existing versions
-              VERSIONS=$(jq -r '.versions' site/versions.json)
-              # Add new version and sort
-              NEW_VERSIONS=$(echo "$VERSIONS" | jq '. += ["'"$VERSION"'"]' | jq 'sort_by(. | split(".") | map(tonumber)) | reverse')
-              # Update versions.json
-              jq --argjson versions "$NEW_VERSIONS" '.versions = $versions' site/versions.json > site/versions.json.new
-              mv site/versions.json.new site/versions.json
-            fi
-          fi
-          
-          # Set RTD_VERSION environment variable for sphinx-rtd-theme
-          export RTD_VERSION=$VERSION
+          # Update switcher.json for pyData theme version switcher
+          python update_docs_gh_version.py --version $VERSION --site-dir site --is-latest $IS_LATEST
           
           # Build the documentation
           cd docs
@@ -84,13 +61,16 @@ jobs:
           mkdir -p ../site/versions/$VERSION
           cp -r build/html/* ../site/versions/$VERSION/
           
-          # If this is the latest version, also copy to the root
+          # If this is the latest version, also copy to the latest directory and root
           if [ "$IS_LATEST" = "true" ]; then
+            rm -rf ../site/latest
+            mkdir -p ../site/latest
+            cp -r build/html/* ../site/latest/
             cp -r build/html/* ../site/
           fi
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

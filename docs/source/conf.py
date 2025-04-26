@@ -35,23 +35,37 @@ language = 'en'
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
 
-# -- Read the Docs theme settings ---------------------------------------------
+# -- PyData theme settings ---------------------------------------------------
 html_theme_options = {
-    'logo_only': False,
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': True,
-    'vcs_pageview_mode': '',
-    'style_nav_header_background': '#2980B9',
-    'flyout_display': 'attached',
-    'version_selector': True,
-    'language_selector': False,
-    # Toc options
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': True,
-    'titles_only': False
+    # Navigation bar
+    "logo": {
+        "text": project,
+    },
+    "use_edit_page_button": False,
+    "show_prev_next": True,
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["version-switcher", "navbar-icon-links"],
+    
+    # Version switcher
+    "switcher": {
+        "json_url": "/switcher.json",  # Root URL of the GitHub Pages site
+        "version_match": version,
+    },
+    
+    # Theme options
+    "show_toc_level": 2,
+    "navigation_depth": 4,
+    "collapse_navigation": True,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/jfouret/ispawn",
+            "icon": "fab fa-github-square",
+            "type": "fontawesome",
+        },
+    ],
 }
