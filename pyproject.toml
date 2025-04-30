@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "ispawn"
-version = "0.2.14"
+version = "0.2.15"
 description = "A tool to spawn docker containers holding multiple services with a single command"
 authors = [
   { name="jfouret" },

@@ -513,3 +513,108 @@ def remove_container(ctx, containers, all):
         container_list = containers
     for c_id in container_list:
         container_service.remove_container(c_id, ctx.obj["force"])
+
+
+@cli.command(name="status")
+@click.pass_context
+def status(ctx):
+    """
+    Show the current project status.
+
+    Displays the current configuration settings, running containers,
+    and checks if the Traefik proxy container is running.
+    """
+    config = ctx.obj["config"]
+    container_service = ContainerService(config)
+    
+    # Display configuration information
+    click.echo(click.style("Configuration:", fg="blue", bold=True))
+    config_table = [
+        ["Name", config.name],
+        ["Network Name", config.network_name],
+        ["Domain", config.domain],
+        ["Domain Prefix", config.domain_prefix],
+        ["Proxy Mode", config.mode.value],
+        ["Install Mode", config.install_mode.value],
+        ["Subnet", config.subnet],
+        ["Mount Point", config.mount_point],
+        ["User in Namespace", "Yes" if config.user_in_namespace else "No"],
+        ["Timezone", config.timezone],
+        ["Home Prefix", config.home_prefix],
+        ["DNS Servers", ", ".join(config.dns)],
+        ["Config Directory", config.config_dir],
+        ["User Root Directory", config.user_root_dir],
+        ["Log Directory", config.base_log_dir],
+        ["Image Name Prefix", config.image_name_prefix],
+        ["Container Name Prefix", config.container_name_prefix],
+    ]
+    
+    # Add certificate-related configuration if in remote mode
+    if config.mode == ProxyMode.REMOTE and config.cert_mode:
+        config_table.append(["Certificate Mode", config.cert_mode.value])
+        if config.cert_mode == CertMode.PROVIDED and config.cert_dir:
+            config_table.append(["Certificate Directory", config.cert_dir])
+        elif config.cert_mode == CertMode.LETSENCRYPT and config.email:
+            config_table.append(["Email for Let's Encrypt", config.email])
+    
+    # Add build customization paths if set
+    if config.env_chunk_path:
+        config_table.append(["Environment Chunk Path", config.env_chunk_path])
+    if config.dockerfile_chunk_path:
+        config_table.append(["Dockerfile Chunk Path", config.dockerfile_chunk_path])
+    if config.entrypoint_chunk_path:
+        config_table.append(["Entrypoint Chunk Path", config.entrypoint_chunk_path])
+    
+    click.echo(tabulate(config_table, tablefmt="simple"))
+    
+    # Display default volumes if any
+    if config.volumes:
+        click.echo("\n" + click.style("Default Volumes:", fg="blue", bold=True))
+        volumes_table = []
+        for vol in config.volumes:
+            mode = "ro" if len(vol) > 2 and vol[2] == "ro" else "rw"
+            volumes_table.append([vol[0], vol[1], mode])
+        click.echo(tabulate(volumes_table, headers=["Host Path", "Container Path", "Mode"], tablefmt="simple"))
+    
+    # Check if Traefik container is running
+    click.echo("\n" + click.style("Traefik Status:", fg="blue", bold=True))
+    
+    # Use Docker client directly to check for Traefik container
+    # The ContainerService's list_containers method excludes containers ending with "-traefik"
+    traefik_container_name = f"{config.name}-traefik"
+    traefik_found = False
+    
+    try:
+        # Get all containers and filter for Traefik
+        all_containers = container_service.client.containers.list(all=True)
+        for container in all_containers:
+            if container.name == traefik_container_name:
+                traefik_found = True
+                traefik_id = container.short_id
+                traefik_status = container.status
+                traefik_running = container.status.lower() == "running"
+                
+                if traefik_running:
+                    click.echo(click.style(f"✓ Traefik proxy is running", fg="green"))
+                    click.echo(f"  Name: {container.name}")
+                    click.echo(f"  ID: {traefik_id}")
+                    click.echo(f"  Status: {traefik_status}")
+                    
+                    # Get container image
+                    try:
+                        image_name = container.image.tags[0] if container.image.tags else container.image.short_id
+                        click.echo(f"  Image: {image_name}")
+                    except Exception:
+                        pass
+                else:
+                    click.echo(click.style(f"! Traefik proxy exists but is not running", fg="yellow"))
+                    click.echo(f"  Name: {container.name}")
+                    click.echo(f"  ID: {traefik_id}")
+                    click.echo(f"  Status: {traefik_status}")
+                break
+        
+        if not traefik_found:
+            click.echo(click.style("✗ Traefik proxy container not found", fg="red"))
+            click.echo("  Run 'ispawn setup' to create the Traefik container")
+    except Exception as e:
+        click.echo(click.style(f"! Error checking Traefik status: {str(e)}", fg="red"))
