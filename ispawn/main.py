@@ -44,17 +44,30 @@ def parse_volumes(volumes, mnt):
 
 @click.group()
 @click.option(
-    "-f", "--force", default=False, is_flag=True, help="Overwrite existing"
+    "-f",
+    "--force",
+    default=False,
+    is_flag=True,
+    help="Force overwrite of existing configurations or resources.",
 )
 @click.option(
     "-u",
     "--user",
     default=False,
     is_flag=True,
-    help="Priorize user config over system config",
+    help=(
+        "Prioritize user-level configuration (~/.ispawn) "
+        "over system-level configuration (/etc/ispawn)."
+    ),
 )
 @click.pass_context
 def cli(ctx, force, user):
+    """
+    ispawn: A tool to manage containerized development environments.
+
+    Provides commands to set up the environment, build images, and run/manage
+    containers with services like VSCode, RStudio, and Jupyter.
+    """
     ctx.obj = {"force": force, "user": user}
     config = Config.load(user_mode=user)
     if config is None:
@@ -74,89 +87,127 @@ def cli(ctx, force, user):
 
 @cli.command()
 @click.option(
-    "-n", "--name", default="ispawn", help="Name for docker namespace"
+    "-n",
+    "--name",
+    default="ispawn",
+    help=(
+        "Namespace prefix for Docker objects (networks, volumes)."
+        " Default: 'ispawn'."
+    ),
 )
 @click.option(
     "-m",
     "--mode",
     default=ProxyMode.LOCAL.value,
     type=click.Choice([m.value for m in ProxyMode]),
-    help="Proxy mode, from where do the client connect (local or remote)",
+    help="Proxy mode: 'local' for development access only,"
+    "'remote' for external access. Default: 'local'.",
 )
-@click.option("-d", "--domain", default="ispawn.localhost", help="Domain name")
+@click.option(
+    "-d",
+    "--domain",
+    default="ispawn.localhost",
+    help="Base domain name for accessing services. Default: "
+    "'ispawn.localhost'.",
+)
 @click.option(
     "--install-mode",
     default=InstallMode.USER.value,
     type=click.Choice([m.value for m in InstallMode]),
-    help="Where to install (user in ~/.ispawn or system in /etc/ispawn)",
+    help="Installation scope: 'user' (~/.ispawn) or 'system' (/etc/ispawn)."
+    "Default: 'user'.",
 )
 @click.option(
     "--subnet",
     default="172.30.0.0/24",
-    help="Subnet CIDR string (docker internal subnet)",
+    help="CIDR notation for the Docker network subnet. Default: "
+    "'172.30.0.0/24'.",
 )
 @click.option(
     "--user-in-namespace",
     is_flag=True,
-    help="If set, add username to namespace when running container",
+    help="If set, include the username in the container namespace "
+    "(e.g., 'username-containername').",
 )
 @click.option(
     "--cert-mode",
     type=click.Choice([m.value for m in CertMode]),
-    help="If Remote, Certificate mode (letsencrypt or provided)",
+    help="Certificate mode for 'remote' proxy mode: 'letsencrypt' for "
+    "automatic certs or 'provided' for custom certs.",
 )
 @click.option(
     "--cert-dir",
-    help=(
-        "If provided, directory containing SSL certificate (cert.pem) "
-        "and key (key.pem)"
-    ),
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help="Directory containing 'cert.pem' and 'key.pem' when using 'provided' "
+    "cert-mode.",
 )
-@click.option("--email", help="if Letsencrypt, email")
+@click.option(
+    "--email",
+    help="Email address required for Let's Encrypt certificate generation.",
+)
 @click.option(
     "-v",
     "--volume",
     "volumes",
     help=(
-        "Volumes to mount in containers by default,"
-        " can specify a mount point with :"
+        "Define default volumes to mount in all containers. Format: "
+        "'host_path:container_path[:ro]'. "
+        "If only 'host_path' is given, it mounts to '/mnt/host_path_basename'."
     ),
     multiple=True,
 )
 @click.option(
     "--mount-point",
-    help="Default mount point for volumes (if : not specified in volume)",
+    help="Default base directory inside containers for volumes specified"
+    " without a target path. Default: '/mnt'.",
     default="/mnt",
 )
-@click.option("--dns", default=["8.8.8.8", "8.8.4.4"], multiple=True, help="")
+@click.option(
+    "--dns",
+    default=["8.8.8.8", "8.8.4.4"],
+    multiple=True,
+    help="DNS servers to use within containers. Can be specified multiple "
+    "times. Defaults: 8.8.8.8, 8.8.4.4.",
+)
 @click.option(
     "--env-chunk-path",
-    type=click.Path(exists=True, path_type=str),
-    help="Default path to environment file for Docker builds",
+    type=click.Path(exists=True, dir_okay=False, path_type=str),
+    help="Path to a file containing environment variables (one per line) to"
+    "inject into built images.",
 )
 @click.option(
     "--dockerfile-chunk-path",
-    type=click.Path(exists=True, path_type=str),
-    help="Default path to dockerfile chunk for Docker builds",
+    type=click.Path(exists=True, dir_okay=False, path_type=str),
+    help="Path to a file containing Dockerfile instructions to append during"
+    "image builds.",
 )
 @click.option(
     "--entrypoint-chunk-path",
-    type=click.Path(exists=True, path_type=str),
-    help="Default path to entrypoint chunk for Docker builds",
+    type=click.Path(exists=True, dir_okay=False, path_type=str),
+    help="Path to a script to prepend to the container's entrypoint.",
 )
 @click.option(
     "--home-prefix",
     default="/home/",
-    help="Home directory prefix (default: /home/)",
+    help="Prefix for user home directories inside the container. Default: "
+    "'/home/'.",
 )
 @click.option(
     "--timezone",
     default="Europe/Paris",
-    help="Container timezone (default: Europe/Paris)",
+    help="Timezone to set within containers (e.g., 'America/New_York')."
+    " Default: 'Europe/Paris'.",
 )
 @click.pass_context
 def setup(ctx, **kwargs):
-    """Setup ispawn environment."""
+    """
+    Initialize the ispawn environment.
+
+    Sets up the necessary configurations, including the Traefik reverse proxy,
+    Docker network, default volumes, and build customization settings.
+    This command only needs to be run once unless configuration changes are
+    needed.
+    """
     kwargs["dns"] = [ip for ip in kwargs["dns"]]
     kwargs["volumes"] = parse_volumes(kwargs["volumes"], kwargs["mount_point"])
     config = Config(**kwargs)
@@ -165,7 +216,13 @@ def setup(ctx, **kwargs):
 
 
 @cli.command(name="build")
-@click.option("-b", "--base", required=True, help="Base image")
+@click.option(
+    "-b",
+    "--base",
+    required=True,
+    help="The base Docker image tag to use for building (e.g., "
+    "'ubuntu:22.04').",
+)
 @click.option(
     "-s",
     "--service",
@@ -173,13 +230,20 @@ def setup(ctx, **kwargs):
     multiple=True,
     type=click.Choice([s.value for s in Service], case_sensitive=False),
     help=(
-        "Services to run (can be specified multiple times)."
-        "Defaults to rstudio and jupyterhub if not specified."
+        "Specify services to include in the image. Can be used multiple times. "
+        "Available: " + ", ".join([s.value for s in Service]) + ". "
+        "Defaults to rstudio and jupyterhub if none are specified."
     ),
 )
 @click.pass_context
 def build(ctx, **kwargs):
-    """Build a Docker image."""
+    """
+    Build a custom Docker image with specified services.
+
+    Constructs a Docker image based on the provided base image, incorporating
+    selected services and applying any global build customizations defined
+    during 'ispawn setup'.
+    """
     # Set default services if none specified
     if "services" not in kwargs.keys():
         kwargs["services"] = []
@@ -193,14 +257,14 @@ def build(ctx, **kwargs):
 
 @cli.group()
 def image():
-    """Manage Docker images."""
+    """Commands for managing ispawn Docker images."""
     pass
 
 
 @image.command(name="list")
 @click.pass_context
 def list_cmd(ctx):
-    """List Docker images."""
+    """List ispawn-related Docker images."""
     im = ImageService(ctx.obj["config"])
     images = im.list_images()
     table = tabulate(
@@ -219,11 +283,17 @@ def list_cmd(ctx):
 
 
 @image.command(name="remove")
-@click.argument("images", nargs=-1)
-@click.option("--all", is_flag=True, help="Remove all images")
+@click.argument("images", nargs=-1, metavar="IMAGE_ID_OR_TAG")
+@click.option(
+    "--all", is_flag=True, help="Remove all ispawn-related Docker images."
+)
 @click.pass_context
 def remove(ctx, images: List[str], all: bool):
-    """Remove Docker images."""
+    """
+    Remove one or more ispawn Docker images.
+
+    You can specify images by their ID or tag.
+    """
     im = ImageService(ctx.obj["config"])
     for digest in images:
         im.remove_image(digest, force=ctx.obj["force"])
@@ -233,9 +303,20 @@ def remove(ctx, images: List[str], all: bool):
 
 
 @cli.command()
-@click.option("-n", "--name", required=True, help="Container name")
-@click.option("-b", "--base", required=True, help="Base docker image")
-@click.option("--build", is_flag=True, help="Build image if missing")
+@click.option(
+    "-n", "--name", required=True, help="Unique name for the container."
+)
+@click.option(
+    "-b",
+    "--base",
+    required=True,
+    help="Base Docker image tag to use (e.g., 'ubuntu:22.04').",
+)
+@click.option(
+    "--build",
+    is_flag=True,
+    help="Build the required image automatically if it doesn't exist.",
+)
 @click.option(
     "-s",
     "--service",
@@ -243,8 +324,9 @@ def remove(ctx, images: List[str], all: bool):
     multiple=True,
     type=click.Choice([s.value for s in Service], case_sensitive=False),
     help=(
-        "Services to run (can be specified multiple times)."
-        "Defaults to vscode, rstudio, and jupyter if not specified."
+        "Specify services to run in the container. Can be used multiple times. "
+        "Available: " + ", ".join([s.value for s in Service]) + ". "
+        "Defaults to vscode, rstudio, jupyter if none are specified."
     ),
 )
 @click.option(
@@ -252,21 +334,30 @@ def remove(ctx, images: List[str], all: bool):
     "--volume",
     "volumes",
     multiple=True,
-    help="Volume mounts (can be specified multiple times)",
+    help=(
+        "Mount a host directory into the container. "
+        "Format: 'host_path:container_path[:ro]'. Can be used multiple times."
+    ),
 )
 @click.option(
     "-g",
     "--group",
     help=(
-        "Required group for RStudio access "
-        "(defaults to primary group of specified user)"
+        "Restrict RStudio access to users belonging to this group. "
+        "Defaults to the primary group of the specified user."
     ),
 )
 @click.option(
-    "--user", help="Run container as specific user (defaults to current user)"
+    "--user",
+    help=(
+        "Username or UID to run the container processes as. "
+        "Defaults to the current user."
+    ),
 )
 @click.option(
-    "--no-sudo", is_flag=True, help="Prevent sudo access within the container"
+    "--no-sudo",
+    is_flag=True,
+    help="Disable sudo privileges for the user inside the container.",
 )
 @click.pass_context
 def run(
@@ -280,7 +371,13 @@ def run(
     user: str,
     no_sudo: bool,
 ):
-    """Run a container."""
+    """
+    Create and run a new development container.
+
+    Launches a container based on the specified image, running the selected
+    services (VSCode, RStudio, Jupyter by default). Configures networking,
+    volumes, and user access according to options and global settings.
+    """
     try:
         # Parse volumes
         parsed_volumes = parse_volumes(volumes, ctx.obj["config"].mount_point)
@@ -343,7 +440,7 @@ def run(
 @cli.command(name="list")
 @click.pass_context
 def list_containers(ctx):
-    """List running containers."""
+    """List currently running ispawn containers."""
     try:
         container_service = ContainerService(ctx.obj["config"])
         containers = container_service.list_containers()
@@ -370,12 +467,20 @@ def list_containers(ctx):
 
 
 @cli.command(name="stop")
-@click.argument("containers", nargs=-1)
-@click.option("--all", is_flag=True, help="Stop all running containers")
-@click.option("--remove", is_flag=True, help="Remove also the containers")
+@click.argument("containers", nargs=-1, metavar="CONTAINER_NAME_OR_ID")
+@click.option("--all", is_flag=True, help="Stop all running ispawn containers.")
+@click.option(
+    "--remove",
+    is_flag=True,
+    help="Remove the container(s) after stopping them.",
+)
 @click.pass_context
 def stop(ctx, containers, all, remove):
-    """Stop a running container."""
+    """
+    Stop one or more running ispawn containers.
+
+    You can specify containers by their name or ID.
+    """
     container_service = ContainerService(ctx.obj["config"])
     if all:
         container_list = [c["id"] for c in container_service.list_containers()]
@@ -388,11 +493,19 @@ def stop(ctx, containers, all, remove):
 
 
 @cli.command(name="remove")
-@click.argument("containers", nargs=-1)
-@click.option("--all", is_flag=True, help="Remove all containers")
+@click.argument("containers", nargs=-1, metavar="CONTAINER_NAME_OR_ID")
+@click.option(
+    "--all", is_flag=True, help="Remove all stopped ispawn containers."
+)
 @click.pass_context
 def remove_container(ctx, containers, all):
-    """Remove a container."""
+    """
+    Remove one or more stopped ispawn containers.
+
+    Containers must be stopped before they can be removed, unless --force is
+    used.
+    You can specify containers by their name or ID.
+    """
     container_service = ContainerService(ctx.obj["config"])
     if all:
         container_list = [c["id"] for c in container_service.list_containers()]
