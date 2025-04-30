@@ -51,7 +51,11 @@ jobs:
           mkdir -p site/versions
           
           # Update switcher.json for pyData theme version switcher
-          python update_docs_gh_version.py --version $VERSION --site-dir site --is-latest $IS_LATEST
+          UP_CMD="python update_docs_gh_version.py --version $VERSION --site-dir site"
+          if  [ "$IS_LATEST" = "true" ]; then
+           UP_CMD="$UP_CMD --is-latest"
+          fi
+          $UP_CMD
           
           # Build the documentation
           cd docs
