@@ -1,0 +1,1213 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; ispawn 0.2.15 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=d5b904a0"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jfouret.github.io/ispawn/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.15';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.2.15" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">ispawn</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="cli.html">
+    Command Line Interface
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/jfouret/ispawn" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="cli.html">
+    Command Line Interface
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/jfouret/ispawn" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#Symbols"><strong>Symbols</strong></a>
+ | <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ 
+</div>
+<h2 id="Symbols">Symbols</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    --all
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-image-remove-all">ispawn-image-remove command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-remove-all">ispawn-remove command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-stop-all">ispawn-stop command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --base
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-build-b">ispawn-build command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-b">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --build
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-build">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --cert-dir
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-cert-dir">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --cert-mode
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-cert-mode">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --dns
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-dns">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --dockerfile-chunk-path
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-dockerfile-chunk-path">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --domain
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-d">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --email
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-email">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --entrypoint-chunk-path
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-entrypoint-chunk-path">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --env-chunk-path
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-env-chunk-path">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --force
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-f">ispawn command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --group
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-g">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --home-prefix
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-home-prefix">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --install-mode
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-install-mode">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --mode
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-m">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --mount-point
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-mount-point">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --name
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-n">ispawn-run command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-n">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    --no-sudo
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-no-sudo">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --remove
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-stop-remove">ispawn-stop command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --service
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-build-s">ispawn-build command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-s">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --subnet
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-subnet">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --timezone
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-timezone">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --user
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-u">ispawn command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-user">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --user-in-namespace
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-user-in-namespace">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --volume
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-v">ispawn-run command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-v">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -b
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-build-b">ispawn-build command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-b">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -d
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-d">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -f
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-f">ispawn command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -g
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-g">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -m
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-m">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -n
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-n">ispawn-run command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-n">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -s
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-build-s">ispawn-build command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-s">ispawn-run command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -u
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-u">ispawn command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -v
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-v">ispawn-run command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-v">ispawn-setup command line option</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.services.config.ConfigManager.apply_config">apply_config() (ispawn.services.config.ConfigManager method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.Config.base_log_dir">base_log_dir (ispawn.domain.config.Config property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.BaseMode">BaseMode (class in ispawn.domain.config)</a>
+</li>
+      <li><a href="api.html#ispawn.services.image.ImageService.build_image">build_image() (ispawn.services.image.ImageService method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.CertMode">CertMode (class in ispawn.domain.config)</a>
+</li>
+      <li><a href="api.html#ispawn.services.image.ImageService.check_image">check_image() (ispawn.services.image.ImageService method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.Config">Config (class in ispawn.domain.config)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.Config.config_dir">config_dir (ispawn.domain.config.Config property)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.Config.config_path">config_path (ispawn.domain.config.Config property)</a>
+</li>
+      <li><a href="api.html#ispawn.services.config.ConfigManager">ConfigManager (class in ispawn.services.config)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    CONTAINER_NAME_OR_ID
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-remove-arg-CONTAINER_NAME_OR_ID">ispawn-remove command line option</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-stop-arg-CONTAINER_NAME_OR_ID">ispawn-stop command line option</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#ispawn.domain.config.Config.container_name_prefix">container_name_prefix (ispawn.domain.config.Config property)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.container.ContainerConfig">ContainerConfig (class in ispawn.domain.container)</a>
+</li>
+      <li><a href="api.html#ispawn.services.container.ContainerService">ContainerService (class in ispawn.services.container)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.ImageConfig.dockerfile_template_path">dockerfile_template_path (ispawn.domain.image.ImageConfig property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.Config.domain_prefix">domain_prefix (ispawn.domain.config.Config property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.ImageConfig.entrypoint_template_path">entrypoint_template_path (ispawn.domain.image.ImageConfig property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.container.ContainerConfig.environment">environment() (ispawn.domain.container.ContainerConfig method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.from_str">from_str() (in module ispawn.domain.image)</a>
+
+      <ul>
+        <li><a href="api.html#ispawn.domain.config.BaseMode.from_str">(ispawn.domain.config.BaseMode class method)</a>
+</li>
+        <li><a href="api.html#ispawn.domain.image.Service.from_str">(ispawn.domain.image.Service class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.Config.from_yaml">from_yaml() (ispawn.domain.config.Config class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.ImageConfig.get_build_context">get_build_context() (ispawn.domain.image.ImageConfig method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.ImageConfig.get_dockerfile_args">get_dockerfile_args() (ispawn.domain.image.ImageConfig method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.ImageConfig.get_entrypoint_args">get_entrypoint_args() (ispawn.domain.image.ImageConfig method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.container.ContainerConfig.get_labels">get_labels() (ispawn.domain.container.ContainerConfig method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.container.ContainerConfig.get_service_domain">get_service_domain() (ispawn.domain.container.ContainerConfig method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.Config.get_system_dir">get_system_dir() (ispawn.domain.config.Config static method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.ImageConfig.get_template_context">get_template_context() (ispawn.domain.image.ImageConfig method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    IMAGE_ID_OR_TAG
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-image-remove-arg-IMAGE_ID_OR_TAG">ispawn-image-remove command line option</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#ispawn.domain.config.Config.image_name_prefix">image_name_prefix (ispawn.domain.config.Config property)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.ImageConfig">ImageConfig (class in ispawn.domain.image)</a>
+</li>
+      <li><a href="api.html#ispawn.services.image.ImageService">ImageService (class in ispawn.services.image)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.InstallMode">InstallMode (class in ispawn.domain.config)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.Config.is_local">is_local (ispawn.domain.config.Config property)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.Config.is_system_install">is_system_install (ispawn.domain.config.Config property)</a>
+</li>
+      <li>
+    ispawn command line option
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-f">--force</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-u">--user</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-f">-f</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-u">-u</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn-build command line option
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-build-b">--base</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-build-s">--service</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-build-b">-b</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-build-s">-s</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn-image-remove command line option
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-image-remove-all">--all</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-image-remove-arg-IMAGE_ID_OR_TAG">IMAGE_ID_OR_TAG</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn-remove command line option
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-remove-all">--all</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-remove-arg-CONTAINER_NAME_OR_ID">CONTAINER_NAME_OR_ID</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn-run command line option
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-run-b">--base</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-build">--build</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-g">--group</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-n">--name</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-no-sudo">--no-sudo</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-s">--service</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-user">--user</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-v">--volume</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-b">-b</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-g">-g</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-n">-n</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-s">-s</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-run-v">-v</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    ispawn-setup command line option
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-setup-cert-dir">--cert-dir</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-cert-mode">--cert-mode</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-dns">--dns</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-dockerfile-chunk-path">--dockerfile-chunk-path</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-d">--domain</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-email">--email</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-entrypoint-chunk-path">--entrypoint-chunk-path</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-env-chunk-path">--env-chunk-path</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-home-prefix">--home-prefix</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-install-mode">--install-mode</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-m">--mode</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-mount-point">--mount-point</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-n">--name</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-subnet">--subnet</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-timezone">--timezone</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-user-in-namespace">--user-in-namespace</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-v">--volume</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-d">-d</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-m">-m</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-n">-n</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-setup-v">-v</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn-stop command line option
+
+      <ul>
+        <li><a href="cli.html#cmdoption-ispawn-stop-all">--all</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-stop-remove">--remove</a>
+</li>
+        <li><a href="cli.html#cmdoption-ispawn-stop-arg-CONTAINER_NAME_OR_ID">CONTAINER_NAME_OR_ID</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn.domain.config
+
+      <ul>
+        <li><a href="api.html#module-ispawn.domain.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn.domain.container
+
+      <ul>
+        <li><a href="api.html#module-ispawn.domain.container">module</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn.domain.image
+
+      <ul>
+        <li><a href="api.html#module-ispawn.domain.image">module</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn.services.config
+
+      <ul>
+        <li><a href="api.html#module-ispawn.services.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn.services.container
+
+      <ul>
+        <li><a href="api.html#module-ispawn.services.container">module</a>
+</li>
+      </ul></li>
+      <li>
+    ispawn.services.image
+
+      <ul>
+        <li><a href="api.html#module-ispawn.services.image">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.Service.JUPYTER">JUPYTER (ispawn.domain.image.Service attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.Service.JUPYTERHUB">JUPYTERHUB (ispawn.domain.image.Service attribute)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.Service.JUPYTERLAB">JUPYTERLAB (ispawn.domain.image.Service attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.CertMode.LETSENCRYPT">LETSENCRYPT (ispawn.domain.config.CertMode attribute)</a>
+</li>
+      <li><a href="api.html#ispawn.services.container.ContainerService.list_containers">list_containers() (ispawn.services.container.ContainerService method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.services.image.ImageService.list_images">list_images() (ispawn.services.image.ImageService method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.Config.load">load() (ispawn.domain.config.Config class method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.ProxyMode.LOCAL">LOCAL (ispawn.domain.config.ProxyMode attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api.html#module-ispawn.domain.config">ispawn.domain.config</a>
+</li>
+        <li><a href="api.html#module-ispawn.domain.container">ispawn.domain.container</a>
+</li>
+        <li><a href="api.html#module-ispawn.domain.image">ispawn.domain.image</a>
+</li>
+        <li><a href="api.html#module-ispawn.services.config">ispawn.services.config</a>
+</li>
+        <li><a href="api.html#module-ispawn.services.container">ispawn.services.container</a>
+</li>
+        <li><a href="api.html#module-ispawn.services.image">ispawn.services.image</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.Config.network_name">network_name (ispawn.domain.config.Config property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.Service.port">port (ispawn.domain.image.Service property)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.port">port() (in module ispawn.domain.image)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.CertMode.PROVIDED">PROVIDED (ispawn.domain.config.CertMode attribute)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.ProxyMode">ProxyMode (class in ispawn.domain.config)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.ProxyMode.REMOTE">REMOTE (ispawn.domain.config.ProxyMode attribute)</a>
+</li>
+      <li><a href="api.html#ispawn.services.config.ConfigManager.remove_config">remove_config() (ispawn.services.config.ConfigManager method)</a>
+</li>
+      <li><a href="api.html#ispawn.services.container.ContainerService.remove_container">remove_container() (ispawn.services.container.ContainerService method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.services.image.ImageService.remove_image">remove_image() (ispawn.services.image.ImageService method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.Config.requires_email">requires_email (ispawn.domain.config.Config property)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.Service.RSTUDIO">RSTUDIO (ispawn.domain.image.Service attribute)</a>
+</li>
+      <li><a href="api.html#ispawn.services.container.ContainerService.run_container">run_container() (ispawn.services.container.ContainerService method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.Config.save">save() (ispawn.domain.config.Config method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.Service">Service (class in ispawn.domain.image)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.services.container.ContainerService.stop_container">stop_container() (ispawn.services.container.ContainerService method)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.config.InstallMode.SYSTEM">SYSTEM (ispawn.domain.config.InstallMode attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.ImageConfig.target_image">target_image (ispawn.domain.image.ImageConfig property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.Config.to_yaml">to_yaml() (ispawn.domain.config.Config method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.InstallMode.USER">USER (ispawn.domain.config.InstallMode attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.config.Config.user_root_dir">user_root_dir (ispawn.domain.config.Config property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.Service.volumes">volumes (ispawn.domain.image.Service property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#ispawn.domain.image.volumes">volumes() (in module ispawn.domain.image)</a>
+</li>
+      <li><a href="api.html#ispawn.domain.image.Service.VSCODE">VSCODE (ispawn.domain.image.Service attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, jfouret.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

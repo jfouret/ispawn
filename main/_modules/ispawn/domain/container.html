@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ispawn.domain.container &#8212; ispawn 0.2.15 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=d5b904a0"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ispawn/domain/container';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jfouret.github.io/ispawn/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.15';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.2.15" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">ispawn</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../cli.html">
+    Command Line Interface
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/jfouret/ispawn" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../cli.html">
+    Command Line Interface
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/jfouret/ispawn" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">ispawn.domain.container</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ispawn.domain.container</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">getpass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pwd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">grp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ispawn.domain.image</span><span class="w"> </span><span class="kn">import</span> <span class="n">Service</span><span class="p">,</span> <span class="n">ImageConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ispawn.domain.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_has_rwx_permissions</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">user_uid</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if current user has rwx permissions on a directory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path: Path to check permissions for</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if user has rwx access, False otherwise</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">st_mode</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">st_uid</span>
+        <span class="n">gid</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">st_gid</span>
+
+        <span class="c1"># Check user permissions</span>
+        <span class="k">if</span> <span class="n">uid</span> <span class="o">==</span> <span class="n">user_uid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">&amp;</span> <span class="mo">0o700</span> <span class="o">==</span> <span class="mo">0o700</span><span class="p">:</span>  <span class="c1"># User has rwx</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Check group permissions</span>
+        <span class="n">user_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">gr_gid</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">grp</span><span class="o">.</span><span class="n">getgrall</span><span class="p">()</span> <span class="k">if</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">gr_mem</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">user_groups</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">&amp;</span> <span class="mo">0o070</span> <span class="o">==</span> <span class="mo">0o070</span><span class="p">:</span>  <span class="c1"># Group has rwx</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">except</span> <span class="p">(</span><span class="ne">PermissionError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ensure_source_directory</span><span class="p">(</span><span class="n">src_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">user_uid</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ensure a source directory exists, creating it if possible.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        src_path: Path to check/create</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of (success, message)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">src_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Source path </span><span class="si">{</span><span class="n">src_path</span><span class="si">}</span><span class="s2"> exists but is not a directory&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_rwx_permissions</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">user_uid</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;User </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2"> does not have rwx permissions on directory &quot;</span>
+                <span class="o">+</span> <span class="n">src_path</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_rwx_permissions</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">user_uid</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Created directory </span><span class="si">{</span><span class="n">src_path</span><span class="si">}</span><span class="s2"> but user </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2"> does not have&quot;</span>
+                <span class="s2">&quot;rwx permissions&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Permission denied creating directory </span><span class="si">{</span><span class="n">src_path</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Failed to create directory </span><span class="si">{</span><span class="n">src_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<div class="viewcode-block" id="ContainerConfig">
+<a class="viewcode-back" href="../../../api.html#ispawn.domain.container.ContainerConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ContainerConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration for a container with comprehensive settings.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): Original container name</span>
+<span class="sd">        group (str): Required group for RStudio access (defaults to username)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Config</span><span class="p">,</span>
+        <span class="n">image_config</span><span class="p">:</span> <span class="n">ImageConfig</span><span class="p">,</span>
+        <span class="n">volumes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sudo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize container configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: Container name</span>
+<span class="sd">            config: Global configuration</span>
+<span class="sd">            image_config: Image configuration</span>
+<span class="sd">            volumes: List of volume mappings</span>
+<span class="sd">            group: Required group for RStudio access (defaults to username)</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If cert_mode is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">container_name_prefix</span><span class="si">}{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_config</span> <span class="o">=</span> <span class="n">image_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sudo</span> <span class="o">=</span> <span class="n">sudo</span>
+
+        <span class="c1"># Handle user for container execution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span> <span class="ow">or</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pwd_entry</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">.</span><span class="n">getpwnam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_uid</span> <span class="o">=</span> <span class="n">pwd_entry</span><span class="o">.</span><span class="n">pw_uid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_gid</span> <span class="o">=</span> <span class="n">pwd_entry</span><span class="o">.</span><span class="n">pw_gid</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="si">}</span><span class="s2"> not found in the system&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Keep service group separate from user&#39;s system group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span>
+
+        <span class="c1"># Create log and volume directories</span>
+        <span class="n">log_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">user_root_dir</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">container_name</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span>
+        <span class="n">vol_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">user_root_dir</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">container_name</span> <span class="o">/</span> <span class="s2">&quot;volumes&quot;</span>
+        <span class="n">log_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">vol_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vol_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">vol_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">log_dir</span><span class="p">)</span>
+
+        <span class="c1"># Process volumes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volumes</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">volumes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volumes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">volumes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">volumes</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;/var/log/ispawn&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Check and create source directories for user volumes</span>
+        <span class="k">for</span> <span class="n">volume</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">volumes</span><span class="p">:</span>
+            <span class="n">src</span> <span class="o">=</span> <span class="n">volume</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">success</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">_ensure_source_directory</span><span class="p">(</span>
+                <span class="n">src</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_uid</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;INFO: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add service-specific volumes last</span>
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_config</span><span class="o">.</span><span class="n">services</span><span class="p">:</span>
+            <span class="n">service_volumes</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">volumes</span>
+            <span class="k">for</span> <span class="n">host_dir</span><span class="p">,</span> <span class="n">container_path</span> <span class="ow">in</span> <span class="n">service_volumes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># Create and check service-specific directory</span>
+                <span class="n">service_vol_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vol_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">service</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="n">host_dir</span>
+                <span class="n">success</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">_ensure_source_directory</span><span class="p">(</span>
+                    <span class="n">service_vol_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_uid</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;INFO: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># Add volume mapping</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">volumes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">service_vol_dir</span><span class="p">),</span>
+                        <span class="n">container_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                            <span class="s2">&quot;~&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">home_prefix</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+
+<div class="viewcode-block" id="ContainerConfig.get_labels">
+<a class="viewcode-back" href="../../../api.html#ispawn.domain.container.ContainerConfig.get_labels">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate container labels for Traefik routing and service</span>
+<span class="sd">            identification.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, str]: Dictionary of Docker labels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;traefik.enable&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;traefik.http.middlewares.redirect-to-https.&quot;</span>
+                <span class="s2">&quot;redirectscheme.scheme&quot;</span>
+            <span class="p">):</span> <span class="s2">&quot;https&quot;</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;traefik.http.middlewares.redirect-to-https.&quot;</span>
+                <span class="s2">&quot;redirectscheme.permanent&quot;</span>
+            <span class="p">):</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_config</span><span class="o">.</span><span class="n">services</span><span class="p">:</span>
+            <span class="n">service_domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_service_domain</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+            <span class="n">router_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">container_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">service</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">service_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">container_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">service</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">-service&quot;</span>
+
+            <span class="n">labels</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">&quot;ispawn.port.</span><span class="si">{</span><span class="n">service</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">port</span><span class="p">),</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;traefik.http.routers.</span><span class="si">{</span><span class="n">router_id</span><span class="si">}</span><span class="s2">.rule&quot;</span>
+                    <span class="p">):</span> <span class="sa">f</span><span class="s2">&quot;Host(`</span><span class="si">{</span><span class="n">service_domain</span><span class="si">}</span><span class="s2">`)&quot;</span><span class="p">,</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;traefik.http.routers.</span><span class="si">{</span><span class="n">router_id</span><span class="si">}</span><span class="s2">.entrypoints&quot;</span>
+                    <span class="p">):</span> <span class="s2">&quot;websecure&quot;</span><span class="p">,</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;traefik.http.routers.</span><span class="si">{</span><span class="n">router_id</span><span class="si">}</span><span class="s2">.middlewares&quot;</span>
+                    <span class="p">):</span> <span class="s2">&quot;redirect-to-https&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;traefik.http.routers.</span><span class="si">{</span><span class="n">router_id</span><span class="si">}</span><span class="s2">.tls&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;traefik.http.routers.</span><span class="si">{</span><span class="n">router_id</span><span class="si">}</span><span class="s2">.service&quot;</span><span class="p">:</span> <span class="n">service_id</span><span class="p">,</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;traefik.http.services.</span><span class="si">{</span><span class="n">service_id</span><span class="si">}</span><span class="s2">.&quot;</span>
+                        <span class="s2">&quot;loadbalancer.server.port&quot;</span>
+                    <span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">port</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">cert_mode</span> <span class="o">==</span> <span class="s2">&quot;letsencrypt&quot;</span><span class="p">:</span>
+                <span class="n">labels</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;traefik.http.routers.</span><span class="si">{</span><span class="n">router_id</span><span class="si">}</span><span class="s2">.tls.certresolver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;letsencrypt&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">labels</span></div>
+
+
+<div class="viewcode-block" id="ContainerConfig.environment">
+<a class="viewcode-back" href="../../../api.html#ispawn.domain.container.ContainerConfig.environment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate environment variables for the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;USER_NAME&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="s2">&quot;USER_PASS&quot;</span><span class="p">:</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Enter password: &quot;</span><span class="p">),</span>
+            <span class="s2">&quot;USER_UID&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_uid</span><span class="p">),</span>
+            <span class="s2">&quot;USER_GID&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_gid</span><span class="p">),</span>
+            <span class="s2">&quot;LOG_DIR&quot;</span><span class="p">:</span> <span class="s2">&quot;/var/log/ispawn&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;SERVICES&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_config</span><span class="o">.</span><span class="n">services</span><span class="p">),</span>
+            <span class="s2">&quot;REQUIRED_GROUP&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span>
+            <span class="s2">&quot;USER_AS_SUDO&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sudo</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ContainerConfig.get_service_domain">
+<a class="viewcode-back" href="../../../api.html#ispawn.domain.container.ContainerConfig.get_service_domain">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_service_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">:</span> <span class="n">Service</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate service domain name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service: Service type</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Service domain name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">domain_prefix</span><span class="si">}{</span><span class="n">service</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">-&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, jfouret.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

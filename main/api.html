@@ -1,0 +1,1150 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API Reference &#8212; ispawn 0.2.15 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=d5b904a0"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jfouret.github.io/ispawn/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.15';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Command Line Interface" href="cli.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.2.15" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">ispawn</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="cli.html">
+    Command Line Interface
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/jfouret/ispawn" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="usage.html">
+    Usage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="cli.html">
+    Command Line Interface
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/jfouret/ispawn" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">API Reference</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
+<p>This section provides detailed information about the ispawn Python API.</p>
+<section id="module-ispawn.domain.config">
+<span id="config"></span><h2>Config<a class="headerlink" href="#module-ispawn.domain.config" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.domain.config.BaseMode">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.domain.config.</span></span><span class="sig-name descname"><span class="pre">BaseMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/domain/config.html#BaseMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.BaseMode" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Base class for mode enums with common string conversion functionality.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.config.BaseMode.from_str">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ispawn.domain.config.BaseMode" title="ispawn.domain.config.BaseMode"><span class="pre">BaseMode</span></a></span></span><a class="reference internal" href="_modules/ispawn/domain/config.html#BaseMode.from_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.BaseMode.from_str" title="Link to this definition">#</a></dt>
+<dd><p>Create mode from string.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.domain.config.CertMode">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.domain.config.</span></span><span class="sig-name descname"><span class="pre">CertMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/domain/config.html#CertMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.CertMode" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ispawn.domain.config.BaseMode" title="ispawn.domain.config.BaseMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseMode</span></code></a></p>
+<p>Available certificate modes for remote proxy.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.config.CertMode.LETSENCRYPT">
+<span class="sig-name descname"><span class="pre">LETSENCRYPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'letsencrypt'</span></em><a class="headerlink" href="#ispawn.domain.config.CertMode.LETSENCRYPT" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.config.CertMode.PROVIDED">
+<span class="sig-name descname"><span class="pre">PROVIDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'provided'</span></em><a class="headerlink" href="#ispawn.domain.config.CertMode.PROVIDED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.domain.config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">install_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subnet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_in_namespace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cert_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cert_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volumes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mount_point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_chunk_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dockerfile_chunk_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entrypoint_chunk_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">home_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/home/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Europe/Paris'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/domain/config.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.Config" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Configuration for reverse proxy and SSL certificates.</p>
+<dl class="simple">
+<dt>Attrs:</dt><dd><p>install_mode: Installation mode system or user
+mode: Proxy mode (local or remote)
+domain: Domain name for services
+subnet: Docker network subnet
+name: Base name
+network_name: Network name
+cert_mode: Certificate mode (required for remote proxy)
+cert_dir: Directory for SSL certificates
+email: Email for Let’s Encrypt (required if cert_mode is letsencrypt)
+env_chunk_path: Path to environment file for Docker builds
+dockerfile_chunk_path: Path to dockerfile chunk for Docker builds
+entrypoint_chunk_path: Path to entrypoint chunk for Docker builds</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.base_log_dir">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">base_log_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.config.Config.base_log_dir" title="Link to this definition">#</a></dt>
+<dd><p>Get base log directory path.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.config_dir">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">config_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.config.Config.config_dir" title="Link to this definition">#</a></dt>
+<dd><p>Get config dir</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.config_path">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">config_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.config.Config.config_path" title="Link to this definition">#</a></dt>
+<dd><p>Get config path</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.container_name_prefix">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">container_name_prefix</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.config.Config.container_name_prefix" title="Link to this definition">#</a></dt>
+<dd><p>Get container name prefix</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.domain_prefix">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">domain_prefix</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.config.Config.domain_prefix" title="Link to this definition">#</a></dt>
+<dd><p>Get domain prefix</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.from_yaml">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ispawn.domain.config.Config" title="ispawn.domain.config.Config"><span class="pre">Config</span></a></span></span><a class="reference internal" href="_modules/ispawn/domain/config.html#Config.from_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.Config.from_yaml" title="Link to this definition">#</a></dt>
+<dd><p>Create Config from YAML.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.get_system_dir">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_system_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ispawn/domain/config.html#Config.get_system_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.Config.get_system_dir" title="Link to this definition">#</a></dt>
+<dd><p>Get system-wide installation directory.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Path to system-wide installation directory (/etc/ispawn)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.image_name_prefix">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">image_name_prefix</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.config.Config.image_name_prefix" title="Link to this definition">#</a></dt>
+<dd><p>Get image name prefix</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.is_local">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_local</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ispawn.domain.config.Config.is_local" title="Link to this definition">#</a></dt>
+<dd><p>Check if using local proxy mode.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.is_system_install">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_system_install</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ispawn.domain.config.Config.is_system_install" title="Link to this definition">#</a></dt>
+<dd><p>Check if using system-wide installation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.load">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ispawn.domain.config.Config" title="ispawn.domain.config.Config"><span class="pre">Config</span></a></span></span><a class="reference internal" href="_modules/ispawn/domain/config.html#Config.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.Config.load" title="Link to this definition">#</a></dt>
+<dd><p>Create Config from system configuration using from_yaml.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.network_name">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">network_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.config.Config.network_name" title="Link to this definition">#</a></dt>
+<dd><p>Get Docker network name.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.requires_email">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">requires_email</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ispawn.domain.config.Config.requires_email" title="Link to this definition">#</a></dt>
+<dd><p>Check if email is required for certificate configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/domain/config.html#Config.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.Config.save" title="Link to this definition">#</a></dt>
+<dd><p>Save proxy configuration to system or user configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.to_yaml">
+<span class="sig-name descname"><span class="pre">to_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TextIO</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/domain/config.html#Config.to_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.Config.to_yaml" title="Link to this definition">#</a></dt>
+<dd><p>Serialize proxy configuration to YAML.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.config.Config.user_root_dir">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_root_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.config.Config.user_root_dir" title="Link to this definition">#</a></dt>
+<dd><p>Get user root directory path.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.domain.config.InstallMode">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.domain.config.</span></span><span class="sig-name descname"><span class="pre">InstallMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/domain/config.html#InstallMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.InstallMode" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ispawn.domain.config.BaseMode" title="ispawn.domain.config.BaseMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseMode</span></code></a></p>
+<p>Available installation modes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.config.InstallMode.SYSTEM">
+<span class="sig-name descname"><span class="pre">SYSTEM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system'</span></em><a class="headerlink" href="#ispawn.domain.config.InstallMode.SYSTEM" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.config.InstallMode.USER">
+<span class="sig-name descname"><span class="pre">USER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user'</span></em><a class="headerlink" href="#ispawn.domain.config.InstallMode.USER" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.domain.config.ProxyMode">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.domain.config.</span></span><span class="sig-name descname"><span class="pre">ProxyMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/domain/config.html#ProxyMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.config.ProxyMode" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ispawn.domain.config.BaseMode" title="ispawn.domain.config.BaseMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseMode</span></code></a></p>
+<p>Available reverse proxy modes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.config.ProxyMode.LOCAL">
+<span class="sig-name descname"><span class="pre">LOCAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'local'</span></em><a class="headerlink" href="#ispawn.domain.config.ProxyMode.LOCAL" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.config.ProxyMode.REMOTE">
+<span class="sig-name descname"><span class="pre">REMOTE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'remote'</span></em><a class="headerlink" href="#ispawn.domain.config.ProxyMode.REMOTE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ispawn.domain.image">
+<span id="image"></span><h2>Image<a class="headerlink" href="#module-ispawn.domain.image" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.domain.image.ImageConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.domain.image.</span></span><span class="sig-name descname"><span class="pre">ImageConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.config.Config" title="ispawn.domain.config.Config"><span class="pre">Config</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">services</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/domain/image.html#ImageConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.image.ImageConfig" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Configuration for building a Docker image with comprehensive settings.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>base (str): Base Docker image to build from
+services (List[str]): List of services to include in the image
+config (Config): Configuration object containing build settings</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.image.ImageConfig.dockerfile_template_path">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dockerfile_template_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#ispawn.domain.image.ImageConfig.dockerfile_template_path" title="Link to this definition">#</a></dt>
+<dd><p>Get path to the Dockerfile template.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Path: Path to Dockerfile template</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.image.ImageConfig.entrypoint_template_path">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">entrypoint_template_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#ispawn.domain.image.ImageConfig.entrypoint_template_path" title="Link to this definition">#</a></dt>
+<dd><p>Get path to the entrypoint script template.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Path: Path to entrypoint script template</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.image.ImageConfig.get_build_context">
+<span class="sig-name descname"><span class="pre">get_build_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/domain/image.html#ImageConfig.get_build_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.image.ImageConfig.get_build_context" title="Link to this definition">#</a></dt>
+<dd><p>Get the complete build context for the image.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>Dict[str, Any]: Complete build context including all necessary</dt><dd><p>files and arguments</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.image.ImageConfig.get_dockerfile_args">
+<span class="sig-name descname"><span class="pre">get_dockerfile_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/domain/image.html#ImageConfig.get_dockerfile_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.image.ImageConfig.get_dockerfile_args" title="Link to this definition">#</a></dt>
+<dd><p>Get Dockerfile template context.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.image.ImageConfig.get_entrypoint_args">
+<span class="sig-name descname"><span class="pre">get_entrypoint_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/domain/image.html#ImageConfig.get_entrypoint_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.image.ImageConfig.get_entrypoint_args" title="Link to this definition">#</a></dt>
+<dd><p>Get entrypoint template context.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.image.ImageConfig.get_template_context">
+<span class="sig-name descname"><span class="pre">get_template_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/domain/image.html#ImageConfig.get_template_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.image.ImageConfig.get_template_context" title="Link to this definition">#</a></dt>
+<dd><p>Get template context for specified template type.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>template_type: Type of template (‘Dockerfile’ or ‘entrypoint.sh’)</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dict[str, Any]: Template context variables</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.image.ImageConfig.target_image">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_image</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ispawn.domain.image.ImageConfig.target_image" title="Link to this definition">#</a></dt>
+<dd><p>Get the target image name.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: Target image name with prefix and tag</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.domain.image.</span></span><span class="sig-name descname"><span class="pre">Service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ispawn.domain.image.Service" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service.JUPYTER">
+<span class="sig-name descname"><span class="pre">JUPYTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'jupyter'</span></em><a class="headerlink" href="#ispawn.domain.image.Service.JUPYTER" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service.JUPYTERHUB">
+<span class="sig-name descname"><span class="pre">JUPYTERHUB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'jupyterhub'</span></em><a class="headerlink" href="#ispawn.domain.image.Service.JUPYTERHUB" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service.JUPYTERLAB">
+<span class="sig-name descname"><span class="pre">JUPYTERLAB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'jupyterlab'</span></em><a class="headerlink" href="#ispawn.domain.image.Service.JUPYTERLAB" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service.RSTUDIO">
+<span class="sig-name descname"><span class="pre">RSTUDIO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rstudio'</span></em><a class="headerlink" href="#ispawn.domain.image.Service.RSTUDIO" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service.VSCODE">
+<span class="sig-name descname"><span class="pre">VSCODE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'vscode'</span></em><a class="headerlink" href="#ispawn.domain.image.Service.VSCODE" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service.from_str">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ispawn.domain.image.Service.from_str" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service.port">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">port</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ispawn.domain.image.Service.port" title="Link to this definition">#</a></dt>
+<dd><p>Get the port number defined in the service’s config.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ispawn.domain.image.Service.volumes">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">volumes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ispawn.domain.image.Service.volumes" title="Link to this definition">#</a></dt>
+<dd><p>Get the volume mappings defined in the service’s config.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>Dict[str, str]: Dictionary mapping host directory names to container</dt><dd><p>paths</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ispawn.domain.image.from_str">
+<span class="sig-prename descclassname"><span class="pre">ispawn.domain.image.</span></span><span class="sig-name descname"><span class="pre">from_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/domain/image.html#from_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.image.from_str" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ispawn.domain.image.port">
+<span class="sig-prename descclassname"><span class="pre">ispawn.domain.image.</span></span><span class="sig-name descname"><span class="pre">port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/domain/image.html#port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.image.port" title="Link to this definition">#</a></dt>
+<dd><p>Get the port number defined in the service’s config.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ispawn.domain.image.volumes">
+<span class="sig-prename descclassname"><span class="pre">ispawn.domain.image.</span></span><span class="sig-name descname"><span class="pre">volumes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/domain/image.html#volumes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.image.volumes" title="Link to this definition">#</a></dt>
+<dd><p>Get the volume mappings defined in the service’s config.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>Dict[str, str]: Dictionary mapping host directory names to container</dt><dd><p>paths</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ispawn.domain.container">
+<span id="container"></span><h2>Container<a class="headerlink" href="#module-ispawn.domain.container" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.domain.container.ContainerConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.domain.container.</span></span><span class="sig-name descname"><span class="pre">ContainerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.config.Config" title="ispawn.domain.config.Config"><span class="pre">Config</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.image.ImageConfig" title="ispawn.domain.image.ImageConfig"><span class="pre">ImageConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">volumes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sudo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/domain/container.html#ContainerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.container.ContainerConfig" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Configuration for a container with comprehensive settings.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>name (str): Original container name
+group (str): Required group for RStudio access (defaults to username)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.container.ContainerConfig.environment">
+<span class="sig-name descname"><span class="pre">environment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/domain/container.html#ContainerConfig.environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.container.ContainerConfig.environment" title="Link to this definition">#</a></dt>
+<dd><p>Generate environment variables for the container.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.container.ContainerConfig.get_labels">
+<span class="sig-name descname"><span class="pre">get_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/domain/container.html#ContainerConfig.get_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.container.ContainerConfig.get_labels" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Generate container labels for Traefik routing and service</dt><dd><p>identification.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dict[str, str]: Dictionary of Docker labels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.domain.container.ContainerConfig.get_service_domain">
+<span class="sig-name descname"><span class="pre">get_service_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.image.Service" title="ispawn.domain.image.Service"><span class="pre">Service</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/ispawn/domain/container.html#ContainerConfig.get_service_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.domain.container.ContainerConfig.get_service_domain" title="Link to this definition">#</a></dt>
+<dd><p>Generate service domain name.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>service: Service type</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Service domain name</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="services">
+<h2>Services<a class="headerlink" href="#services" title="Link to this heading">#</a></h2>
+<section id="image-service">
+<h3>Image Service<a class="headerlink" href="#image-service" title="Link to this heading">#</a></h3>
+<dl class="py class" id="module-ispawn.services.image">
+<dt class="sig sig-object py" id="ispawn.services.image.ImageService">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.services.image.</span></span><span class="sig-name descname"><span class="pre">ImageService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.config.Config" title="ispawn.domain.config.Config"><span class="pre">Config</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/services/image.html#ImageService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.image.ImageService" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Service for handling Docker image operations.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.image.ImageService.build_image">
+<span class="sig-name descname"><span class="pre">build_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.image.ImageConfig" title="ispawn.domain.image.ImageConfig"><span class="pre">ImageConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Image</span></span></span><a class="reference internal" href="_modules/ispawn/services/image.html#ImageService.build_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.image.ImageService.build_image" title="Link to this definition">#</a></dt>
+<dd><p>Build a Docker image using the provided configuration.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>config: ImageConfig instance with build configuration</p>
+</dd>
+<dt>Returns:</dt><dd><p>Built Docker image</p>
+</dd>
+<dt>Raises:</dt><dd><p>ImageError: If image build fails</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.image.ImageService.check_image">
+<span class="sig-name descname"><span class="pre">check_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.image.ImageConfig" title="ispawn.domain.image.ImageConfig"><span class="pre">ImageConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/ispawn/services/image.html#ImageService.check_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.image.ImageService.check_image" title="Link to this definition">#</a></dt>
+<dd><p>Check if a Docker image exists based on the provided configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.image.ImageService.list_images">
+<span class="sig-name descname"><span class="pre">list_images</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/services/image.html#ImageService.list_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.image.ImageService.list_images" title="Link to this definition">#</a></dt>
+<dd><p>List all ispawn images.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>prefix: Image name prefix to filter by</p>
+</dd>
+<dt>Returns:</dt><dd><p>List of image information dictionaries</p>
+</dd>
+<dt>Raises:</dt><dd><p>ImageError: If listing images fails</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.image.ImageService.remove_image">
+<span class="sig-name descname"><span class="pre">remove_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">digest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/services/image.html#ImageService.remove_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.image.ImageService.remove_image" title="Link to this definition">#</a></dt>
+<dd><p>Remove a Docker image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name: Name of the image to remove
+force: Force removal of the image</p>
+</dd>
+<dt>Raises:</dt><dd><p>ImageError: If image removal fails</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="container-service">
+<h3>Container Service<a class="headerlink" href="#container-service" title="Link to this heading">#</a></h3>
+<dl class="py class" id="module-ispawn.services.container">
+<dt class="sig sig-object py" id="ispawn.services.container.ContainerService">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.services.container.</span></span><span class="sig-name descname"><span class="pre">ContainerService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.config.Config" title="ispawn.domain.config.Config"><span class="pre">Config</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Service for handling Docker operations.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.container.ContainerService.list_containers">
+<span class="sig-name descname"><span class="pre">list_containers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService.list_containers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService.list_containers" title="Link to this definition">#</a></dt>
+<dd><p>List all ispawn containers.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List[Dict[str, str]]: List of container information</p>
+</dd>
+<dt>Raises:</dt><dd><p>ContainerError: If container listing fails</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.container.ContainerService.remove_container">
+<span class="sig-name descname"><span class="pre">remove_container</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService.remove_container"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService.remove_container" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.container.ContainerService.run_container">
+<span class="sig-name descname"><span class="pre">run_container</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.container.ContainerConfig" title="ispawn.domain.container.ContainerConfig"><span class="pre">ContainerConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Container</span></span></span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService.run_container"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService.run_container" title="Link to this definition">#</a></dt>
+<dd><p>Run a Docker container with the specified configuration.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>container: Container configuration
+force: Whether to force replace an existing container</p>
+</dd>
+<dt>Returns:</dt><dd><p>Running Docker container</p>
+</dd>
+<dt>Raises:</dt><dd><p>ContainerError: If container operations fail</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.container.ContainerService.stop_container">
+<span class="sig-name descname"><span class="pre">stop_container</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService.stop_container"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService.stop_container" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="config-manager">
+<h3>Config Manager<a class="headerlink" href="#config-manager" title="Link to this heading">#</a></h3>
+<p id="module-ispawn.services.config">Configuration manager for ispawn.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ispawn.services.config.ConfigManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ispawn.services.config.</span></span><span class="sig-name descname"><span class="pre">ConfigManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ispawn.domain.config.Config" title="ispawn.domain.config.Config"><span class="pre">Config</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ispawn/services/config.html#ConfigManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.config.ConfigManager" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Configuration manager for ispawn.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.config.ConfigManager.apply_config">
+<span class="sig-name descname"><span class="pre">apply_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/services/config.html#ConfigManager.apply_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.config.ConfigManager.apply_config" title="Link to this definition">#</a></dt>
+<dd><p>Apply the configuration.</p>
+<p>Creates necessary directories, generates certificates,
+sets up Docker network, and configures traefik.</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>ConfigurationError: If configuration cannot be applied</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.config.ConfigManager.remove_config">
+<span class="sig-name descname"><span class="pre">remove_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/services/config.html#ConfigManager.remove_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.config.ConfigManager.remove_config" title="Link to this definition">#</a></dt>
+<dd><p>Remove the configuration and cleanup resources.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="cli.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Command Line Interface</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ispawn.domain.config">Config</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.BaseMode"><code class="docutils literal notranslate"><span class="pre">BaseMode</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.BaseMode.from_str"><code class="docutils literal notranslate"><span class="pre">BaseMode.from_str()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.CertMode"><code class="docutils literal notranslate"><span class="pre">CertMode</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.CertMode.LETSENCRYPT"><code class="docutils literal notranslate"><span class="pre">CertMode.LETSENCRYPT</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.CertMode.PROVIDED"><code class="docutils literal notranslate"><span class="pre">CertMode.PROVIDED</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.base_log_dir"><code class="docutils literal notranslate"><span class="pre">Config.base_log_dir</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.config_dir"><code class="docutils literal notranslate"><span class="pre">Config.config_dir</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.config_path"><code class="docutils literal notranslate"><span class="pre">Config.config_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.container_name_prefix"><code class="docutils literal notranslate"><span class="pre">Config.container_name_prefix</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.domain_prefix"><code class="docutils literal notranslate"><span class="pre">Config.domain_prefix</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.from_yaml"><code class="docutils literal notranslate"><span class="pre">Config.from_yaml()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.get_system_dir"><code class="docutils literal notranslate"><span class="pre">Config.get_system_dir()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.image_name_prefix"><code class="docutils literal notranslate"><span class="pre">Config.image_name_prefix</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.is_local"><code class="docutils literal notranslate"><span class="pre">Config.is_local</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.is_system_install"><code class="docutils literal notranslate"><span class="pre">Config.is_system_install</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.load"><code class="docutils literal notranslate"><span class="pre">Config.load()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.network_name"><code class="docutils literal notranslate"><span class="pre">Config.network_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.requires_email"><code class="docutils literal notranslate"><span class="pre">Config.requires_email</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.save"><code class="docutils literal notranslate"><span class="pre">Config.save()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.to_yaml"><code class="docutils literal notranslate"><span class="pre">Config.to_yaml()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.Config.user_root_dir"><code class="docutils literal notranslate"><span class="pre">Config.user_root_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.InstallMode"><code class="docutils literal notranslate"><span class="pre">InstallMode</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.InstallMode.SYSTEM"><code class="docutils literal notranslate"><span class="pre">InstallMode.SYSTEM</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.InstallMode.USER"><code class="docutils literal notranslate"><span class="pre">InstallMode.USER</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.ProxyMode"><code class="docutils literal notranslate"><span class="pre">ProxyMode</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.ProxyMode.LOCAL"><code class="docutils literal notranslate"><span class="pre">ProxyMode.LOCAL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.config.ProxyMode.REMOTE"><code class="docutils literal notranslate"><span class="pre">ProxyMode.REMOTE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ispawn.domain.image">Image</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.ImageConfig"><code class="docutils literal notranslate"><span class="pre">ImageConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.ImageConfig.dockerfile_template_path"><code class="docutils literal notranslate"><span class="pre">ImageConfig.dockerfile_template_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.ImageConfig.entrypoint_template_path"><code class="docutils literal notranslate"><span class="pre">ImageConfig.entrypoint_template_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.ImageConfig.get_build_context"><code class="docutils literal notranslate"><span class="pre">ImageConfig.get_build_context()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.ImageConfig.get_dockerfile_args"><code class="docutils literal notranslate"><span class="pre">ImageConfig.get_dockerfile_args()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.ImageConfig.get_entrypoint_args"><code class="docutils literal notranslate"><span class="pre">ImageConfig.get_entrypoint_args()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.ImageConfig.get_template_context"><code class="docutils literal notranslate"><span class="pre">ImageConfig.get_template_context()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.ImageConfig.target_image"><code class="docutils literal notranslate"><span class="pre">ImageConfig.target_image</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service"><code class="docutils literal notranslate"><span class="pre">Service</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service.JUPYTER"><code class="docutils literal notranslate"><span class="pre">Service.JUPYTER</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service.JUPYTERHUB"><code class="docutils literal notranslate"><span class="pre">Service.JUPYTERHUB</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service.JUPYTERLAB"><code class="docutils literal notranslate"><span class="pre">Service.JUPYTERLAB</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service.RSTUDIO"><code class="docutils literal notranslate"><span class="pre">Service.RSTUDIO</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service.VSCODE"><code class="docutils literal notranslate"><span class="pre">Service.VSCODE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service.from_str"><code class="docutils literal notranslate"><span class="pre">Service.from_str()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service.port"><code class="docutils literal notranslate"><span class="pre">Service.port</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.Service.volumes"><code class="docutils literal notranslate"><span class="pre">Service.volumes</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.from_str"><code class="docutils literal notranslate"><span class="pre">from_str()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.port"><code class="docutils literal notranslate"><span class="pre">port()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.image.volumes"><code class="docutils literal notranslate"><span class="pre">volumes()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ispawn.domain.container">Container</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.container.ContainerConfig"><code class="docutils literal notranslate"><span class="pre">ContainerConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.container.ContainerConfig.environment"><code class="docutils literal notranslate"><span class="pre">ContainerConfig.environment()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.container.ContainerConfig.get_labels"><code class="docutils literal notranslate"><span class="pre">ContainerConfig.get_labels()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.domain.container.ContainerConfig.get_service_domain"><code class="docutils literal notranslate"><span class="pre">ContainerConfig.get_service_domain()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#services">Services</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-service">Image Service</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.image.ImageService"><code class="docutils literal notranslate"><span class="pre">ImageService</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.image.ImageService.build_image"><code class="docutils literal notranslate"><span class="pre">ImageService.build_image()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.image.ImageService.check_image"><code class="docutils literal notranslate"><span class="pre">ImageService.check_image()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.image.ImageService.list_images"><code class="docutils literal notranslate"><span class="pre">ImageService.list_images()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.image.ImageService.remove_image"><code class="docutils literal notranslate"><span class="pre">ImageService.remove_image()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#container-service">Container Service</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService"><code class="docutils literal notranslate"><span class="pre">ContainerService</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.list_containers"><code class="docutils literal notranslate"><span class="pre">ContainerService.list_containers()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.remove_container"><code class="docutils literal notranslate"><span class="pre">ContainerService.remove_container()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.run_container"><code class="docutils literal notranslate"><span class="pre">ContainerService.run_container()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.stop_container"><code class="docutils literal notranslate"><span class="pre">ContainerService.stop_container()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#config-manager">Config Manager</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.config.ConfigManager"><code class="docutils literal notranslate"><span class="pre">ConfigManager</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.config.ConfigManager.apply_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager.apply_config()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.config.ConfigManager.remove_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager.remove_config()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, jfouret.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
