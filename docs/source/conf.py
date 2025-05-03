@@ -1,12 +1,22 @@
 import os
 import sys
+import tomllib
+
+# Get the absolute path to the project root
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+
+# Read version from pyproject.toml
+pyproject_path = os.path.join(project_root, "pyproject.toml")
+with open(pyproject_path, "rb") as f:
+    pyproject_data = tomllib.load(f)
 
 project = "ispawn"
 copyright = "2025, jfouret"
 author = "jfouret"
 
-version = "0.2.14"
-release = "0.2.14"
+# Extract version from pyproject.toml
+version = pyproject_data["project"]["version"]
+release = version
 
 
 sys.path.insert(0, os.path.abspath("../.."))
@@ -36,7 +46,7 @@ html_theme_options = {
     "navbar_end": ["version-switcher", "navbar-icon-links"],
     # Version switcher
     "switcher": {
-        "json_url": "/switcher.json",
+        "json_url": "https://jfouret.github.io/ispawn/switcher.json",
         "version_match": version,
     },
     # Theme options
