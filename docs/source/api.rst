@@ -1,5 +1,5 @@
-API
-===
+API Reference
+=============
 
 This section provides detailed information about the ispawn Python API.
 
@@ -31,7 +31,7 @@ Services
 --------
 
 Image Service
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. automodule:: ispawn.services.image
    :members:
@@ -39,7 +39,7 @@ Image Service
    :show-inheritance:
 
 Container Service
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 .. automodule:: ispawn.services.container
    :members:
@@ -47,7 +47,7 @@ Container Service
    :show-inheritance:
 
 Config Manager
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. automodule:: ispawn.services.config
    :members:

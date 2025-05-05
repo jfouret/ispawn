@@ -45,7 +45,7 @@ Service.volumes = property(volumes)
 
 
 @classmethod
-def from_str(cls, s: str):
+def from_str(cls: Service, s: str) -> Service:
     try:
         return cls(s)
     except ValueError:

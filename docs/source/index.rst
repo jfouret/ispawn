@@ -57,22 +57,8 @@ Core Features:
 Explore the documentation to learn how to install, configure, and use ``ispawn``.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: User Guide
+   :maxdepth: 3
 
-   installation
-   usage
-   troubleshooting
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Reference
-
+   manual
    cli
    api
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Development
-
-   contributing

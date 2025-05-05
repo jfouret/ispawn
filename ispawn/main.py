@@ -300,7 +300,7 @@ def remove(ctx, images: List[str], all: bool):
     """
     Remove one or more ispawn 'spawn images'.
 
-    You can specify images by their ID or tag (e.g., ispawn-ubuntu:22.04_...).
+    You can specify images by their ID or tag (e.g., ispawn-ubuntu:22.04 ...).
     """
     im = ImageService(ctx.obj["config"])
     for digest in images:
