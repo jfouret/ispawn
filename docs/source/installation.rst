@@ -1,20 +1,35 @@
+.. _installation:
+
 Installation
-===========
+============
 
-You can install ispawn using pip:
+From GitHub (Recommended)
+-------------------------
 
-.. code-block:: bash
-
-   pip install ispawn
-
-Or using poetry:
+This method installs the latest development version directly from the GitHub repository.
 
 .. code-block:: bash
 
-   poetry add ispawn
+   pip install git+https://github.com/jfouret/ispawn.git
 
-Requirements
+From Source
 -----------
 
-* Python 3.10 or higher
-* Docker
+Clone the repository and install it locally. This is useful for development or testing specific branches.
+
+.. code-block:: bash
+
+   git clone https://github.com/jfouret/ispawn.git
+   cd ispawn
+   pip install .
+   # Or using poetry for development:
+   # poetry install
+
+Requirements
+------------
+
+*   Python >=3.11
+*   Docker
+*   Git (for installation from GitHub or Source)
+*   Linux/Unix system (Windows support through WSL2)
+
