@@ -332,7 +332,8 @@ def remove(ctx, images: List[str], all: bool):
     multiple=True,
     type=click.Choice([s.value for s in Service], case_sensitive=False),
     help=(
-        "Specify services to include in the spawn run. Can be used multiple times. "
+        "Specify services to include in the spawn run. Can be used multiple "
+        "times. "
         "Available: " + ", ".join([s.value for s in Service]) + ". "
         "Defaults to vscode, rstudio, jupyter if none are specified."
     ),
@@ -351,7 +352,8 @@ def remove(ctx, images: List[str], all: bool):
     "-g",
     "--group",
     help=(
-        "Restrict RStudio access to users belonging to this group within the spawn run. "
+        "Restrict RStudio access to users belonging to this group within the "
+        "spawn run. "
         "Defaults to the primary group of the specified user."
     ),
 )
@@ -433,7 +435,9 @@ def run(
         container = container_service.run_container(
             container_config, force=ctx.obj["force"]
         )
-        click.echo(f"Spawn run's container '{container.name}' started successfully")
+        click.echo(
+            f"Spawn run's container '{container.name}' started successfully"
+        )
 
         # Display service URLs
         click.echo("\nService URLs:")
@@ -452,9 +456,10 @@ def list_containers(ctx):
     """List running and stopped ispawn 'spawn runs' (containers)."""
     try:
         container_service = ContainerService(ctx.obj["config"])
-        # Assuming list_containers() actually lists all relevant containers (running/stopped)
+        # Assuming list_containers() actually lists all relevant containers 
+        # (running/stopped)
         # Need modification in ContainerService.list_containers to return labels
-        containers = container_service.list_containers(all_containers=True) # Fetch all
+        containers = container_service.list_containers(all_containers=True)
         if not containers:
             click.echo("No ispawn spawn runs found.")
             return
@@ -507,7 +512,8 @@ def stop(ctx, containers, all, remove):
 @cli.command(name="remove")
 @click.argument("containers", nargs=-1, metavar="CONTAINER_NAME_OR_ID")
 @click.option(
-    "--all", is_flag=True, help="Remove all stopped ispawn spawn runs containers."
+    "--all", is_flag=True,
+    help="Remove all stopped ispawn spawn runs containers."
 )
 @click.pass_context
 def remove_container(ctx, containers, all):
@@ -573,9 +579,13 @@ def status(ctx):
     if config.env_chunk_path:
         config_table.append(["Environment Chunk Path", config.env_chunk_path])
     if config.dockerfile_chunk_path:
-        config_table.append(["Dockerfile Chunk Path", config.dockerfile_chunk_path])
+        config_table.append(
+            ["Dockerfile Chunk Path", config.dockerfile_chunk_path]
+        )
     if config.entrypoint_chunk_path:
-        config_table.append(["Entrypoint Chunk Path", config.entrypoint_chunk_path])
+        config_table.append(
+            ["Entrypoint Chunk Path", config.entrypoint_chunk_path]
+        )
     
     click.echo(tabulate(config_table, tablefmt="simple"))
     
@@ -586,13 +596,18 @@ def status(ctx):
         for vol in config.volumes:
             mode = "ro" if len(vol) > 2 and vol[2] == "ro" else "rw"
             volumes_table.append([vol[0], vol[1], mode])
-        click.echo(tabulate(volumes_table, headers=["Host Path", "Container Path", "Mode"], tablefmt="simple"))
+        click.echo(tabulate(
+            volumes_table,
+            headers=["Host Path", "Container Path", "Mode"],
+            tablefmt="simple")
+        )
     
     # Check if Traefik container is running
     click.echo("\n" + click.style("Traefik Status:", fg="blue", bold=True))
     
     # Use Docker client directly to check for Traefik container
-    # The ContainerService's list_containers method excludes containers ending with "-traefik"
+    # The ContainerService's list_containers method excludes containers ending
+    # with "-traefik"
     traefik_container_name = f"{config.name}-traefik"
     traefik_found = False
     
@@ -607,26 +622,35 @@ def status(ctx):
                 traefik_running = container.status.lower() == "running"
                 
                 if traefik_running:
-                    click.echo(click.style(f"✓ Traefik proxy is running", fg="green"))
+                    click.echo(
+                        click.style("✓ Traefik proxy is running", fg="green")
+                    )
                     click.echo(f"  Name: {container.name}")
                     click.echo(f"  ID: {traefik_id}")
                     click.echo(f"  Status: {traefik_status}")
-                    
-                    # Get container image
-                    try:
-                        image_name = container.image.tags[0] if container.image.tags else container.image.short_id
-                        click.echo(f"  Image: {image_name}")
-                    except Exception:
-                        pass
+
+                    image_name = container.image.short_id
+                    if container.image.tags:
+                        if len(container.image.tags) > 0:
+                            image_name = container.image.tags[0]
+
+                    click.echo(f"  Image: {image_name}")
                 else:
-                    click.echo(click.style(f"! Traefik proxy exists but is not running", fg="yellow"))
+                    click.echo(click.style(
+                        "! Traefik proxy exists but is not running",
+                        fg="yellow"
+                    ))
                     click.echo(f"  Name: {container.name}")
                     click.echo(f"  ID: {traefik_id}")
                     click.echo(f"  Status: {traefik_status}")
                 break
         
         if not traefik_found:
-            click.echo(click.style("✗ Traefik proxy container not found", fg="red"))
+            click.echo(
+                click.style("✗ Traefik proxy container not found", fg="red")
+            )
             click.echo("  Run 'ispawn setup' to create the Traefik container")
     except Exception as e:
-        click.echo(click.style(f"! Error checking Traefik status: {str(e)}", fg="red"))
+        click.echo(
+            click.style(f"! Error checking Traefik status: {str(e)}", fg="red")
+        )
