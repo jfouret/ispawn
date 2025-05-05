@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ispawn documentation &#8212; ispawn 0.2.15 documentation</title>
+    <title>ispawn: Interactive Spawn Manager &#8212; ispawn 0.2.15 documentation</title>
   
   
   
@@ -145,18 +145,42 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="troubleshooting.html">
+    Troubleshooting
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="cli.html">
-    Command Line Interface
+    CLI
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
-    API Reference
+    API
   </a>
 </li>
 
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+    Contributing to ispawn
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -275,15 +299,29 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="troubleshooting.html">
+    Troubleshooting
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="cli.html">
-    Command Line Interface
+    CLI
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
-    API Reference
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing to ispawn
   </a>
 </li>
 
@@ -365,43 +403,101 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="ispawn-documentation">
-<h1>ispawn documentation<a class="headerlink" href="#ispawn-documentation" title="Link to this heading">#</a></h1>
-<p>ispawn is a tool to spawn docker containers holding multiple services with a single command.</p>
-<section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h2>
+  <section id="ispawn-interactive-spawn-manager">
+<span id="index"></span><h1>ispawn: Interactive Spawn Manager<a class="headerlink" href="#ispawn-interactive-spawn-manager" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">ispawn</span></code> acts as an <strong>interactive spawn</strong> manager. It simplifies creating and managing containerized development environments by introducing the concept of a <strong>spawn</strong>.</p>
+<p>Forget manual Dockerfile crafting and complex setups. With <code class="docutils literal notranslate"><span class="pre">ispawn</span></code>, you define <em>what</em> you need (base OS + services), and it handles the <em>how</em>, letting you focus purely on your interactive development and analysis tasks.</p>
+<section id="what-is-a-spawn">
+<h2>What is a <strong>Spawn</strong>?<a class="headerlink" href="#what-is-a-spawn" title="Link to this heading">#</a></h2>
+<p>A <strong>Spawn</strong> is a ready-to-use, interactive development environment managed by <code class="docutils literal notranslate"><span class="pre">ispawn</span></code>. It’s built by layering components onto a base Docker image, resulting in a specialized <strong>Spawn Image</strong>. This image is then used to launch container instances, referred to as <strong>Spawn Runs</strong>.</p>
+<p>The Spawn Image is constructed from three types of layers, each corresponding to Docker image layers defined by Dockerfile snippets:</p>
+<ol class="arabic simple">
+<li><p><strong>Base Image:</strong></p>
 <ul class="simple">
-<li><p>Build Docker images with multiple services (JupyterLab, RStudio, VSCode, etc.)</p></li>
-<li><p>Run containers with these services</p></li>
-<li><p>Manage containers and images</p></li>
-<li><p>Configure networking and volumes</p></li>
+<li><p>The foundational layer used after <code class="docutils literal notranslate"><span class="pre">FROM</span></code>.</p></li>
+<li><p>Can be a simple OS (e.g., <code class="docutils literal notranslate"><span class="pre">ubuntu:22.04</span></code>) or a complex, pre-configured environment (e.g., with specific R/Python versions and packages).</p></li>
 </ul>
+</li>
+<li><p><strong>Service Layers:</strong></p>
+<ul class="simple">
+<li><p>Add the interactive tools you need (e.g., VSCode, RStudio, Jupyter).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ispawn</span></code> provides curated Dockerfile snippets for each supported service, ensuring they are correctly installed and configured.</p></li>
+<li><p>Selected via the <code class="docutils literal notranslate"><span class="pre">--service</span></code> option during <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">build</span></code> or <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">run</span> <span class="pre">--build</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Setup Layers (Optional):</strong></p>
+<ul class="simple">
+<li><p>Customize the environment further based on infrastructure needs (e.g., LDAP integration, proxy settings, custom certificates, additional packages).</p></li>
+<li><p>Defined by user-provided Dockerfile snippets specified during <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">setup</span></code> (using <code class="docutils literal notranslate"><span class="pre">--dockerfile-chunk-path</span></code>). These snippets are applied globally to all spawn images built by <code class="docutils literal notranslate"><span class="pre">ispawn</span></code>.</p></li>
+</ul>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Others things can be managed through ispawn such as the volume mounts, the entrypoint, the environment variables, the network settings, etc. See the documentation for more details.</p>
+</div>
+<p>Once the Spawn Image is built (e.g., <code class="docutils literal notranslate"><span class="pre">ispawn-ubuntu:22.04_vscode_rstudio</span></code>), <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">run</span></code> launches it as a Spawn Run (a container), making the services accessible via HTTPS through the integrated Traefik proxy (e.g., <code class="docutils literal notranslate"><span class="pre">https://myenv-vscode.ispawn.localhost</span></code>).</p>
+</section>
+<section id="core-features">
+<h2>Core Features:<a class="headerlink" href="#core-features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>🚀 Quick Setup &amp; Launch:</strong> Get started with a single <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">setup</span></code> command, then launch full environments with <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">run</span></code>.</p></li>
+<li><p><strong>🔧 Multiple Interactive Services:</strong> Combine VSCode, RStudio, and Jupyter/JupyterLab/JupyterHub within a single spawn.</p></li>
+<li><p><strong>🔒 Secure Browser Access:</strong> Automatic HTTPS setup via Traefik for all services, accessible through predictable hostnames (e.g., <code class="docutils literal notranslate"><span class="pre">myenv-vscode.ispawn.localhost</span></code>).</p></li>
+<li><p><strong>📁 Volume Mapping &amp; Data Persistence:</strong> Automatically maps home directories and manages persistent storage within the spawn for service configurations and user data (VSCode settings/extensions, RStudio history, Jupyter configs).</p></li>
+<li><p><strong>🔄 Spawn Lifecycle Management:</strong> Simple commands (<code class="docutils literal notranslate"><span class="pre">run</span></code>, <code class="docutils literal notranslate"><span class="pre">stop</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code>, <code class="docutils literal notranslate"><span class="pre">remove</span></code>) to manage your spawns. (Note: <cite>start</cite> is not currently a command).</p></li>
+<li><p><strong>🛠️ Global Build Customization:</strong> Define custom Dockerfile snippets, environment variables, and entrypoint scripts during <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">setup</span></code> to tailor <em>all</em> future spawn image builds (e.g., install custom packages, set proxies).</p></li>
+<li><p><strong>👥 Access Control:</strong> Restrict RStudio access based on user groups within the spawn.</p></li>
+<li><p><strong>💾 Image Management:</strong> Build, list, and remove the enriched Docker images used for your spawns.</p></li>
+</ul>
+<p>Explore the documentation to learn how to install, configure, and use <code class="docutils literal notranslate"><span class="pre">ispawn</span></code>.</p>
 <div class="toctree-wrapper compound">
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#from-github-recommended">From GitHub (Recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#from-source">From Source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#requirements">Requirements</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#setup">Setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#building-images">Building Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#running-containers">Running Containers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#managing-containers">Managing Containers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usage.html#managing-images">Managing Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#building-spawn-images-explicitly">Building Spawn Images Explicitly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#build-customization">Build Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#access-control">Access Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#data-persistence">Data Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#managing-spawns-images-and-runs">Managing Spawns images and runs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#managing-spawn-images">Managing Spawn Images</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#getting-help">Getting Help</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#ispawn">ispawn</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-ispawn.domain.config">Config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-ispawn.domain.image">Image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#module-ispawn.domain.container">Container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#services">Services</a></li>
 </ul>
 </li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ispawn</a></li>
 </ul>
 </div>
 </section>
@@ -445,7 +541,10 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#features">Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-spawn">What is a <strong>Spawn</strong>?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-features">Core Features:</a><ul class="visible nav section-nav flex-column">
+</ul>
+</li>
 </ul>
   </nav></div>
 

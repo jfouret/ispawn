@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Command Line Interface &#8212; ispawn 0.2.15 documentation</title>
+    <title>CLI &#8212; ispawn 0.2.15 documentation</title>
   
   
   
@@ -51,8 +51,8 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API Reference" href="api.html" />
-    <link rel="prev" title="Usage" href="usage.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Troubleshooting" href="troubleshooting.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.15" />
@@ -145,19 +145,43 @@
 </li>
 
 
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="troubleshooting.html">
+    Troubleshooting
+  </a>
+</li>
+
+
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    Command Line Interface
+    CLI
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
-    API Reference
+    API
   </a>
 </li>
 
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+    Contributing to ispawn
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -273,16 +297,30 @@
 </li>
 
 
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="troubleshooting.html">
+    Troubleshooting
+  </a>
+</li>
+
+
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    Command Line Interface
+    CLI
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
-    API Reference
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing to ispawn
   </a>
 </li>
 
@@ -380,7 +418,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Command Line Interface</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">CLI</span></li>
   </ul>
 </nav>
 </div>
@@ -397,14 +435,20 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="command-line-interface">
-<h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Link to this heading">#</a></h1>
+  <section id="cli">
+<h1>CLI<a class="headerlink" href="#cli" title="Link to this heading">#</a></h1>
 <p>ispawn provides a command-line interface for building and managing Docker containers with multiple services.</p>
 <section id="ispawn">
 <h2>ispawn<a class="headerlink" href="#ispawn" title="Link to this heading">#</a></h2>
-<p>ispawn: A tool to manage containerized development environments.</p>
-<p>Provides commands to set up the environment, build images, and run/manage
-containers with services like VSCode, RStudio, and Jupyter.</p>
+<p>ispawn: Manage development environments as ‘spawns’.</p>
+<p>A spawn combines a base Docker image with selected services (e.g., VSCode,
+RStudio, Jupyter) into a ready-to-run, containerized environment accessible
+via HTTPS.</p>
+<p>This tool provides commands to:
+- Set up the ispawn environment (networking, proxy).
+- Build enriched ‘spawn images’ from a base image and services.
+- Run, list, stop, and remove ‘spawn runs’ (running instances).
+- Manage the underlying spawn images.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
 </pre></div>
 </div>
@@ -423,10 +467,11 @@ containers with services like VSCode, RStudio, and Jupyter.</p>
 
 <section id="ispawn-build">
 <h3>build<a class="headerlink" href="#ispawn-build" title="Link to this heading">#</a></h3>
-<p>Build a custom Docker image with specified services.</p>
-<p>Constructs a Docker image based on the provided base image, incorporating
-selected services and applying any global build customizations defined
-during ‘ispawn setup’.</p>
+<p>Build a reusable ‘spawn image’ with specified services.</p>
+<p>Constructs an enriched Docker image based on the provided base image,
+incorporating selected services and applying any global build customizations
+defined during ‘ispawn setup’. This image can then be used to quickly
+launch ‘spawn runs’.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>build<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </pre></div>
 </div>
@@ -451,21 +496,21 @@ during ‘ispawn setup’.</p>
 </section>
 <section id="ispawn-image">
 <h3>image<a class="headerlink" href="#ispawn-image" title="Link to this heading">#</a></h3>
-<p>Commands for managing ispawn Docker images.</p>
+<p>Commands for managing ispawn ‘spawn images’.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>image<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
 </pre></div>
 </div>
 <section id="ispawn-image-list">
 <h4>list<a class="headerlink" href="#ispawn-image-list" title="Link to this heading">#</a></h4>
-<p>List ispawn-related Docker images.</p>
+<p>List ispawn-related ‘spawn images’.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>image<span class="w"> </span>list<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </pre></div>
 </div>
 </section>
 <section id="ispawn-image-remove">
 <h4>remove<a class="headerlink" href="#ispawn-image-remove" title="Link to this heading">#</a></h4>
-<p>Remove one or more ispawn Docker images.</p>
-<p>You can specify images by their ID or tag.</p>
+<p>Remove one or more ispawn ‘spawn images’.</p>
+<p>You can specify images by their ID or tag (e.g., <a href="#id1"><span class="problematic" id="id2">ispawn-ubuntu:22.04_</span></a>…).</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>image<span class="w"> </span>remove<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>IMAGE_ID_OR_TAG
 </pre></div>
 </div>
@@ -487,17 +532,17 @@ during ‘ispawn setup’.</p>
 </section>
 <section id="ispawn-list">
 <h3>list<a class="headerlink" href="#ispawn-list" title="Link to this heading">#</a></h3>
-<p>List currently running ispawn containers.</p>
+<p>List running and stopped ispawn ‘spawn runs’ (containers).</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>list<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </pre></div>
 </div>
 </section>
 <section id="ispawn-remove">
 <h3>remove<a class="headerlink" href="#ispawn-remove" title="Link to this heading">#</a></h3>
-<p>Remove one or more stopped ispawn containers.</p>
-<p>Containers must be stopped before they can be removed, unless –force is
-used.
-You can specify containers by their name or ID.</p>
+<p>Remove one or more stopped ‘spawn runs’ (containers).</p>
+<p>Specify spawn runs by the name given during ‘run’ or by container ID.
+Containers must be stopped first unless –force is used.
+Note: Internally, this operates on container names/IDs.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>remove<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>CONTAINER_NAME_OR_ID
 </pre></div>
 </div>
@@ -505,7 +550,7 @@ You can specify containers by their name or ID.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-remove-all">
 <span class="sig-name descname"><span class="pre">--all</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-remove-all" title="Link to this definition">#</a></dt>
-<dd><p>Remove all stopped ispawn containers.</p>
+<dd><p>Remove all stopped ispawn spawn runs containers.</p>
 </dd></dl>
 
 <p class="rubric">Arguments</p>
@@ -518,10 +563,11 @@ You can specify containers by their name or ID.</p>
 </section>
 <section id="ispawn-run">
 <h3>run<a class="headerlink" href="#ispawn-run" title="Link to this heading">#</a></h3>
-<p>Create and run a new development container.</p>
-<p>Launches a container based on the specified image, running the selected
-services (VSCode, RStudio, Jupyter by default). Configures networking,
-volumes, and user access according to options and global settings.</p>
+<p>Create and run a new ‘spawn run’ (a container instance).</p>
+<p>Launches a container instance (a ‘spawn run’) based on the specified base
+image and services. If the corresponding ‘spawn image’ doesn’t exist,
+it can be built automatically using –build. Configures networking,
+volumes, and user access.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>run<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </pre></div>
 </div>
@@ -529,25 +575,25 @@ volumes, and user access according to options and global settings.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-n">
 <span id="cmdoption-ispawn-run-name"></span><span class="sig-name descname"><span class="pre">-n</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--name</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;name&gt;</span></span><a class="headerlink" href="#cmdoption-ispawn-run-n" title="Link to this definition">#</a></dt>
-<dd><p><strong>Required</strong> Unique name for the container.</p>
+<dd><p><strong>Required</strong> Unique name for the ‘spawn run’.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-b">
 <span id="cmdoption-ispawn-run-base"></span><span class="sig-name descname"><span class="pre">-b</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--base</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;base&gt;</span></span><a class="headerlink" href="#cmdoption-ispawn-run-b" title="Link to this definition">#</a></dt>
-<dd><p><strong>Required</strong> Base Docker image tag to use (e.g., ‘ubuntu:22.04’).</p>
+<dd><p><strong>Required</strong> Base Docker image tag for the spawn (e.g., ‘ubuntu:22.04’).</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-build">
 <span class="sig-name descname"><span class="pre">--build</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-run-build" title="Link to this definition">#</a></dt>
-<dd><p>Build the required image automatically if it doesn’t exist.</p>
+<dd><p>Build the required ‘spawn image’ automatically if it doesn’t exist.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-s">
 <span id="cmdoption-ispawn-run-service"></span><span class="sig-name descname"><span class="pre">-s</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--service</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;services&gt;</span></span><a class="headerlink" href="#cmdoption-ispawn-run-s" title="Link to this definition">#</a></dt>
-<dd><p>Specify services to run in the container. Can be used multiple times. Available: vscode, rstudio, jupyter, jupyterlab, jupyterhub. Defaults to vscode, rstudio, jupyter if none are specified.</p>
+<dd><p>Specify services to include in the spawn run. Can be used multiple times. Available: vscode, rstudio, jupyter, jupyterlab, jupyterhub. Defaults to vscode, rstudio, jupyter if none are specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
 <dd class="field-odd"><p>vscode | rstudio | jupyter | jupyterlab | jupyterhub</p>
@@ -558,25 +604,25 @@ volumes, and user access according to options and global settings.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-v">
 <span id="cmdoption-ispawn-run-volume"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--volume</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;volumes&gt;</span></span><a class="headerlink" href="#cmdoption-ispawn-run-v" title="Link to this definition">#</a></dt>
-<dd><p>Mount a host directory into the container. Format: ‘host_path:container_path[:ro]’. Can be used multiple times.</p>
+<dd><p>Mount a host directory into the spawn run. Format: ‘host_path:container_path[:ro]’. Can be used multiple times.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-g">
 <span id="cmdoption-ispawn-run-group"></span><span class="sig-name descname"><span class="pre">-g</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--group</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;group&gt;</span></span><a class="headerlink" href="#cmdoption-ispawn-run-g" title="Link to this definition">#</a></dt>
-<dd><p>Restrict RStudio access to users belonging to this group. Defaults to the primary group of the specified user.</p>
+<dd><p>Restrict RStudio access to users belonging to this group within the spawn run. Defaults to the primary group of the specified user.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-user">
 <span class="sig-name descname"><span class="pre">--user</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;user&gt;</span></span><a class="headerlink" href="#cmdoption-ispawn-run-user" title="Link to this definition">#</a></dt>
-<dd><p>Username or UID to run the container processes as. Defaults to the current user.</p>
+<dd><p>Username or UID to run the spawn run processes as. Defaults to the current user.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-no-sudo">
 <span class="sig-name descname"><span class="pre">--no-sudo</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-run-no-sudo" title="Link to this definition">#</a></dt>
-<dd><p>Disable sudo privileges for the user inside the container.</p>
+<dd><p>Disable sudo privileges for the user inside the spawn run.</p>
 </dd></dl>
 
 </section>
@@ -711,17 +757,18 @@ needed.</p>
 </section>
 <section id="ispawn-status">
 <h3>status<a class="headerlink" href="#ispawn-status" title="Link to this heading">#</a></h3>
-<p>Show the current project status.</p>
-<p>Displays the current configuration settings, running containers,
-and checks if the Traefik proxy container is running.</p>
+<p>Show the current ispawn status.</p>
+<p>Displays configuration, checks Traefik proxy status, and lists
+running/stopped ‘spawn runs’ (containers).</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>status<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </pre></div>
 </div>
 </section>
 <section id="ispawn-stop">
 <h3>stop<a class="headerlink" href="#ispawn-stop" title="Link to this heading">#</a></h3>
-<p>Stop one or more running ispawn containers.</p>
-<p>You can specify containers by their name or ID.</p>
+<p>Stop one or more running ‘spawn runs’ (containers).</p>
+<p>Specify spawn runs by the name given during ‘run’ or by container ID.
+Note: Internally, this operates on container names/IDs.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>stop<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>CONTAINER_NAME_OR_ID
 </pre></div>
 </div>
@@ -729,13 +776,13 @@ and checks if the Traefik proxy container is running.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-stop-all">
 <span class="sig-name descname"><span class="pre">--all</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-stop-all" title="Link to this definition">#</a></dt>
-<dd><p>Stop all running ispawn containers.</p>
+<dd><p>Stop all running ispawn spawn runs.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-stop-remove">
 <span class="sig-name descname"><span class="pre">--remove</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-stop-remove" title="Link to this definition">#</a></dt>
-<dd><p>Remove the container(s) after stopping them.</p>
+<dd><p>Remove the spawn run(s) associated container(s) after stopping.</p>
 </dd></dl>
 
 <p class="rubric">Arguments</p>
@@ -760,12 +807,12 @@ and checks if the Traefik proxy container is running.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="usage.html"
+       href="troubleshooting.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Usage</p>
+        <p class="prev-next-title">Troubleshooting</p>
       </div>
     </a>
     <a class="right-next"
@@ -773,7 +820,7 @@ and checks if the Traefik proxy container is running.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">API Reference</p>
+        <p class="prev-next-title">API</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

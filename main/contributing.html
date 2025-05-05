@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; ispawn 0.2.15 documentation</title>
+    <title>Contributing to ispawn &#8212; ispawn 0.2.15 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
     <script src="_static/documentation_options.js?v=d5b904a0"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'installation';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'contributing';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jfouret.github.io/ispawn/switcher.json';
@@ -51,8 +51,7 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Usage" href="usage.html" />
-    <link rel="prev" title="ispawn: Interactive Spawn Manager" href="index.html" />
+    <link rel="prev" title="API" href="api.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.15" />
@@ -131,8 +130,8 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
     Installation
   </a>
 </li>
@@ -173,8 +172,8 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
     Contributing to ispawn
   </a>
 </li>
@@ -283,8 +282,8 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
     Installation
   </a>
 </li>
@@ -318,8 +317,8 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="contributing.html">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     Contributing to ispawn
   </a>
 </li>
@@ -418,7 +417,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Installation</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Contributing to ispawn</span></li>
   </ul>
 </nav>
 </div>
@@ -435,34 +434,198 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="installation">
-<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
-<section id="from-github-recommended">
-<h2>From GitHub (Recommended)<a class="headerlink" href="#from-github-recommended" title="Link to this heading">#</a></h2>
-<p>This method installs the latest development version directly from the GitHub repository.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/jfouret/ispawn.git
-</pre></div>
-</div>
-</section>
-<section id="from-source">
-<h2>From Source<a class="headerlink" href="#from-source" title="Link to this heading">#</a></h2>
-<p>Clone the repository and install it locally. This is useful for development or testing specific branches.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/jfouret/ispawn.git
-<span class="nb">cd</span><span class="w"> </span>ispawn
-pip<span class="w"> </span>install<span class="w"> </span>.
-<span class="c1"># Or using poetry for development:</span>
-<span class="c1"># poetry install</span>
-</pre></div>
-</div>
-</section>
+  <section id="contributing-to-ispawn">
+<span id="contributing"></span><h1>Contributing to ispawn<a class="headerlink" href="#contributing-to-ispawn" title="Link to this heading">#</a></h1>
+<p>This guide is for developers who want to contribute to ispawn. For user documentation, see the main documentation index.</p>
+<section id="development-setup">
+<h2>Development Setup<a class="headerlink" href="#development-setup" title="Link to this heading">#</a></h2>
 <section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h2>
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Python &gt;=3.11</p></li>
 <li><p>Docker</p></li>
-<li><p>Git (for installation from GitHub or Source)</p></li>
-<li><p>Linux/Unix system (Windows support through WSL2)</p></li>
+<li><p>Poetry</p></li>
+<li><p>Development dependencies: <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">--with</span> <span class="pre">dev</span></code></p></li>
 </ul>
+</section>
+<section id="project-structure">
+<h3>Project Structure<a class="headerlink" href="#project-structure" title="Link to this heading">#</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ispawn/
+├── __init__.py
+├── main.py         # CLI entrypoint using Click
+├── domain/         # Core business logic, data models, and app service definitions
+│   ├── __init__.py
+│   ├── config.py     # Configuration models (InstallMode, CertMode, etc.)
+│   ├── container.py  # Container configuration logic
+│   ├── exceptions.py # Custom exceptions
+│   ├── image.py      # Image configuration logic (base image, services)
+│   └── services/     # Definitions for runnable applications (VSCode, RStudio, etc.)
+│       ├── jupyter/
+│       ├── jupyterhub/
+│       ├── jupyterlab/
+│       ├── rstudio/
+│       └── vscode/
+├── services/       # Business operations and external integrations (Docker API, Config Mgmt)
+│   ├── __init__.py
+│   ├── config.py     # Configuration management (reading/writing config files)
+│   ├── container.py  # Container lifecycle management (run, stop, list, remove)
+│   └── image.py      # Image management (build, list, remove)
+├── templates/      # Jinja2 templates for Dockerfiles, entrypoints, Traefik configs
+└── files/          # Static configuration files (e.g., Traefik dynamic providers)
+</pre></div>
+</div>
+</section>
+</section>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h3>
+<p>ispawn follows a layered architecture pattern with clear separation of concerns:</p>
+</section>
+<section id="domain-layer-domain">
+<h3>Domain Layer (<code class="docutils literal notranslate"><span class="pre">domain/</span></code>)<a class="headerlink" href="#domain-layer-domain" title="Link to this heading">#</a></h3>
+<p>The domain layer contains the core business logic and data models. These are pure Python classes that don’t depend on external services or frameworks.</p>
+<p>Domain models are designed to be:</p>
+<ul class="simple">
+<li><p>Independent of external services</p></li>
+<li><p>Focused on business rules</p></li>
+<li><p>Highly testable</p></li>
+<li><p>Free of side effects</p></li>
+</ul>
+</section>
+<section id="service-layer-services">
+<h3>Service Layer (<code class="docutils literal notranslate"><span class="pre">services/</span></code>)<a class="headerlink" href="#service-layer-services" title="Link to this heading">#</a></h3>
+<p>Services implement operations that often involve external systems or side effects:</p>
+<p>Services are responsible for:</p>
+<ul class="simple">
+<li><p>Integrating with external systems</p></li>
+<li><p>Implementing complex operations</p></li>
+<li><p>Managing resources</p></li>
+<li><p>Handling errors and retries</p></li>
+</ul>
+</section>
+<section id="key-design-principles">
+<h3>Key Design Principles<a class="headerlink" href="#key-design-principles" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p><strong>Separation of Concerns</strong>
+*   Domain models focus on business logic
+*   Services handle external integrations
+*   Commands coordinate operations</p></li>
+<li><p><strong>Dependency Direction</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>commands → services → domain
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Domain has no external dependencies</p></li>
+<li><p>Services depend on domain</p></li>
+<li><p>Commands depend on services and domain</p></li>
+</ul>
+</li>
+<li><p><strong>Error Handling</strong>
+*   Domain defines custom exceptions
+*   Services translate external errors
+*   Commands present errors to users</p></li>
+</ol>
+</section>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h2>
+<section id="running-tests">
+<h3>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run unit tests</span>
+pytest
+
+<span class="c1"># Run with coverage</span>
+pytest<span class="w"> </span>--cov<span class="o">=</span>ispawn
+
+<span class="c1"># Run integration tests</span>
+pytest<span class="w"> </span>-m<span class="w"> </span>integration
+
+<span class="c1"># Run end-to-end tests</span>
+pytest<span class="w"> </span>-m<span class="w"> </span>e2e
+</pre></div>
+</div>
+</section>
+<section id="testing-strategy">
+<h3>Testing Strategy<a class="headerlink" href="#testing-strategy" title="Link to this heading">#</a></h3>
+<p>Tests are organized in multiple layers:</p>
+<ol class="arabic simple">
+<li><p><strong>Unit Tests</strong>
+*   Test individual components in isolation
+*   Mock external dependencies
+*   Focus on business logic</p></li>
+<li><p><strong>Integration Tests</strong>
+*   Test interaction between components
+*   Use real Docker daemon
+*   Verify service integration</p></li>
+<li><p><strong>End-to-End Tests</strong>
+*   Test complete workflows
+*   Simulate real user scenarios
+*   Verify system behavior</p></li>
+</ol>
+</section>
+</section>
+<section id="contributing-guidelines">
+<h2>Contributing Guidelines<a class="headerlink" href="#contributing-guidelines" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Fork the repository</p></li>
+<li><p>Create a feature branch (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">-b</span> <span class="pre">feature/amazing-feature</span></code>)</p></li>
+<li><p>Make your changes</p></li>
+<li><p>Add tests for your changes</p></li>
+<li><p>Run the test suite to ensure everything passes</p></li>
+<li><p>Commit your changes (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'Add</span> <span class="pre">amazing</span> <span class="pre">feature'</span></code>)</p></li>
+<li><p>Push to the branch (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">feature/amazing-feature</span></code>)</p></li>
+<li><p>Create a Pull Request</p></li>
+</ol>
+<section id="code-style">
+<h3>Code Style<a class="headerlink" href="#code-style" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Follow PEP 8 guidelines</p></li>
+<li><p>Use type hints</p></li>
+<li><p>Write docstrings for public functions</p></li>
+<li><p>Keep functions focused and small</p></li>
+<li><p>Add comments for complex logic</p></li>
+</ul>
+</section>
+<section id="pull-request-process">
+<h3>Pull Request Process<a class="headerlink" href="#pull-request-process" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Update documentation for any changed functionality (including this <code class="docutils literal notranslate"><span class="pre">contributing.rst</span></code> guide if processes change).</p></li>
+<li><p>If adding new modules or significantly changing existing ones, ensure <code class="docutils literal notranslate"><span class="pre">docs/source/api.rst</span></code> is updated accordingly (or that auto-generation picks up the changes).</p></li>
+<li><p>Add tests for new features.</p></li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code> if applicable.</p></li>
+<li><p>Ensure CI passes all checks.</p></li>
+<li><p>Get review from maintainers.</p></li>
+</ol>
+</section>
+</section>
+<section id="building-the-documentation-locally">
+<h2>Building the Documentation Locally<a class="headerlink" href="#building-the-documentation-locally" title="Link to this heading">#</a></h2>
+<p>The documentation is built using Sphinx. To build it locally:</p>
+<ol class="arabic">
+<li><p>Ensure you have installed the development dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>dev
+</pre></div>
+</div>
+</li>
+<li><p>Navigate to the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>docs
+</pre></div>
+</div>
+</li>
+<li><p>Build the HTML documentation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>make<span class="w"> </span>html
+<span class="c1"># Or on Windows:</span>
+<span class="c1"># poetry run .\make.bat html</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The generated documentation will be available in <code class="docutils literal notranslate"><span class="pre">docs/build/html/index.html</span></code>.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">#</a></h2>
+<p>This project is licensed under the Apache-2.0 License - see the <code class="docutils literal notranslate"><span class="pre">LICENSE.txt</span></code> file for details.</p>
 </section>
 </section>
 
@@ -477,22 +640,13 @@ pip<span class="w"> </span>install<span class="w"> </span>.
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="index.html"
+       href="api.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">ispawn: Interactive Spawn Manager</p>
+        <p class="prev-next-title">API</p>
       </div>
-    </a>
-    <a class="right-next"
-       href="usage.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Usage</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -513,9 +667,30 @@ pip<span class="w"> </span>install<span class="w"> </span>.
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-github-recommended">From GitHub (Recommended)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-source">From Source</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-setup">Development Setup</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-structure">Project Structure</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#architecture">Architecture</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#domain-layer-domain">Domain Layer (<code class="docutils literal notranslate"><span class="pre">domain/</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#service-layer-services">Service Layer (<code class="docutils literal notranslate"><span class="pre">services/</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-design-principles">Key Design Principles</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">Testing</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tests">Running Tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-strategy">Testing Strategy</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing-guidelines">Contributing Guidelines</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-style">Code Style</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pull-request-process">Pull Request Process</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-documentation-locally">Building the Documentation Locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#license">License</a></li>
 </ul>
   </nav></div>
 
@@ -523,7 +698,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/installation.rst.txt"
+      <li><a href="_sources/contributing.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

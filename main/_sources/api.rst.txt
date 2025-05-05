@@ -1,5 +1,5 @@
-API Reference
-============
+API
+===
 
 This section provides detailed information about the ispawn Python API.
 

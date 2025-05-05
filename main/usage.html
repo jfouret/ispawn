@@ -51,7 +51,7 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Command Line Interface" href="cli.html" />
+    <link rel="next" title="Troubleshooting" href="troubleshooting.html" />
     <link rel="prev" title="Installation" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -146,18 +146,42 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="troubleshooting.html">
+    Troubleshooting
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="cli.html">
-    Command Line Interface
+    CLI
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
-    API Reference
+    API
   </a>
 </li>
 
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+    Contributing to ispawn
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -274,15 +298,29 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="troubleshooting.html">
+    Troubleshooting
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="cli.html">
-    Command Line Interface
+    CLI
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
-    API Reference
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing to ispawn
   </a>
 </li>
 
@@ -398,52 +436,180 @@
                 <article class="bd-article">
                   
   <section id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h1>
 <section id="setup">
 <h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
-<p>Before using ispawn, you need to set up the environment:</p>
+<p>Before using ispawn for the first time, you need to set up the environment. This command initializes necessary configurations and sets up the Traefik reverse proxy if needed.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>setup
 </pre></div>
 </div>
-<p>This will create a configuration file in either <code class="docutils literal notranslate"><span class="pre">~/.ispawn</span></code> (user mode) or <code class="docutils literal notranslate"><span class="pre">/etc/ispawn</span></code> (system mode).</p>
+<p>This will create configuration files, typically in <code class="docutils literal notranslate"><span class="pre">~/.ispawn</span></code> (user mode) or <code class="docutils literal notranslate"><span class="pre">/etc/ispawn</span></code> (system mode), depending on the installation.</p>
 </section>
-<section id="building-images">
-<h2>Building Images<a class="headerlink" href="#building-images" title="Link to this heading">#</a></h2>
-<p>To build a Docker image with specific services:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>build<span class="w"> </span>-b<span class="w"> </span>ubuntu:22.04<span class="w"> </span>-s<span class="w"> </span>rstudio<span class="w"> </span>-s<span class="w"> </span>jupyterlab
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
+<ol class="arabic">
+<li><p><strong>Run a spawn</strong> with default services (VSCode, RStudio, Jupyter):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>mydev<span class="w"> </span>--base<span class="w"> </span>ubuntu:22.04<span class="w"> </span>--build
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--name</span> <span class="pre">mydev</span></code>: Assigns a unique name to your spawn run.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--base</span> <span class="pre">ubuntu:22.04</span></code>: Specifies the base Docker image. ispawn looks for an existing spawn image (e.g., <code class="docutils literal notranslate"><span class="pre">ispawn-ubuntu:22.04_vscode_rstudio_jupyter</span></code>) and runs it if available.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--build</span></code>: If the required spawn image (e.g., <code class="docutils literal notranslate"><span class="pre">ispawn-ubuntu:22.04_vscode_rstudio_jupyter</span></code>) doesn’t exist, build it automatically before running the spawn.</p></li>
+</ul>
+</li>
+<li><p><strong>Access your services</strong> through your browser:</p>
+<p>ispawn uses a Traefik reverse proxy to provide secure HTTPS access to services via subdomains based on the spawn run name and sevices. By default, these are under <code class="docutils literal notranslate"><span class="pre">.ispawn.localhost</span></code>.</p>
+<ul class="simple">
+<li><p>VSCode:   <code class="docutils literal notranslate"><span class="pre">https://mydev-vscode.ispawn.localhost</span></code></p></li>
+<li><p>RStudio:  <code class="docutils literal notranslate"><span class="pre">https://mydev-rstudio.ispawn.localhost</span></code></p></li>
+<li><p>Jupyter:  <code class="docutils literal notranslate"><span class="pre">https://mydev-jupyter.ispawn.localhost</span></code></p></li>
+</ul>
+<p>You might need to accept self-signed certificates the first time you connect.</p>
+</li>
+</ol>
+</section>
+<section id="building-spawn-images-explicitly">
+<h2>Building Spawn Images Explicitly<a class="headerlink" href="#building-spawn-images-explicitly" title="Link to this heading">#</a></h2>
+<p>While <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">run</span></code> can build spawn images implicitly using the <code class="docutils literal notranslate"><span class="pre">--build</span></code> flag, you can also build them explicitly using <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">build</span></code>. This is useful for pre-building images or customizing the included services.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build an image based on ubuntu:22.04 with only RStudio and JupyterLab</span>
+ispawn<span class="w"> </span>build<span class="w"> </span>--base<span class="w"> </span>ubuntu:22.04<span class="w"> </span>--service<span class="w"> </span>rstudio<span class="w"> </span>--service<span class="w"> </span>jupyterlab
+
+<span class="c1"># Run a spawn using the pre-built image</span>
+ispawn<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>analysis-env<span class="w"> </span>--base<span class="w"> </span>ubuntu:22.04<span class="w"> </span>--service<span class="w"> </span>rstudio<span class="w"> </span>--service<span class="w"> </span>jupyterlab
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Spawn Images are specifically built for each unique combination of a base image and selected services.
+This means if you build an image with RStudio and JupyterLab, you cannot directly run a spawn requesting only RStudio from that <em>exact</em> image. You would need to either build a new image specifically for RStudio or use the <code class="docutils literal notranslate"><span class="pre">--build</span></code> flag with <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">run</span></code> to create it on the fly.</p>
+</div>
+</section>
+<section id="build-customization">
+<h2>Build Customization<a class="headerlink" href="#build-customization" title="Link to this heading">#</a></h2>
+<p>You can customize how images are built by providing additional files during the initial <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">setup</span></code> command. These customizations apply globally to all subsequent builds.</p>
+<ul>
+<li><p><strong>Environment File</strong> (<code class="docutils literal notranslate"><span class="pre">--env-chunk-path</span></code>):
+*   A file containing environment variables (e.g., <code class="docutils literal notranslate"><span class="pre">KEY=value</span></code> pairs).
+*   These variables are added to <code class="docutils literal notranslate"><span class="pre">/etc/environment</span></code> within all built spawn images.
+*   Useful for setting global environment variables like proxy settings.</p>
+<p><em>Example ``env.txt``:</em></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CUSTOM_VAR=value
+PROXY_SERVER=proxy.company.com
+</pre></div>
+</div>
+</li>
+<li><p><strong>Dockerfile Chunk</strong> (<code class="docutils literal notranslate"><span class="pre">--dockerfile-chunk-path</span></code>):
+*   A snippet of valid Dockerfile commands.
+*   This snippet is inserted after the ispawn-generated Dockerfile during the build process.
+*   Allows installation of additional system packages (e.g LDAP libraries) or other build-time modifications.</p>
+<p><em>Example ``custom.dockerfile``:</em></p>
+<div class="highlight-dockerfile notranslate"><div class="highlight"><pre><span></span><span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>custom-package<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>another-package
+</pre></div>
+</div>
+</li>
+<li><p><strong>Entrypoint Script</strong> (<code class="docutils literal notranslate"><span class="pre">--entrypoint-chunk-path</span></code>):
+*   A shell script.
+*   This script is executed as part of the spawn’s entrypoint when the spawn starts.
+*   Useful for performing runtime configuration or setup tasks (e.g., LDAP user config).</p>
+<p><em>Example ``startup.sh``:</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Configuring system at runtime...&quot;</span>
+custom-setup-command
+</pre></div>
+</div>
+</li>
+</ul>
+<p>To apply these during setup:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>setup<span class="w"> </span>--env-chunk-path<span class="w"> </span>env.txt<span class="w"> </span>--dockerfile-chunk-path<span class="w"> </span>custom.dockerfile<span class="w"> </span>--entrypoint-chunk-path<span class="w"> </span>startup.sh
 </pre></div>
 </div>
 </section>
-<section id="running-containers">
-<h2>Running Containers<a class="headerlink" href="#running-containers" title="Link to this heading">#</a></h2>
-<p>To run a container with the built image:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>run<span class="w"> </span>-n<span class="w"> </span>my-container<span class="w"> </span>-b<span class="w"> </span>ispawn/ubuntu:22.04<span class="w"> </span>-v<span class="w"> </span>/path/to/data
+<section id="access-control">
+<h2>Access Control<a class="headerlink" href="#access-control" title="Link to this heading">#</a></h2>
+<section id="rstudio-group-access">
+<h3>RStudio Group Access<a class="headerlink" href="#rstudio-group-access" title="Link to this heading">#</a></h3>
+<p>Access to the RStudio service can be restricted to members of a specific system group.</p>
+<ul class="simple">
+<li><p>By default, only the user who runs the <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">run</span></code> command can access the RStudio instance within the spawn.</p></li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">--group</span> <span class="pre">&lt;group_name&gt;</span></code> option with <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">run</span></code> to specify a group whose members should be granted access.</p></li>
+<li><p>Users attempting to log in to RStudio must belong to this group <em>within the spawn’s environment</em>. This often mirrors the host system’s groups if user IDs are mapped correctly.</p></li>
+</ul>
+<p>Example restricting access to the <code class="docutils literal notranslate"><span class="pre">data-scientists</span></code> group:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>analysis<span class="w"> </span>--base<span class="w"> </span>ubuntu:22.04<span class="w"> </span>--group<span class="w"> </span>data-scientists
 </pre></div>
 </div>
 </section>
-<section id="managing-containers">
-<h2>Managing Containers<a class="headerlink" href="#managing-containers" title="Link to this heading">#</a></h2>
-<p>List running containers:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>list
+</section>
+<section id="data-persistence">
+<h2>Data Persistence<a class="headerlink" href="#data-persistence" title="Link to this heading">#</a></h2>
+<p>ispawn ensures that user data and configurations for each service within a spawn persist across spawn restarts and removals. It achieves this by mounting specific host directories into the spawn at the correct locations.</p>
+<section id="service-specific-volumes">
+<h3>Service-Specific Volumes<a class="headerlink" href="#service-specific-volumes" title="Link to this heading">#</a></h3>
+<p>Each service has designated directories within the spawn that are backed by volumes on the host machine:</p>
+<ol class="arabic simple">
+<li><p><strong>RStudio</strong>: <code class="docutils literal notranslate"><span class="pre">~/.local/share/rstudio</span></code> (stores settings, history, etc.)</p></li>
+<li><p><strong>Jupyter</strong>: <code class="docutils literal notranslate"><span class="pre">~/.jupyter</span></code> (config), <code class="docutils literal notranslate"><span class="pre">~/.ipython</span></code> (history, profiles)</p></li>
+<li><p><strong>VSCode</strong>: <code class="docutils literal notranslate"><span class="pre">~/.vscode</span></code> (settings), <code class="docutils literal notranslate"><span class="pre">~/.config/Code</span></code> (extensions, state)</p></li>
+</ol>
+</section>
+<section id="volume-organization-on-host">
+<h3>Volume Organization on Host<a class="headerlink" href="#volume-organization-on-host" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>ispawn manages these volumes within its configuration directory (e.g., <code class="docutils literal notranslate"><span class="pre">~/.ispawn/user/ispawn/volumes/</span></code>).</p></li>
+<li><p>Each spawn run gets its own dedicated subdirectory under <code class="docutils literal notranslate"><span class="pre">volumes/</span></code>, named after the spawn run name (e.g., <code class="docutils literal notranslate"><span class="pre">mydev/</span></code>).</p></li>
+<li><p>Inside the spawn run’s directory, service-specific data is further isolated (e.g., <code class="docutils literal notranslate"><span class="pre">mydev/rstudio/share/</span></code>, <code class="docutils literal notranslate"><span class="pre">mydev/jupyter/jupyter/</span></code>).</p></li>
+<li><p>This structure ensures data isolation between services of distrinct spawn runs.</p></li>
+</ul>
+<p><em>Example host directory structure:</em></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>~/.ispawn/user/ispawn/volumes/
+└── mydev/
+    ├── rstudio/
+    │   └── share/        # Maps to ~/.local/share/rstudio in spawn
+    ├── jupyter/
+    │   ├── jupyter/      # Maps to ~/.jupyter in spawn
+    │   └── ipython/      # Maps to ~/.ipython in spawn
+    └── vscode/
+        ├── vscode/       # Maps to ~/.vscode in spawn
+        └── config/       # Maps to ~/.config/Code in spawn
 </pre></div>
 </div>
-<p>Stop a container:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>stop<span class="w"> </span>my-container
+<p>Data persists even if the spawn run is stopped and removed (using <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">stop</span></code> and <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">remove</span></code>). A new spawn started with the same name will reuse the existing volume directory.</p>
+</section>
+</section>
+<section id="managing-spawns-images-and-runs">
+<h2>Managing Spawns images and runs<a class="headerlink" href="#managing-spawns-images-and-runs" title="Link to this heading">#</a></h2>
+<p>List started spawn run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># List running spawns</span>
+ispawn<span class="w"> </span>list
 </pre></div>
 </div>
-<p>Remove a container:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>remove<span class="w"> </span>my-container
+<ul class="simple">
+<li><p>List all spawns (including stopped ones)</p></li>
+</ul>
+<p>Stop a running spawn:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>stop<span class="w"> </span>ispawn-mydev
+</pre></div>
+</div>
+<p>Remove a stopped spawn (associated volumes are kept):</p>
+<p>..note:: The prefix is needed here (what is expected is the container name/not the spawn name).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>remove<span class="w"> </span>ispawn-mydev
+
+<span class="c1"># Remove all stopped spawns</span>
+ispawn<span class="w"> </span>remove<span class="w"> </span>--all
 </pre></div>
 </div>
 </section>
-<section id="managing-images">
-<h2>Managing Images<a class="headerlink" href="#managing-images" title="Link to this heading">#</a></h2>
-<p>List available images:</p>
+<section id="managing-spawn-images">
+<h2>Managing Spawn Images<a class="headerlink" href="#managing-spawn-images" title="Link to this heading">#</a></h2>
+<p>List ispawn-managed Docker images (the enriched images used for spawns):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>image<span class="w"> </span>list
 </pre></div>
 </div>
-<p>Remove an image:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>image<span class="w"> </span>remove<span class="w"> </span>ispawn/ubuntu:22.04
+<p>Remove an ispawn-managed image (specify by tag or ID):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>image<span class="w"> </span>remove<span class="w"> </span>ispawn-ubuntu:22.04_vscode_rstudio_jupyter
 </pre></div>
 </div>
 </section>
@@ -469,11 +635,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="cli.html"
+       href="troubleshooting.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Command Line Interface</p>
+        <p class="prev-next-title">Troubleshooting</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -497,10 +663,20 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-images">Building Images</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-containers">Running Containers</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-containers">Managing Containers</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-images">Managing Images</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">Quick Start</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-spawn-images-explicitly">Building Spawn Images Explicitly</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-customization">Build Customization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#access-control">Access Control</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rstudio-group-access">RStudio Group Access</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-persistence">Data Persistence</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#service-specific-volumes">Service-Specific Volumes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#volume-organization-on-host">Volume Organization on Host</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-spawns-images-and-runs">Managing Spawns images and runs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-spawn-images">Managing Spawn Images</a></li>
 </ul>
   </nav></div>
 
