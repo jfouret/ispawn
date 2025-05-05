@@ -17,18 +17,19 @@ This will create configuration files, typically in ``~/.ispawn`` (user mode) or 
 Quick Start
 -----------
 
-1.  **Run a container** with default services (VSCode, RStudio, Jupyter):
+1.  **Run a spawn** with default services (VSCode, RStudio, Jupyter):
 
     .. code-block:: bash
 
        ispawn run --name mydev --base ubuntu:22.04 --build
 
-    *   ``--name mydev``: Assigns a name to your container.
-    *   ``--base ubuntu:22.04``: Specifies the base Docker image to use. ispawn will build a new image on top of this, adding the requested services. If an image like ``ispawn/ubuntu:22.04`` doesn't exist locally, it will be built automatically.
+    *   ``--name mydev``: Assigns a unique name to your spawn run.
+    *   ``--base ubuntu:22.04``: Specifies the base Docker image. ispawn looks for an existing spawn image (e.g., ``ispawn-ubuntu:22.04_vscode_rstudio_jupyter``) and runs it if available.
+    *   ``--build``: If the required spawn image (e.g., ``ispawn-ubuntu:22.04_vscode_rstudio_jupyter``) doesn't exist, build it automatically before running the spawn.
 
 2.  **Access your services** through your browser:
 
-    ispawn uses a Traefik reverse proxy to provide secure HTTPS access to services via subdomains based on the container name. By default, these are under ``.ispawn.localhost``.
+    ispawn uses a Traefik reverse proxy to provide secure HTTPS access to services via subdomains based on the spawn run name and sevices. By default, these are under ``.ispawn.localhost``.
 
     *   VSCode:   ``https://mydev-vscode.ispawn.localhost``
     *   RStudio:  ``https://mydev-rstudio.ispawn.localhost``
@@ -36,22 +37,22 @@ Quick Start
 
     You might need to accept self-signed certificates the first time you connect.
 
-Building Images Explicitly
---------------------------
+Building Spawn Images Explicitly
+--------------------------------
 
-While ``ispawn run`` can build images implicitly using the ``--build`` flag, you can also build them explicitly using ``ispawn build``. This is useful for pre-building images or customizing the included services.
+While ``ispawn run`` can build spawn images implicitly using the ``--build`` flag, you can also build them explicitly using ``ispawn build``. This is useful for pre-building images or customizing the included services.
 
 .. code-block:: bash
 
    # Build an image based on ubuntu:22.04 with only RStudio and JupyterLab
-   ispawn build --base ubuntu:22.04 --services rstudio jupyterlab
+   ispawn build --base ubuntu:22.04 --service rstudio --service jupyterlab
 
-   # Run a container using the pre-built image
-   ispawn run --name analysis-env --base ubuntu:22.04 --services rstudio jupyterlab
+   # Run a spawn using the pre-built image
+   ispawn run --name analysis-env --base ubuntu:22.04 --service rstudio --service jupyterlab
 
 .. note::
-   Image are specifically build for each combination of services with a base image. 
-   This means that if you build a base image with RStudio and JupyterLab, and then try to run a container with only RStudio, it will not work (or be rebuilt with the flag ``--build``). 
+   Spawn Images are specifically built for each unique combination of a base image and selected services.
+   This means if you build an image with RStudio and JupyterLab, you cannot directly run a spawn requesting only RStudio from that *exact* image. You would need to either build a new image specifically for RStudio or use the ``--build`` flag with ``ispawn run`` to create it on the fly.
 
 Build Customization
 -------------------
@@ -60,7 +61,7 @@ You can customize how images are built by providing additional files during the 
 
 *   **Environment File** (``--env-chunk-path``):
     *   A file containing environment variables (e.g., ``KEY=value`` pairs).
-    *   These variables are added to ``/etc/environment`` within all built containers.
+    *   These variables are added to ``/etc/environment`` within all built spawn images.
     *   Useful for setting global environment variables like proxy settings.
 
     *Example ``env.txt``:*
@@ -85,8 +86,8 @@ You can customize how images are built by providing additional files during the 
 
 *   **Entrypoint Script** (``--entrypoint-chunk-path``):
     *   A shell script.
-    *   This script is executed as part of the container's entrypoint when the container starts.
-    *   Useful for performing runtime configuration or setup tasks (e.g LDPA user config).
+    *   This script is executed as part of the spawn's entrypoint when the spawn starts.
+    *   Useful for performing runtime configuration or setup tasks (e.g., LDAP user config).
 
     *Example ``startup.sh``:*
 
@@ -110,9 +111,9 @@ RStudio Group Access
 
 Access to the RStudio service can be restricted to members of a specific system group.
 
-*   By default, only the user who runs the ``ispawn run`` command can access the RStudio instance within the container.
+*   By default, only the user who runs the ``ispawn run`` command can access the RStudio instance within the spawn.
 *   Use the ``--group <group_name>`` option with ``ispawn run`` to specify a group whose members should be granted access.
-*   Users attempting to log in to RStudio must belong to this group *within the container's environment*. This often mirrors the host system's groups if user IDs are mapped correctly.
+*   Users attempting to log in to RStudio must belong to this group *within the spawn's environment*. This often mirrors the host system's groups if user IDs are mapped correctly.
 
 Example restricting access to the ``data-scientists`` group:
 
@@ -123,34 +124,24 @@ Example restricting access to the ``data-scientists`` group:
 Data Persistence
 ----------------
 
-ispawn ensures that user data and configurations for each service within a container persist across container restarts and removals. It achieves this by mounting specific host directories into the container at the correct locations.
+ispawn ensures that user data and configurations for each service within a spawn persist across spawn restarts and removals. It achieves this by mounting specific host directories into the spawn at the correct locations.
 
 Service-Specific Volumes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Each service has designated directories within the container that are backed by volumes on the host machine:
+Each service has designated directories within the spawn that are backed by volumes on the host machine:
 
-1.  **RStudio**:
-    *   ``~/.local/share/rstudio``: Stores RStudio user settings, history, etc.
-    *   Mounted to persist user preferences and state.
-
-2.  **Jupyter**:
-    *   ``~/.jupyter``: Jupyter configuration files.
-    *   ``~/.ipython``: IPython history, profiles, and settings.
-    *   Maintains notebook settings, kernels, and history.
-
-3.  **VSCode**:
-    *   ``~/.vscode``: VSCode user settings and configurations.
-    *   ``~/.config/Code``: VSCode extensions cache and workspace state.
-    *   Preserves installed extensions, UI state, and user preferences.
+1.  **RStudio**: ``~/.local/share/rstudio`` (stores settings, history, etc.)
+2.  **Jupyter**: ``~/.jupyter`` (config), ``~/.ipython`` (history, profiles)
+3.  **VSCode**: ``~/.vscode`` (settings), ``~/.config/Code`` (extensions, state)
 
 Volume Organization on Host
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *   ispawn manages these volumes within its configuration directory (e.g., ``~/.ispawn/user/ispawn/volumes/``).
-*   Each container gets its own dedicated subdirectory under ``volumes/``, named after the container (e.g., ``mydev/``).
-*   Inside the container's directory, service-specific data is further isolated (e.g., ``mydev/rstudio/share/``, ``mydev/jupyter/jupyter/``).
-*   This structure ensures data isolation between containers and services.
+*   Each spawn run gets its own dedicated subdirectory under ``volumes/``, named after the spawn run name (e.g., ``mydev/``).
+*   Inside the spawn run's directory, service-specific data is further isolated (e.g., ``mydev/rstudio/share/``, ``mydev/jupyter/jupyter/``).
+*   This structure ensures data isolation between services of distrinct spawn runs.
 
 *Example host directory structure:*
 
@@ -159,52 +150,56 @@ Volume Organization on Host
     ~/.ispawn/user/ispawn/volumes/
     └── mydev/
         ├── rstudio/
-        │   └── share/        # Maps to ~/.local/share/rstudio in container
+        │   └── share/        # Maps to ~/.local/share/rstudio in spawn
         ├── jupyter/
-        │   ├── jupyter/      # Maps to ~/.jupyter in container
-        │   └── ipython/      # Maps to ~/.ipython in container
+        │   ├── jupyter/      # Maps to ~/.jupyter in spawn
+        │   └── ipython/      # Maps to ~/.ipython in spawn
         └── vscode/
-            ├── vscode/       # Maps to ~/.vscode in container
-            └── config/       # Maps to ~/.config/Code in container
+            ├── vscode/       # Maps to ~/.vscode in spawn
+            └── config/       # Maps to ~/.config/Code in spawn
 
-Data persists even if the container is stopped and removed (using ``ispawn stop`` and ``ispawn remove``). A new container started with the same name will reuse the existing volume directory.
+Data persists even if the spawn run is stopped and removed (using ``ispawn stop`` and ``ispawn remove``). A new spawn started with the same name will reuse the existing volume directory.
 
-Managing Containers
--------------------
+Managing Spawns images and runs
+-------------------------------
 
-List running or all ispawn containers:
+List started spawn run:
 
 .. code-block:: bash
 
-   # List running containers
+   # List running spawns
    ispawn list
 
-   # List all containers (including stopped)
-   ispawn list --all
+* List all spawns (including stopped ones)
 
-Stop a running container:
-
-.. code-block:: bash
-
-   ispawn stop mydev
-
-Remove a stopped container (associated volumes are kept unless ``--remove-volumes`` is used):
+Stop a running spawn:
 
 .. code-block:: bash
 
-   ispawn remove mydev
+   ispawn stop ispawn-mydev
 
-Managing Images
----------------
+Remove a stopped spawn (associated volumes are kept):
 
-List ispawn-managed Docker images:
+..note:: The prefix is needed here (what is expected is the container name/not the spawn name).
+
+.. code-block:: bash
+
+   ispawn remove ispawn-mydev
+
+   # Remove all stopped spawns
+   ispawn remove --all
+
+Managing Spawn Images
+---------------------
+
+List ispawn-managed Docker images (the enriched images used for spawns):
 
 .. code-block:: bash
 
    ispawn image list
 
-Remove an ispawn-managed image:
+Remove an ispawn-managed image (specify by tag or ID):
 
 .. code-block:: bash
 
-   ispawn image remove ispawn/ubuntu:22.04_vscode_rstudio_jupyter
+   ispawn image remove ispawn-ubuntu:22.04_vscode_rstudio_jupyter

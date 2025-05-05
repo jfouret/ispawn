@@ -63,10 +63,17 @@ def parse_volumes(volumes, mnt):
 @click.pass_context
 def cli(ctx, force, user):
     """
-    ispawn: A tool to manage containerized development environments.
+    ispawn: Manage development environments as 'spawns'.
 
-    Provides commands to set up the environment, build images, and run/manage
-    containers with services like VSCode, RStudio, and Jupyter.
+    A spawn combines a base Docker image with selected services (e.g., VSCode,
+    RStudio, Jupyter) into a ready-to-run, containerized environment accessible
+    via HTTPS.
+
+    This tool provides commands to:
+    - Set up the ispawn environment (networking, proxy).
+    - Build enriched 'spawn images' from a base image and services.
+    - Run, list, stop, and remove 'spawn runs' (running instances).
+    - Manage the underlying spawn images.
     """
     ctx.obj = {"force": force, "user": user}
     config = Config.load(user_mode=user)
@@ -238,11 +245,12 @@ def setup(ctx, **kwargs):
 @click.pass_context
 def build(ctx, **kwargs):
     """
-    Build a custom Docker image with specified services.
+    Build a reusable 'spawn image' with specified services.
 
-    Constructs a Docker image based on the provided base image, incorporating
-    selected services and applying any global build customizations defined
-    during 'ispawn setup'.
+    Constructs an enriched Docker image based on the provided base image,
+    incorporating selected services and applying any global build customizations
+    defined during 'ispawn setup'. This image can then be used to quickly
+    launch 'spawn runs'.
     """
     # Set default services if none specified
     if "services" not in kwargs.keys():
@@ -257,14 +265,14 @@ def build(ctx, **kwargs):
 
 @cli.group()
 def image():
-    """Commands for managing ispawn Docker images."""
+    """Commands for managing ispawn 'spawn images'."""
     pass
 
 
 @image.command(name="list")
 @click.pass_context
 def list_cmd(ctx):
-    """List ispawn-related Docker images."""
+    """List ispawn-related 'spawn images'."""
     im = ImageService(ctx.obj["config"])
     images = im.list_images()
     table = tabulate(
@@ -290,9 +298,9 @@ def list_cmd(ctx):
 @click.pass_context
 def remove(ctx, images: List[str], all: bool):
     """
-    Remove one or more ispawn Docker images.
+    Remove one or more ispawn 'spawn images'.
 
-    You can specify images by their ID or tag.
+    You can specify images by their ID or tag (e.g., ispawn-ubuntu:22.04_...).
     """
     im = ImageService(ctx.obj["config"])
     for digest in images:
@@ -304,18 +312,18 @@ def remove(ctx, images: List[str], all: bool):
 
 @cli.command()
 @click.option(
-    "-n", "--name", required=True, help="Unique name for the container."
+    "-n", "--name", required=True, help="Unique name for the 'spawn run'."
 )
 @click.option(
     "-b",
     "--base",
     required=True,
-    help="Base Docker image tag to use (e.g., 'ubuntu:22.04').",
+    help="Base Docker image tag for the spawn (e.g., 'ubuntu:22.04').",
 )
 @click.option(
     "--build",
     is_flag=True,
-    help="Build the required image automatically if it doesn't exist.",
+    help="Build the required 'spawn image' automatically if it doesn't exist.",
 )
 @click.option(
     "-s",
@@ -324,7 +332,7 @@ def remove(ctx, images: List[str], all: bool):
     multiple=True,
     type=click.Choice([s.value for s in Service], case_sensitive=False),
     help=(
-        "Specify services to run in the container. Can be used multiple times. "
+        "Specify services to include in the spawn run. Can be used multiple times. "
         "Available: " + ", ".join([s.value for s in Service]) + ". "
         "Defaults to vscode, rstudio, jupyter if none are specified."
     ),
@@ -335,7 +343,7 @@ def remove(ctx, images: List[str], all: bool):
     "volumes",
     multiple=True,
     help=(
-        "Mount a host directory into the container. "
+        "Mount a host directory into the spawn run. "
         "Format: 'host_path:container_path[:ro]'. Can be used multiple times."
     ),
 )
@@ -343,21 +351,21 @@ def remove(ctx, images: List[str], all: bool):
     "-g",
     "--group",
     help=(
-        "Restrict RStudio access to users belonging to this group. "
+        "Restrict RStudio access to users belonging to this group within the spawn run. "
         "Defaults to the primary group of the specified user."
     ),
 )
 @click.option(
     "--user",
     help=(
-        "Username or UID to run the container processes as. "
+        "Username or UID to run the spawn run processes as. "
         "Defaults to the current user."
     ),
 )
 @click.option(
     "--no-sudo",
     is_flag=True,
-    help="Disable sudo privileges for the user inside the container.",
+    help="Disable sudo privileges for the user inside the spawn run.",
 )
 @click.pass_context
 def run(
@@ -372,11 +380,12 @@ def run(
     no_sudo: bool,
 ):
     """
-    Create and run a new development container.
+    Create and run a new 'spawn run' (a container instance).
 
-    Launches a container based on the specified image, running the selected
-    services (VSCode, RStudio, Jupyter by default). Configures networking,
-    volumes, and user access according to options and global settings.
+    Launches a container instance (a 'spawn run') based on the specified base
+    image and services. If the corresponding 'spawn image' doesn't exist,
+    it can be built automatically using --build. Configures networking,
+    volumes, and user access.
     """
     try:
         # Parse volumes
@@ -424,7 +433,7 @@ def run(
         container = container_service.run_container(
             container_config, force=ctx.obj["force"]
         )
-        click.echo(f"Container {container.name} started successfully")
+        click.echo(f"Spawn run's container '{container.name}' started successfully")
 
         # Display service URLs
         click.echo("\nService URLs:")
@@ -440,12 +449,14 @@ def run(
 @cli.command(name="list")
 @click.pass_context
 def list_containers(ctx):
-    """List currently running ispawn containers."""
+    """List running and stopped ispawn 'spawn runs' (containers)."""
     try:
         container_service = ContainerService(ctx.obj["config"])
-        containers = container_service.list_containers()
+        # Assuming list_containers() actually lists all relevant containers (running/stopped)
+        # Need modification in ContainerService.list_containers to return labels
+        containers = container_service.list_containers(all_containers=True) # Fetch all
         if not containers:
-            click.echo("No containers found")
+            click.echo("No ispawn spawn runs found.")
             return
         table = tabulate(
             [
@@ -468,18 +479,19 @@ def list_containers(ctx):
 
 @cli.command(name="stop")
 @click.argument("containers", nargs=-1, metavar="CONTAINER_NAME_OR_ID")
-@click.option("--all", is_flag=True, help="Stop all running ispawn containers.")
+@click.option("--all", is_flag=True, help="Stop all running ispawn spawn runs.")
 @click.option(
     "--remove",
     is_flag=True,
-    help="Remove the container(s) after stopping them.",
+    help="Remove the spawn run(s) associated container(s) after stopping.",
 )
 @click.pass_context
 def stop(ctx, containers, all, remove):
     """
-    Stop one or more running ispawn containers.
+    Stop one or more running 'spawn runs' (containers).
 
-    You can specify containers by their name or ID.
+    Specify spawn runs by the name given during 'run' or by container ID.
+    Note: Internally, this operates on container names/IDs.
     """
     container_service = ContainerService(ctx.obj["config"])
     if all:
@@ -495,16 +507,16 @@ def stop(ctx, containers, all, remove):
 @cli.command(name="remove")
 @click.argument("containers", nargs=-1, metavar="CONTAINER_NAME_OR_ID")
 @click.option(
-    "--all", is_flag=True, help="Remove all stopped ispawn containers."
+    "--all", is_flag=True, help="Remove all stopped ispawn spawn runs containers."
 )
 @click.pass_context
 def remove_container(ctx, containers, all):
     """
-    Remove one or more stopped ispawn containers.
+    Remove one or more stopped 'spawn runs' (containers).
 
-    Containers must be stopped before they can be removed, unless --force is
-    used.
-    You can specify containers by their name or ID.
+    Specify spawn runs by the name given during 'run' or by container ID.
+    Containers must be stopped first unless --force is used.
+    Note: Internally, this operates on container names/IDs.
     """
     container_service = ContainerService(ctx.obj["config"])
     if all:
@@ -519,10 +531,10 @@ def remove_container(ctx, containers, all):
 @click.pass_context
 def status(ctx):
     """
-    Show the current project status.
+    Show the current ispawn status.
 
-    Displays the current configuration settings, running containers,
-    and checks if the Traefik proxy container is running.
+    Displays configuration, checks Traefik proxy status, and lists
+    running/stopped 'spawn runs' (containers).
     """
     config = ctx.obj["config"]
     container_service = ContainerService(config)
