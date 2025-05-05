@@ -1,5 +1,5 @@
-CLI
-===
+CLI Reference
+=============
 
 ispawn provides a command-line interface for building and managing Docker containers with multiple services.
 

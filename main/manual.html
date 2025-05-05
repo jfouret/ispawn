@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Troubleshooting &#8212; ispawn 0.2.15 documentation</title>
+    <title>Manual &#8212; ispawn 0.2.15 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
     <script src="_static/documentation_options.js?v=d5b904a0"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'troubleshooting';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'manual';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jfouret.github.io/ispawn/switcher.json';
@@ -51,8 +51,8 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Contributing to ispawn" href="contributing.html" />
-    <link rel="prev" title="Usage" href="usage.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="ispawn: Interactive Spawn Manager" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.2.15" />
@@ -132,7 +132,7 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="manual.html">
+  <a class="nav-link nav-internal" href="#">
     Manual
   </a>
 </li>
@@ -253,7 +253,7 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="manual.html">
+  <a class="nav-link nav-internal" href="#">
     Manual
   </a>
 </li>
@@ -328,10 +328,10 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ispawn</a></li>
 </ul>
 </div>
@@ -373,10 +373,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="manual.html" class="nav-link">Manual</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Troubleshooting</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Manual</span></li>
   </ul>
 </nav>
 </div>
@@ -393,38 +390,45 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="troubleshooting">
-<span id="id1"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h1>
-<section id="common-issues">
-<h2>Common Issues<a class="headerlink" href="#common-issues" title="Link to this heading">#</a></h2>
-<ol class="arabic simple">
-<li><p><strong>Certificate Errors</strong>
-*   For local development, ensure your system trusts the generated certificates.
-*   For remote access, verify your SSL certificates are valid.</p></li>
-<li><p><strong>Port Conflicts</strong>
-*   Ensure ports 80/443 are available for traefik.
-*   Check for other services using required ports.</p></li>
-<li><p><strong>Container Access</strong>
-*   Verify the container is running with <code class="docutils literal notranslate"><span class="pre">ispawn</span> <span class="pre">list</span></code>.
-*   Check your <code class="docutils literal notranslate"><span class="pre">/etc/hosts</span></code> file has the correct entries.
-*   Ensure your browser accepts the SSL certificates.</p></li>
-<li><p><strong>RStudio Access Denied</strong>
-*   Verify you belong to the required group if <code class="docutils literal notranslate"><span class="pre">--group</span></code> was used.
-*   Check the group name matches exactly.
-*   Use the <code class="docutils literal notranslate"><span class="pre">groups</span></code> command in the container or host to list your groups.</p></li>
-<li><p><strong>Data Persistence Issues</strong>
-*   Check volume directory permissions (typically in <code class="docutils literal notranslate"><span class="pre">~/.ispawn/user/ispawn/volumes/</span></code>).
-*   Verify service-specific subdirectories exist within the container’s volume directory.
-*   Ensure proper overlay mounting order (ispawn handles this internally).</p></li>
-</ol>
-</section>
-<section id="getting-help">
-<h2>Getting Help<a class="headerlink" href="#getting-help" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Check the <a class="reference external" href="https://github.com/jfouret/ispawn/issues">GitHub Issues</a> for known problems or to report a new one.</p></li>
-<li><p>For development-related questions, see the <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing to ispawn</span></a> guide.</p></li>
+  <section id="manual">
+<span id="id1"></span><h1>Manual<a class="headerlink" href="#manual" title="Link to this heading">#</a></h1>
+<p>This section provides a comprehensive guide to using ispawn, covering installation, usage, troubleshooting, and how to contribute to the project.</p>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#from-github-recommended">From GitHub (Recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#from-source">From Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#requirements">Requirements</a></li>
 </ul>
-</section>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#building-spawn-images-explicitly">Building Spawn Images Explicitly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#build-customization">Build Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#access-control">Access Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#data-persistence">Data Persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#managing-spawns-images-and-runs">Managing Spawns images and runs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#managing-spawn-images">Managing Spawn Images</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#getting-help">Getting Help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ispawn</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#development-setup">Development Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#contributing-guidelines">Contributing Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#building-the-documentation-locally">Building the Documentation Locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#license">License</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </section>
 
 
@@ -438,20 +442,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="usage.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Usage</p>
+        <p class="prev-next-title">ispawn: Interactive Spawn Manager</p>
       </div>
     </a>
     <a class="right-next"
-       href="contributing.html"
+       href="installation.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Contributing to ispawn</p>
+        <p class="prev-next-title">Installation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -467,23 +471,10 @@
 
 
   <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-issues">Common Issues</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-help">Getting Help</a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/troubleshooting.rst.txt"
+      <li><a href="_sources/manual.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>
