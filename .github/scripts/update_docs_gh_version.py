@@ -15,30 +15,35 @@ import sys
 def verify_version_match(version, project_root):
     """
     Verify that the version matches the version in pyproject.toml.
-    
+
     Args:
         version: Version string from the git tag (e.g., "0.2.15")
         project_root: Path to the project root directory
-        
+
     Returns:
         bool: True if versions match, False otherwise
     """
     # Skip verification for non-version refs (like 'main')
     if version == "main":
         return True
-        
+
     # Read version from pyproject.toml
     pyproject_path = os.path.join(project_root, "pyproject.toml")
     try:
         with open(pyproject_path, "rb") as f:
             pyproject_data = tomllib.load(f)
             toml_version = pyproject_data["project"]["version"]
-            
+
         if version != toml_version:
-            print(f"ERROR: Version mismatch! Git tag: {version}, pyproject.toml: {toml_version}")
+            print(
+                f"ERROR: Version mismatch! Git tag: {version}, "
+                f"pyproject.toml: {toml_version}"
+            )
             return False
-        
-        print(f"Version verification successful: {version} matches pyproject.toml")
+
+        print(
+            f"Version verification successful: {version} matches pyproject.toml"
+        )
         return True
     except Exception as e:
         print(f"ERROR: Failed to verify version match: {str(e)}")
@@ -89,8 +94,6 @@ def update_versions_json(site_dir, version):
     return versions_data
 
 
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="Update documentation versions for GitHub Pages deployment"
@@ -101,7 +104,7 @@ def main():
         help="Version being built (e.g., 0.2.15 or main)",
     )
     parser.add_argument(
-        "--site-dir", 
+        "--site-dir",
         help="Path to the site directory",
     )
 
@@ -122,7 +125,10 @@ def main():
     if args.site_dir:
         update_versions_json(args.site_dir, args.version)
 
-        print(f"Switcher.json for version {args.version} has been updated successfully.")
+        print(
+            f"Switcher.json for version {args.version} "
+            "has been updated successfully."
+        )
 
 
 if __name__ == "__main__":
