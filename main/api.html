@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>API Reference &#8212; ispawn 0.2.15 documentation</title>
+    <title>API Reference &#8212; ispawn 0.2.16 documentation</title>
   
   
   
@@ -38,14 +38,14 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=d5b904a0"></script>
+    <script src="_static/documentation_options.js?v=e2418eca"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jfouret.github.io/ispawn/switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.15';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.16';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -54,7 +54,7 @@
     <link rel="prev" title="CLI Reference" href="cli.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.2.15" />
+  <meta name="docsearch:version" content="0.2.16" />
   </head>
   
   
@@ -847,10 +847,22 @@ force: Force removal of the image</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Service for handling Docker operations.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.container.ContainerService.get_container_info">
+<span class="sig-name descname"><span class="pre">get_container_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService.get_container_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService.get_container_info" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ispawn.services.container.ContainerService.list_containers">
-<span class="sig-name descname"><span class="pre">list_containers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService.list_containers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService.list_containers" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">list_containers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">running</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService.list_containers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService.list_containers" title="Link to this definition">#</a></dt>
 <dd><p>List all ispawn containers.</p>
 <dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>running (bool, optional):</dt><dd><p>If True, only running containers are returned.
+If False, only stopped containers are returned.
+Defaults to None (all containers).</p>
+</dd>
+</dl>
+</dd>
 <dt>Returns:</dt><dd><p>List[Dict[str, str]]: List of container information</p>
 </dd>
 <dt>Raises:</dt><dd><p>ContainerError: If container listing fails</p>
@@ -877,6 +889,11 @@ force: Whether to force replace an existing container</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ispawn.services.container.ContainerService.start_container">
+<span class="sig-name descname"><span class="pre">start_container</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ispawn/services/container.html#ContainerService.start_container"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ispawn.services.container.ContainerService.start_container" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ispawn.services.container.ContainerService.stop_container">
@@ -1046,9 +1063,11 @@ sets up Docker network, and configures traefik.</p>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ispawn.services.container">Container Service</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService"><code class="docutils literal notranslate"><span class="pre">ContainerService</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.get_container_info"><code class="docutils literal notranslate"><span class="pre">ContainerService.get_container_info()</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.list_containers"><code class="docutils literal notranslate"><span class="pre">ContainerService.list_containers()</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.remove_container"><code class="docutils literal notranslate"><span class="pre">ContainerService.remove_container()</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.run_container"><code class="docutils literal notranslate"><span class="pre">ContainerService.run_container()</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.start_container"><code class="docutils literal notranslate"><span class="pre">ContainerService.start_container()</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn.services.container.ContainerService.stop_container"><code class="docutils literal notranslate"><span class="pre">ContainerService.stop_container()</span></code></a></li>
 </ul>
 </li>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>CLI Reference &#8212; ispawn 0.2.15 documentation</title>
+    <title>CLI Reference &#8212; ispawn 0.2.16 documentation</title>
   
   
   
@@ -38,14 +38,14 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=d5b904a0"></script>
+    <script src="_static/documentation_options.js?v=e2418eca"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'cli';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jfouret.github.io/ispawn/switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.15';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.16';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -55,7 +55,7 @@
     <link rel="prev" title="Contributing to ispawn" href="contributing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.2.15" />
+  <meta name="docsearch:version" content="0.2.16" />
   </head>
   
   
@@ -433,10 +433,10 @@ launch ‘spawn runs’.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-build-s">
 <span id="cmdoption-ispawn-build-service"></span><span class="sig-name descname"><span class="pre">-s</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--service</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;services&gt;</span></span><a class="headerlink" href="#cmdoption-ispawn-build-s" title="Link to this definition">#</a></dt>
-<dd><p>Specify services to include in the image. Can be used multiple times. Available: vscode, rstudio, jupyter, jupyterlab, jupyterhub. Defaults to rstudio and jupyterhub if none are specified.</p>
+<dd><p>Specify services to include in the image. Can be used multiple times. Available: jupyterhub, vscode, jupyterlab, jupyter, rstudio. Defaults to rstudio and jupyterhub if none are specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>vscode | rstudio | jupyter | jupyterlab | jupyterhub</p>
+<dd class="field-odd"><p>jupyterhub | vscode | jupyterlab | jupyter | rstudio</p>
 </dd>
 </dl>
 </dd></dl>
@@ -478,6 +478,20 @@ launch ‘spawn runs’.</p>
 
 </section>
 </section>
+<section id="ispawn-info">
+<h3>info<a class="headerlink" href="#ispawn-info" title="Link to this heading">#</a></h3>
+<p>Display information about a specific spawn run.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>info<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>CONTAINER_NAME_OR_ID
+</pre></div>
+</div>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-ispawn-info-arg-CONTAINER_NAME_OR_ID">
+<span class="sig-name descname"><span class="pre">CONTAINER_NAME_OR_ID</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-info-arg-CONTAINER_NAME_OR_ID" title="Link to this definition">#</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+</section>
 <section id="ispawn-list">
 <h3>list<a class="headerlink" href="#ispawn-list" title="Link to this heading">#</a></h3>
 <p>List running and stopped ispawn ‘spawn runs’ (containers).</p>
@@ -505,6 +519,28 @@ Note: Internally, this operates on container names/IDs.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-remove-arg-CONTAINER_NAME_OR_ID">
 <span class="sig-name descname"><span class="pre">CONTAINER_NAME_OR_ID</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-remove-arg-CONTAINER_NAME_OR_ID" title="Link to this definition">#</a></dt>
+<dd><p>Optional argument(s)</p>
+</dd></dl>
+
+</section>
+<section id="ispawn-restart">
+<h3>restart<a class="headerlink" href="#ispawn-restart" title="Link to this heading">#</a></h3>
+<p>Restart one or more stopped ‘spawn runs’ (containers).</p>
+<p>Specify spawn runs by the name given during ‘run’ or by container ID.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>ispawn<span class="w"> </span>restart<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>CONTAINER_NAME_OR_ID
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-ispawn-restart-a">
+<span id="cmdoption-ispawn-restart-all"></span><span class="sig-name descname"><span class="pre">-a</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--all</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-restart-a" title="Link to this definition">#</a></dt>
+<dd><p>Restart all ispawn spawn runs.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-ispawn-restart-arg-CONTAINER_NAME_OR_ID">
+<span class="sig-name descname"><span class="pre">CONTAINER_NAME_OR_ID</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-ispawn-restart-arg-CONTAINER_NAME_OR_ID" title="Link to this definition">#</a></dt>
 <dd><p>Optional argument(s)</p>
 </dd></dl>
 
@@ -541,10 +577,10 @@ volumes, and user access.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-ispawn-run-s">
 <span id="cmdoption-ispawn-run-service"></span><span class="sig-name descname"><span class="pre">-s</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--service</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;services&gt;</span></span><a class="headerlink" href="#cmdoption-ispawn-run-s" title="Link to this definition">#</a></dt>
-<dd><p>Specify services to include in the spawn run. Can be used multiple times. Available: vscode, rstudio, jupyter, jupyterlab, jupyterhub. Defaults to vscode, rstudio, jupyter if none are specified.</p>
+<dd><p>Specify services to include in the spawn run. Can be used multiple times. Available: jupyterhub, vscode, jupyterlab, jupyter, rstudio. Defaults to vscode, rstudio, jupyter if none are specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>vscode | rstudio | jupyter | jupyterlab | jupyterhub</p>
+<dd class="field-odd"><p>jupyterhub | vscode | jupyterlab | jupyter | rstudio</p>
 </dd>
 </dl>
 </dd></dl>
@@ -798,8 +834,10 @@ Note: Internally, this operates on container names/IDs.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn-image-remove">remove</a></li>
 </ul>
 </li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn-info">info</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn-list">list</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn-remove">remove</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn-restart">restart</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn-run">run</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn-setup">setup</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ispawn-status">status</a></li>
