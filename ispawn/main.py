@@ -459,7 +459,7 @@ def list_containers(ctx):
         # Assuming list_containers() actually lists all relevant containers
         # (running/stopped)
         # Need modification in ContainerService.list_containers to return labels
-        containers = container_service.list_containers(all_containers=True)
+        containers = container_service.list_containers()
         if not containers:
             click.echo("No ispawn spawn runs found.")
             return
@@ -500,7 +500,9 @@ def stop(ctx, containers, all, remove):
     """
     container_service = ContainerService(ctx.obj["config"])
     if all:
-        container_list = [c["id"] for c in container_service.list_containers()]
+        container_list = [
+            c["id"] for c in container_service.list_containers(running=True)
+        ]
     else:
         container_list = containers
     for c_id in container_list:
@@ -532,6 +534,53 @@ def remove_container(ctx, containers, all):
         container_list = containers
     for c_id in container_list:
         container_service.remove_container(c_id, ctx.obj["force"])
+
+
+@cli.command(name="restart")
+@click.argument("containers", nargs=-1, metavar="CONTAINER_NAME_OR_ID")
+@click.option("-a", "--all", is_flag=True, help="Restart all ispawn spawn runs.")
+@click.pass_context
+def restart(ctx, containers, all):
+    """
+    Restart one or more stopped 'spawn runs' (containers).
+
+    Specify spawn runs by the name given during 'run' or by container ID.
+    """
+    container_service = ContainerService(ctx.obj["config"])
+    if all:
+        container_list = [
+            c["id"] for c in container_service.list_containers(running=False)
+        ]
+    else:
+        container_list = containers
+    for c_id in container_list:
+        container_service.start_container(c_id)
+
+
+@cli.command(name="info")
+@click.argument("container_name", metavar="CONTAINER_NAME_OR_ID")
+@click.pass_context
+def info(ctx, container_name):
+    """Display information about a specific spawn run."""
+    container_service = ContainerService(ctx.obj["config"])
+    info = container_service.get_container_info(container_name)
+    if info is None:
+        click.echo(f"Container '{container_name}' not found.")
+        return
+
+    click.echo(click.style("Container Information:", fg="blue", bold=True))
+    info_table = [
+        ["Name", info["name"]],
+        ["ID", info["id"]],
+        ["Status", info["status"]],
+        ["Image", info["image"]],
+    ]
+    click.echo(tabulate(info_table, tablefmt="simple"))
+
+    if info["urls"]:
+        click.echo("\n" + click.style("Service URLs:", fg="blue", bold=True))
+        for url in info["urls"]:
+            click.echo(url)
 
 
 @cli.command(name="status")

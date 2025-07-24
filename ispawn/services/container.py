@@ -75,14 +75,21 @@ class ContainerService:
             "labels": config.get_labels(),
             "network": config.config.network_name,
             "mounts": mounts,
-            "command": "sleep infinity",
         }
 
         # Run the container
         return self.client.containers.run(**container_config)
 
-    def list_containers(self) -> List[Dict[str, str]]:
+    def list_containers(
+        self, running: bool = None
+    ) -> List[Dict[str, str]]:
         """List all ispawn containers.
+
+        Args:
+            running (bool, optional):
+                If True, only running containers are returned.
+                If False, only stopped containers are returned.
+                Defaults to None (all containers).
 
         Returns:
             List[Dict[str, str]]: List of container information
@@ -93,6 +100,11 @@ class ContainerService:
         containers = self.client.containers.list(all=True)
         result = []
         for c in containers:
+            if running is not None:
+                if running is True and c.status != "running":
+                    continue
+                if running is False and c.status == "running":
+                    continue
             if not c.name.startswith(self.config.container_name_prefix):
                 continue
             if c.name.endswith("-traefik"):
@@ -112,7 +124,7 @@ class ContainerService:
                 )
                 if router_match:
                     service_id = router_match.group(1)
-                    service_match = re.match(f"([^-]+)-{c.name}$", service_id)
+                    service_match = re.match(f"^{c.name}-(.+)$", service_id)
                     if service_match:
                         domain_match = re.search(r"Host\(`([^`]+)`\)", value)
                         if domain_match:
@@ -134,6 +146,61 @@ class ContainerService:
         container: Container = self.client.containers.get(container_id)
         container.stop()
 
+    def start_container(self, container_id: str) -> None:
+        try:
+            container: Container = self.client.containers.get(container_id)
+            if container.status == "running":
+                print(f"Warning: Container {container_id} is already running.")
+                return
+            container.start()
+        except docker.errors.NotFound:
+            print(f"Warning: Container {container_id} not found.")
+
     def remove_container(self, container_id: str, force: bool = False) -> None:
-        container: Container = self.client.containers.get(container_id)
-        container.remove(force=force)
+        try:
+            container: Container = self.client.containers.get(container_id)
+            if container.status == "running" and not force:
+                print(
+                    f"Warning: Container {container_id} is running. "
+                    "Stop it before removing."
+                )
+                return
+            container.remove(force=force)
+        except docker.errors.NotFound:
+            print(f"Warning: Container {container_id} not found.")
+
+    def get_container_info(self, container_id: str) -> Dict[str, str]:
+        try:
+            container: Container = self.client.containers.get(container_id)
+        except docker.errors.NotFound:
+            return None
+
+        try:
+            image_name = container.image.tags[0]
+        except IndexError:
+            image_name = container.attrs["Image"].split(":")[-1][:12]
+
+        # Get service URLs from Traefik labels
+        service_urls = []
+
+        for label, value in container.labels.items():
+            # Match router rule labels
+            router_match = re.match(
+                r"traefik\.http\.routers\.([^.]+)\.rule", label
+            )
+            if router_match:
+                service_id = router_match.group(1)
+                service_match = re.match(f"^{container.name}-(.+)$", service_id)
+                if service_match:
+                    domain_match = re.search(r"Host\(`([^`]+)`\)", value)
+                    if domain_match:
+                        domain = domain_match.group(1)
+                        service_urls.append(f"https://{domain}")
+
+        return {
+            "name": container.name,
+            "urls": service_urls,
+            "image": image_name,
+            "status": container.status,
+            "id": container.short_id,
+        }
