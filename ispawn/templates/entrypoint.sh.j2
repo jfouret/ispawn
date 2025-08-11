@@ -1,8 +1,38 @@
 #!/bin/bash
 set -e
 
+# Function to add a line to a file if it doesn't already exist
+add_line_if_not_exists() {
+    local line="$1"
+    local file="$2"
+    # Use grep -F to treat the line as a fixed string
+    # Use -q to suppress output
+    # Use -- to handle lines that might start with -
+    if ! grep -qF -- "$line" "$file" 2>/dev/null; then
+        echo "$line" >> "$file"
+    fi
+}
+
+# Function to rotate log files by moving them
+rotate_log() {
+    local log_file="$1"
+    if [ ! -f "$log_file" ]; then
+        return
+    fi
+
+    local i=1
+    while [ -f "${log_file}.${i}" ]; do
+        i=$((i+1))
+    done
+    echo "[$(date)] Moving old log file to ${log_file}.${i}"
+    mv "$log_file" "${log_file}.${i}"
+}
+
 export LOG_DIR=/var/log/ispawn
 mkdir -p $LOG_DIR
+
+rotate_log "${LOG_DIR}/entrypoint.log"
+
 echo "[$(date)] Starting container initialization..." > "${LOG_DIR}/entrypoint.log"
 chown $USER_UID:$USER_UID ${LOG_DIR}/entrypoint.log
 exec 1> >(tee -a "${LOG_DIR}/entrypoint.log")
@@ -31,19 +61,21 @@ if ! getent passwd "$USER_NAME" &>/dev/null; then
 fi
 
 if [ "$USER_AS_SUDO" = "1" ]; then
-    echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    add_line_if_not_exists "$USER_NAME ALL=(ALL) NOPASSWD:ALL" "/etc/sudoers"
 fi
 
-mkdir -p /var/log/ispawn/services
+mkdir -p ${LOG_DIR}/services
 chown -R $USER_NAME:$USER_NAME /var/log/ispawn/services
 {% for service in services %}
 echo "[$(date)] Starting {{ service }} service..."
-echo "" > /var/log/ispawn/services/{{ service }}.log
+rotate_log "/var/log/ispawn/services/{{ service }}.log"
+touch /var/log/ispawn/services/{{ service }}.log
 chown $USER_NAME:$USER_NAME /var/log/ispawn/services/{{ service }}.log
-bash /usr/local/bin/ispawn-entrypoint-{{ service }}.sh
+bash /usr/local/bin/ispawn-entrypoint-{{ service }}.sh >> /var/log/ispawn/services/{{ service }}.log
 echo "[$(date)] {{ service }} initiated."
 {% endfor %}
 
 chown -R $USER_UID:$USER_UID ${LOG_DIR}/services
 
 sleep infinity
+

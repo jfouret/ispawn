@@ -1,8 +1,11 @@
 import click
 from pathlib import Path
 from typing import List
+import requests
 import sys
 from tabulate import tabulate
+from urllib3.exceptions import InsecureRequestWarning
+from urllib.parse import urlparse
 
 from ispawn.domain.config import InstallMode, CertMode, ProxyMode, Config
 from ispawn.services.config import ConfigManager
@@ -463,19 +466,30 @@ def list_containers(ctx):
         if not containers:
             click.echo("No ispawn spawn runs found.")
             return
-        table = tabulate(
-            [
+        config_name = ctx.obj["config"].name
+        pattern = re.compile(f"^{re.escape(config_name)}-(?:[^-]+-)?(.+)$")
+        table_data = []
+        for container in containers:
+            ispawn_name = container["name"]  # Default to full name
+            match = pattern.match(container["name"])
+            if match:
+                ispawn_name = match.group(1)
+
+            table_data.append(
                 [
+                    ispawn_name,
                     container["name"],
                     container["id"],
                     container["status"],
                     container["image"],
                 ]
-                for container in containers
-            ],
-            headers=["NAME", "ID", "STATUS", "IMAGE"],
+            )
+        click.echo(
+            tabulate(
+                table_data,
+                headers=["ISPAWN NAME", "DOCKER NAME", "ID", "STATUS", "IMAGE"],
+            )
         )
-        click.echo(table)
 
     except Exception as e:
         click.echo(f"Error: {str(e)}", err=True)
@@ -499,12 +513,42 @@ def stop(ctx, containers, all, remove):
     Note: Internally, this operates on container names/IDs.
     """
     container_service = ContainerService(ctx.obj["config"])
+    container_list = []
     if all:
         container_list = [
             c["id"] for c in container_service.list_containers(running=True)
         ]
-    else:
-        container_list = containers
+    elif containers:
+        all_ispawn_containers = container_service.list_containers(running=True)
+        config_name = ctx.obj["config"].name
+        pattern = re.compile(f"^{re.escape(config_name)}-(?:[^-]+-)?(.+)$")
+        resolved_ids = set()
+
+        for name_or_id in containers:
+            found = []
+            for c in all_ispawn_containers:
+                match = pattern.match(c["name"])
+                ispawn_name = match.group(1) if match else None
+                if (
+                    c["id"].startswith(name_or_id)
+                    or c["name"] == name_or_id
+                    or ispawn_name == name_or_id
+                ):
+                    found.append(c)
+
+            if not found:
+                click.echo(f"Error: Container '{name_or_id}' not found.", err=True)
+                continue
+            unique_ids = {f["id"] for f in found}
+            if len(unique_ids) > 1:
+                click.echo(
+                    f"Error: Ambiguous name '{name_or_id}' matches multiple containers. Please use a unique ID.",
+                    err=True,
+                )
+                continue
+            resolved_ids.add(list(unique_ids)[0])
+        container_list = list(resolved_ids)
+
     for c_id in container_list:
         container_service.stop_container(c_id)
         if remove:
@@ -528,10 +572,40 @@ def remove_container(ctx, containers, all):
     Note: Internally, this operates on container names/IDs.
     """
     container_service = ContainerService(ctx.obj["config"])
+    container_list = []
     if all:
-        container_list = [c["id"] for c in container_service.list_containers()]
-    else:
-        container_list = containers
+        container_list = [c["id"] for c in container_service.list_containers(running=False)]
+    elif containers:
+        all_ispawn_containers = container_service.list_containers(running=False)
+        config_name = ctx.obj["config"].name
+        pattern = re.compile(f"^{re.escape(config_name)}-(?:[^-]+-)?(.+)$")
+        resolved_ids = set()
+
+        for name_or_id in containers:
+            found = []
+            for c in all_ispawn_containers:
+                match = pattern.match(c["name"])
+                ispawn_name = match.group(1) if match else None
+                if (
+                    c["id"].startswith(name_or_id)
+                    or c["name"] == name_or_id
+                    or ispawn_name == name_or_id
+                ):
+                    found.append(c)
+
+            if not found:
+                click.echo(f"Error: Container '{name_or_id}' not found.", err=True)
+                continue
+            unique_ids = {f["id"] for f in found}
+            if len(unique_ids) > 1:
+                click.echo(
+                    f"Error: Ambiguous name '{name_or_id}' matches multiple containers. Please use a unique ID.",
+                    err=True,
+                )
+                continue
+            resolved_ids.add(list(unique_ids)[0])
+        container_list = list(resolved_ids)
+
     for c_id in container_list:
         container_service.remove_container(c_id, ctx.obj["force"])
 
@@ -547,12 +621,42 @@ def restart(ctx, containers, all):
     Specify spawn runs by the name given during 'run' or by container ID.
     """
     container_service = ContainerService(ctx.obj["config"])
+    container_list = []
     if all:
         container_list = [
             c["id"] for c in container_service.list_containers(running=False)
         ]
-    else:
-        container_list = containers
+    elif containers:
+        all_ispawn_containers = container_service.list_containers(running=False)
+        config_name = ctx.obj["config"].name
+        pattern = re.compile(f"^{re.escape(config_name)}-(?:[^-]+-)?(.+)$")
+        resolved_ids = set()
+
+        for name_or_id in containers:
+            found = []
+            for c in all_ispawn_containers:
+                match = pattern.match(c["name"])
+                ispawn_name = match.group(1) if match else None
+                if (
+                    c["id"].startswith(name_or_id)
+                    or c["name"] == name_or_id
+                    or ispawn_name == name_or_id
+                ):
+                    found.append(c)
+
+            if not found:
+                click.echo(f"Error: Container '{name_or_id}' not found.", err=True)
+                continue
+            unique_ids = {f["id"] for f in found}
+            if len(unique_ids) > 1:
+                click.echo(
+                    f"Error: Ambiguous name '{name_or_id}' matches multiple containers. Please use a unique ID.",
+                    err=True,
+                )
+                continue
+            resolved_ids.add(list(unique_ids)[0])
+        container_list = list(resolved_ids)
+
     for c_id in container_list:
         container_service.start_container(c_id)
 
@@ -563,10 +667,40 @@ def restart(ctx, containers, all):
 def info(ctx, container_name):
     """Display information about a specific spawn run."""
     container_service = ContainerService(ctx.obj["config"])
-    info = container_service.get_container_info(container_name)
+    resolved_id = None
+
+    all_ispawn_containers = container_service.list_containers()
+    config_name = ctx.obj["config"].name
+    pattern = re.compile(f"^{re.escape(config_name)}-(?:[^-]+-)?(.+)$")
+    found = []
+
+    for c in all_ispawn_containers:
+        match = pattern.match(c["name"])
+        ispawn_name = match.group(1) if match else None
+        if (
+            c["id"].startswith(container_name)
+            or c["name"] == container_name
+            or ispawn_name == container_name
+        ):
+            found.append(c)
+
+    if not found:
+        click.echo(f"Container '{container_name}' not found.", err=True)
+        sys.exit(1)
+    unique_ids = {f["id"] for f in found}
+    if len(unique_ids) > 1:
+        click.echo(
+            f"Error: Ambiguous name '{container_name}' matches multiple containers. Please use a unique ID.",
+            err=True,
+        )
+        sys.exit(1)
+    resolved_id = list(unique_ids)[0]
+
+    info = container_service.get_container_info(resolved_id)
     if info is None:
-        click.echo(f"Container '{container_name}' not found.")
-        return
+        # This case should ideally not be reached if the above logic is correct
+        click.echo(f"Container '{container_name}' not found.", err=True)
+        sys.exit(1)
 
     click.echo(click.style("Container Information:", fg="blue", bold=True))
     info_table = [
@@ -577,10 +711,45 @@ def info(ctx, container_name):
     ]
     click.echo(tabulate(info_table, tablefmt="simple"))
 
+    all_ok = True
     if info["urls"]:
         click.echo("\n" + click.style("Service URLs:", fg="blue", bold=True))
+        title_re = re.compile(r'<title>(.*?)</title>', re.IGNORECASE | re.DOTALL)
         for url in info["urls"]:
-            click.echo(url)
+            hostname = urlparse(url).hostname
+            verify_cert = not (hostname and hostname.endswith(".localhost"))
+            if not verify_cert:
+                requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.5',
+                    'Connection': 'keep-alive',
+                    'Upgrade-Insecure-Requests': '1',
+                }
+            try:
+                r = requests.get(
+                    url,
+                    timeout=5,
+                    allow_redirects=True,
+                    headers=headers,
+                    verify=verify_cert,
+                )
+                if r.status_code == 200:
+                    title_match = title_re.search(r.text)
+                    title = title_match.group(1).strip() if title_match else "OK"
+                    click.echo(click.style(f"  ✓ {url}", fg="green") + f" ({title})")
+                else:
+                    all_ok = False
+                    click.echo(click.style(f"  ✗ {url}", fg="red") + f" (HTTP {r.status_code})")
+            except requests.exceptions.RequestException as e:
+                all_ok = False
+                # Make the error message more concise
+                error_type = type(e).__name__.replace("Error", "").replace("Exception", "")
+                click.echo(click.style(f"  ✗ {url}", fg="red") + f" ({error_type})")
+
+    if not all_ok:
+        sys.exit(1)
 
 
 @cli.command(name="status")
@@ -708,3 +877,4 @@ def status(ctx):
         click.echo(
             click.style(f"! Error checking Traefik status: {str(e)}", fg="red")
         )
+

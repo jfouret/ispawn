@@ -21,9 +21,15 @@ c.JupyterHub.hub_connect_ip = '127.0.0.1'
 c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
 
 # Group-based authentication
-c.PAMAuthenticator.admin_groups = {'${REQUIRED_GROUP}'}
+# Grant admin rights to the users in the '${REQUIRED_GROUP}' group
+# c.PAMAuthenticator.admin_groups is not deprecated, but using roles is the recommended approach
+c.JupyterHub.load_roles = [
+    {
+        'name': 'admin',
+        'groups': ['${REQUIRED_GROUP}'],
+    }
+]
 c.PAMAuthenticator.allowed_groups = {'${REQUIRED_GROUP}'}
-
 # Spawn single-user servers with system user permissions
 c.Spawner.default_url = '/lab'  # Use JupyterLab as default interface
 # Configure environment for spawned servers
@@ -34,7 +40,7 @@ c.Spawner.environment = {
 
 # Configure spawner
 c.LocalProcessSpawner.shell_cmd = ['bash', '-l', '-c']
-c.Spawner.cmd = ['bash', '-l', '-c', 'exec jupyter lab']
+c.Spawner.cmd = ['jupyterhub-singleuser']
 c.Spawner.notebook_dir = '~'
 c.Spawner.debug = True
 EOL
@@ -49,3 +55,4 @@ else
     micromamba activate jupyterhub_ispawn && \
     jupyterhub -f /etc/jupyterhub/jupyterhub_config.py > "${LOG_DIR}/services/jupyterhub.log" 2>&1 &
 fi
+
